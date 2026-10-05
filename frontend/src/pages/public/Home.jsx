@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Icon from '../../components/ui/Icon.jsx';
 import SectionHeading from '../../components/ui/SectionHeading.jsx';
 import AsyncContent from '../../components/ui/AsyncContent.jsx';
+import HeroSlider from '../../components/ui/HeroSlider.jsx';
 import { useContent } from '../../hooks/useContent.js';
 import { assetUrl } from '../../api/client.js';
 
@@ -17,28 +18,33 @@ const campaignIcons = {
 
 export default function Home() {
   const home = useContent('home');
+  const slides = useContent('slides');
   const campaigns = useContent('campaigns');
   const networks = useContent('networks');
   const hero = home.data?.hero;
 
   return (
     <>
-      <section className="hero" style={hero ? { '--hero-image': `url("${hero.image}")` } : undefined}>
-        <div className="container hero__inner">
-          <span className="eyebrow eyebrow--light">Manila Central University Alumni</span>
-          <h1>{hero?.title || 'Join the 50,000+ Centralino graduates worldwide!'}</h1>
-          <p>{hero?.subtitle || 'Connect with your fellow Centralinos from all over the world.'}</p>
-          <div className="hero__actions">
-            <Link to="/alumni-contact-update" className="btn btn-gold btn-lg">
-              Stay Connected <Icon name="arrowRight" size={18} />
-            </Link>
-            <Link to="/alumni-contact-update#alumni-id" className="btn btn-outline-light btn-lg">
-              <Icon name="id" size={18} /> Get Alumni ID
-            </Link>
-            <Link to="/volunteer" className="btn btn-ghost-light btn-lg">Volunteer</Link>
+      {slides.data?.length ? (
+        <HeroSlider slides={slides.data} />
+      ) : (
+        <section className="hero" style={hero ? { '--hero-image': `url("${hero.image}")` } : undefined}>
+          <div className="container hero__inner">
+            <span className="eyebrow eyebrow--light">Manila Central University Alumni</span>
+            <h1>{hero?.title || 'Join the 50,000+ Centralino graduates worldwide!'}</h1>
+            <p>{hero?.subtitle || 'Connect with your fellow Centralinos from all over the world.'}</p>
+            <div className="hero__actions">
+              <Link to="/alumni-contact-update" className="btn btn-gold btn-lg">
+                Stay Connected <Icon name="arrowRight" size={18} />
+              </Link>
+              <Link to="/alumni-contact-update#alumni-id" className="btn btn-outline-light btn-lg">
+                <Icon name="id" size={18} /> Get Alumni ID
+              </Link>
+              <Link to="/volunteer" className="btn btn-ghost-light btn-lg">Volunteer</Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {home.data && (
         <div className="container">

@@ -23,6 +23,7 @@ const Login = lazy(() => import('../pages/auth/Login.jsx'));
 const M365Callback = lazy(() => import('../pages/auth/M365Callback.jsx'));
 const Dashboard = lazy(() => import('../pages/admin/Dashboard.jsx'));
 const Categories = lazy(() => import('../pages/admin/Categories.jsx'));
+const Slides = lazy(() => import('../pages/admin/Slides.jsx'));
 const Donations = lazy(() => import('../pages/admin/Donations.jsx'));
 const Scholars = lazy(() => import('../pages/admin/Scholars.jsx'));
 const AdminNetworks = lazy(() => import('../pages/admin/Networks.jsx'));
@@ -69,6 +70,7 @@ export default function AppRoutes() {
         {/* Admin panel (admin + staff) */}
         <Route path="admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
+          <Route path="slides" element={<Slides />} />
           <Route path="categories" element={<Categories />} />
           <Route path="donations" element={<Donations />} />
           <Route path="scholars" element={<Scholars />} />

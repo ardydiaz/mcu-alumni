@@ -15,7 +15,7 @@ export default function Modal({ open, title, subtitle, onClose, children, footer
   return (
     <dialog
       ref={ref}
-      className={`modal modal--${size}`}
+      className={`admin-modal admin-modal--${size}`}
       onCancel={(e) => {
         e.preventDefault();
         onClose();

@@ -7,6 +7,7 @@ export const adminNav = [
   {
     group: 'Website content',
     items: [
+      { label: 'Homepage slider', to: '/admin/slides', icon: 'image' },
       { label: 'Categories', to: '/admin/categories', icon: 'tag' },
       { label: 'Scholars', to: '/admin/scholars', icon: 'award' },
       { label: 'Networks', to: '/admin/networks', icon: 'users' },

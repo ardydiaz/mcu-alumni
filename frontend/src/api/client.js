@@ -6,6 +6,7 @@ const REFRESH_KEY = 'mcu_alumni_refresh';
 const CONTENT_ENDPOINTS = {
   site: '/content/site',
   home: '/content/home',
+  slides: '/slides?limit=20',
   give: '/content/give',
   courses: '/content/courses',
   volunteer: '/content/volunteer',

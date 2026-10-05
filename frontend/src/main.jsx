@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-// Base styles first, so page/admin stylesheets imported by components can override them.
+// Bootstrap first, then our styles so the MCU design overrides Bootstrap defaults.
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/global.css';
 import App from './App.jsx';
 

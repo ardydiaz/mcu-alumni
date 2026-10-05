@@ -18,7 +18,7 @@ export function ToastProvider({ children }) {
       {children}
       <div className="toasts" role="status" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className={`toast toast--${t.type}`}>
+          <div key={t.id} className={`admin-toast admin-toast--${t.type}`}>
             <Icon name={t.type === 'error' ? 'close' : 'check'} size={16} />
             {t.message}
           </div>

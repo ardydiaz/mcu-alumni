@@ -241,6 +241,43 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
 .hero__actions, .page-hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 
 .page-hero__inner { padding-top: 80px; padding-bottom: 80px; }
+
+/* Homepage slider (React Bootstrap Carousel) */
+.hero-slider { position: relative; background: var(--purple-900); }
+.hero-slider .carousel-item { transition-duration: 0.8s; }
+/* Same height for every slide so the page doesn't jump when slides change. */
+.hero-slider__slide { height: clamp(600px, 82vh, 720px); display: flex; align-items: center; }
+.hero-slider__slide .hero__inner { padding-top: 40px; padding-bottom: 120px; }
+/* Slider photos show in their true colors: no purple overlay or gold glow. A light,
+   colorless shade behind the text (left side only) plus a text shadow keeps white text readable. */
+.hero-slider__slide {
+  background-color: #1b1024;
+  background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.18) 45%, rgba(0, 0, 0, 0) 70%), var(--hero-image);
+}
+.hero-slider__slide::after { display: none; }
+.hero-slider__slide h1,
+.hero-slider__slide .hero-slider__title,
+.hero-slider__slide p,
+.hero-slider__slide .eyebrow { text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4); }
+.hero-slider__slide .hero__inner { width: 100%; }
+.hero-slider__title { color: #fff; max-width: 780px; font-size: clamp(2.5rem, 6vw, 4.4rem); font-weight: 800; letter-spacing: -0.02em; }
+.hero-slider .carousel-indicators { bottom: 96px; margin-bottom: 0; gap: 8px; z-index: 3; }
+.hero-slider .carousel-indicators [data-bs-target] {
+  width: 28px; height: 5px; margin: 0; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.55); opacity: 1;
+  transition: width 0.3s var(--ease), background 0.3s;
+}
+.hero-slider .carousel-indicators .active { width: 44px; background: var(--gold-500); }
+.hero-slider .carousel-control-prev,
+.hero-slider .carousel-control-next { width: 64px; opacity: 1; z-index: 3; }
+.hero-slider .carousel-control-prev-icon,
+.hero-slider .carousel-control-next-icon {
+  width: 48px; height: 48px; border-radius: 50%; background-size: 18px;
+  background-color: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(6px);
+  transition: background-color 0.2s;
+}
+.hero-slider .carousel-control-prev:hover .carousel-control-prev-icon,
+.hero-slider .carousel-control-next:hover .carousel-control-next-icon { background-color: rgba(255, 183, 54, 0.85); }
+.hero-slider .carousel-control-prev:focus-visible, .hero-slider .carousel-control-next:focus-visible { outline: 3px solid var(--gold-500); outline-offset: -6px; }
 .page-hero h1 { max-width: 820px; }
 .page-hero p { max-width: 680px; font-size: 1.12rem; color: rgba(255, 255, 255, 0.88); margin: 0; }
 
@@ -287,7 +324,7 @@ a.card:hover, .card.pillar:hover, .card.scholar:hover, .card.perk:hover, .card.n
 }
 .card--padded { padding: 36px; }
 .card--glass { background: rgba(255, 255, 255, 0.98); padding: 28px; border: 0; box-shadow: var(--shadow-lg); }
-.card--note { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--gold-100); border-color: var(--gold-200); font-size: 0.92rem; }
+.card--note { display: flex; flex-direction: row; align-items: center; gap: 10px; padding: 14px 16px; background: var(--gold-100); border-color: var(--gold-200); font-size: 0.92rem; }
 .card--stack { flex-direction: column; align-items: flex-start; gap: 4px; }
 
 .icon-badge {
@@ -455,7 +492,7 @@ a.card:hover, .card.pillar:hover, .card.scholar:hover, .card.perk:hover, .card.n
    ========================================================================== */
 .form { display: grid; gap: 18px; }
 .form fieldset { border: 0; padding: 0; margin: 0 0 8px; display: grid; gap: 16px; min-width: 0; }
-.form legend { font-weight: 800; color: var(--ink); font-size: 1rem; margin-bottom: 14px; padding: 0; }
+.form legend { float: none; width: auto; font-weight: 800; color: var(--ink); font-size: 1rem; margin-bottom: 14px; padding: 0; }
 .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .form-grid--amount { grid-template-columns: 140px 1fr; }
 .span-2 { grid-column: span 2; }
@@ -564,6 +601,10 @@ a.card:hover, .card.pillar:hover, .card.scholar:hover, .card.perk:hover, .card.n
 }
 
 @media (max-width: 820px) {
+  /* Swipe instead of arrows on small screens */
+  .hero-slider .carousel-control-prev, .hero-slider .carousel-control-next { display: none; }
+  /* Phones: fixed height tall enough for the longest title + both buttons. */
+  .hero-slider__slide { height: 680px; }
   .section { padding: 64px 0; }
   .split, .feature-row, .footer-contact__inner { grid-template-columns: 1fr; gap: 32px; }
   .feature-row--reverse .feature-row__media { order: 0; }
