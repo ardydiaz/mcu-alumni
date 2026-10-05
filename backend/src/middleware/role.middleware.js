@@ -21,6 +21,7 @@ const both = (actions) => ({ 'Super Admin': actions, Administrator: actions, Fac
 
 export const PERMISSIONS = [
   { module: 'Dashboard', ...both(['view']) },
+  { module: 'Homepage slider', ...both(MANAGE) },
   { module: 'Campaigns', ...both(MANAGE) },
   { module: 'Scholars', ...both(MANAGE) },
   { module: 'Networks', ...both(MANAGE) },

@@ -15,6 +15,7 @@ import tracerRoutes from '../../modules/tracer/tracer.routes.js';
 import volunteerRoutes from '../../modules/volunteers/volunteer.routes.js';
 import messageRoutes from '../../modules/messages/message.routes.js';
 import logRoutes from '../../modules/logs/log.routes.js';
+import slideRoutes from '../../modules/slides/slide.routes.js';
 
 const router = Router();
 
@@ -36,5 +37,6 @@ router.use('/tracer', tracerRoutes);
 router.use('/volunteers', volunteerRoutes);
 router.use('/messages', messageRoutes);
 router.use('/logs', logRoutes);
+router.use('/slides', slideRoutes);
 
 export default router;

@@ -37,7 +37,8 @@ export const validate =
     if (error) {
       const errors = {};
       for (const detail of error.details) {
-        const key = detail.path.join('.') || detail.context?.key || '_';
+        // Object-level rules can point at a field via context.field (e.g. slide buttons).
+        const key = detail.path.join('.') || detail.context?.field || detail.context?.key || '_';
         errors[key] ??= detail.message;
       }
       return next(ApiError.unprocessable(undefined, errors));
