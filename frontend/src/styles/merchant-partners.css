@@ -1,0 +1,207 @@
+/* ==========================================================================
+   Merchant Partners page. Classes are prefixed "mp-" so they can't clash with Bootstrap.
+   ========================================================================== */
+
+.mp-section { padding: 104px 0; }
+.mp-section--tinted {
+  background:
+    radial-gradient(55% 40% at 100% 0%, rgba(92, 41, 124, 0.07), transparent 70%),
+    radial-gradient(45% 35% at 0% 100%, rgba(255, 183, 54, 0.08), transparent 70%),
+    var(--surface-2);
+}
+.mp-section--cta { padding-top: 0; background: var(--surface-2); }
+
+.mp-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; margin-bottom: 16px;
+  border-radius: 999px; background: var(--purple-50); color: var(--purple-700);
+  font-size: 0.74rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.mp-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold-500); }
+
+.mp-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: 48px; align-items: end; margin-bottom: 36px; }
+.mp-heading h2 { font-size: clamp(1.9rem, 3.6vw, 2.75rem); line-height: 1.12; margin: 0; }
+.mp-heading p { margin: 0; color: var(--muted); font-size: 1.05rem; }
+
+/* ---- Banner: leave room for the card that overlaps it --------------------- */
+.mp .page-hero--glass .page-hero__inner { padding-bottom: 40px; }
+
+/* ---- How to redeem --------------------------------------------------------- */
+.mp-redeem {
+  position: relative; z-index: 3; list-style: none; margin: -52px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: var(--surface); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow-lg);
+}
+.mp-redeem li { display: flex; align-items: flex-start; gap: 16px; padding: 24px 26px; }
+.mp-redeem li + li { border-left: 1px solid var(--line); }
+.mp-redeem__icon {
+  flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; color: #fff;
+  background: linear-gradient(135deg, var(--purple-600), var(--purple-900));
+}
+.mp-redeem small { display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-700); }
+.mp-redeem strong { display: block; color: var(--ink); font-size: 1.02rem; margin: 2px 0; }
+.mp-redeem li > div span { color: var(--muted); font-size: 0.9rem; }
+
+/* ---- Alumni ID ---------------------------------------------------------- */
+.mp-id { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 72px; align-items: center; }
+.mp-id__text h2 { font-size: clamp(2rem, 3.8vw, 2.9rem); line-height: 1.1; margin: 0 0 16px; }
+.mp-id__text > p { color: var(--muted); font-size: 1.08rem; margin: 0 0 22px; }
+.mp-id__list { list-style: none; margin: 0 0 30px; padding: 0; display: grid; gap: 10px; }
+.mp-id__list li { display: flex; align-items: center; gap: 10px; color: var(--ink-2); font-weight: 500; }
+.mp-id__list svg {
+  flex: none; box-sizing: content-box; padding: 4px; border-radius: 50%; background: var(--purple-50); color: var(--purple-700);
+}
+.mp-id__media { position: relative; isolation: isolate; padding: 24px; }
+.mp-id__media::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 32px; transform: rotate(-3deg);
+  background: linear-gradient(135deg, var(--purple-100), var(--gold-100));
+}
+.mp-id__media img {
+  display: block; width: 100%; border-radius: 20px; box-shadow: var(--shadow-lg);
+  transform: rotate(2deg); transition: transform 0.5s var(--ease);
+}
+.mp-id__media:hover img { transform: rotate(0deg) scale(1.02); }
+.mp-id__badge {
+  position: absolute; left: -12px; bottom: -18px; display: flex; flex-direction: column; gap: 2px; max-width: 200px;
+  padding: 16px 20px; border-radius: 18px; color: #fff;
+  background: linear-gradient(135deg, var(--purple-700), var(--purple-900)); box-shadow: var(--shadow-lg);
+}
+.mp-id__badge strong { font-family: var(--font-display); font-size: 2rem; font-weight: 900; line-height: 1; color: var(--gold-400); }
+.mp-id__badge span { font-size: 0.86rem; color: rgba(255, 255, 255, 0.85); }
+
+/* ---- Filters --------------------------------------------------------------- */
+.mp-toolbar {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 12px; margin-bottom: 28px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow-sm);
+}
+.mp-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.mp-filter {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 0; border-radius: 999px;
+  background: transparent; color: var(--ink-2); font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.mp-filter:hover { background: var(--purple-50); color: var(--purple-700); }
+.mp-filter.is-selected { background: var(--purple-700); color: #fff; }
+.mp-filter:focus-visible { outline: 3px solid var(--gold-500); outline-offset: 2px; }
+.mp-filter__count {
+  min-width: 24px; padding: 1px 7px; border-radius: 999px; text-align: center;
+  background: var(--surface-2); color: var(--muted); font-size: 0.75rem; font-weight: 700;
+}
+.mp-filter.is-selected .mp-filter__count { background: var(--gold-500); color: var(--ink); }
+
+.mp-search {
+  display: flex; align-items: center; gap: 10px; min-width: 280px; padding: 0 16px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); color: var(--muted);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.mp-search:focus-within { border-color: var(--purple-700); background: var(--surface); box-shadow: 0 0 0 4px var(--purple-50); }
+.mp-search input { border: 0; outline: 0; background: transparent; padding: 11px 0; font: inherit; width: 100%; color: var(--ink); }
+
+/* ---- Offer cards ------------------------------------------------------------ */
+.mp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.mp-card {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 22px;
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s;
+  animation: mp-in 0.5s var(--ease) both; animation-delay: calc(var(--i, 0) * 40ms);
+}
+.mp-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
+@keyframes mp-in { from { opacity: 0; transform: translateY(16px); } }
+
+.mp-card__logo {
+  position: relative; height: 170px; padding: 28px; display: grid; place-items: center;
+  background: linear-gradient(180deg, #fff, var(--surface-2)); border-bottom: 1px solid var(--line);
+}
+.mp-card__logo { overflow: hidden; }
+.mp-card__logo img { width: auto; height: auto; max-height: 112px; max-width: 62%; object-fit: contain; border-radius: 10px; transition: transform 0.4s var(--ease); }
+.mp-card:hover .mp-card__logo img { transform: scale(1.05); }
+.mp-card__deal {
+  position: absolute; top: 14px; right: 14px; display: inline-flex; align-items: baseline; gap: 4px;
+  padding: 6px 12px; border-radius: 999px; background: var(--gold-500); color: var(--ink);
+  font-family: var(--font-display); font-size: 0.95rem; font-weight: 900; box-shadow: 0 6px 14px -6px rgba(210, 149, 40, 0.8);
+}
+.mp-card__deal small { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+
+.mp-card__body { flex: 1; display: flex; flex-direction: column; padding: 20px 22px 20px; }
+.mp-card__body h3 { font-size: 1.12rem; margin: 0 0 8px; }
+.mp-card__body p { flex: 1; color: var(--muted); font-size: 0.93rem; line-height: 1.55; margin: 0 0 18px; }
+.mp-card__foot { padding-top: 14px; border-top: 1px dashed var(--line); }
+
+.mp-validity { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+.mp-validity--ongoing { background: #e6f6ec; color: #17693a; }
+.mp-validity--active { background: var(--purple-50); color: var(--purple-700); }
+.mp-validity--soon { background: var(--gold-100); color: var(--gold-800); }
+.mp-validity--ended { background: var(--surface-2); color: var(--muted); }
+
+.mp-card.is-ended { opacity: 0.7; }
+.mp-card.is-ended .mp-card__logo img { filter: grayscale(1); }
+.mp-card.is-ended .mp-card__deal { background: var(--line); color: var(--muted); box-shadow: none; }
+
+.mp-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 56px 24px; text-align: center;
+  background: var(--surface); border: 1px dashed var(--purple-100); border-radius: 22px;
+}
+.mp-empty__icon { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 8px; border-radius: 50%; background: var(--purple-50); color: var(--purple-700); }
+.mp-empty strong { color: var(--ink); font-size: 1.1rem; }
+.mp-empty p { margin: 0 0 14px; color: var(--muted); }
+
+.mp-ended { margin-top: 36px; }
+.mp-ended__toggle {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 9px 16px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface); cursor: pointer;
+  color: var(--muted); font: inherit; font-size: 0.88rem; font-weight: 600; transition: border-color 0.2s, color 0.2s;
+}
+.mp-ended__toggle:hover { border-color: var(--purple-700); color: var(--purple-700); }
+.mp-ended__toggle svg { transition: transform 0.2s var(--ease); }
+.mp-ended__toggle[aria-expanded='true'] svg { transform: rotate(180deg); }
+
+/* ---- Call to action -------------------------------------------------------- */
+.mp-cta {
+  display: flex; align-items: center; justify-content: space-between; gap: 32px;
+  padding: 48px 52px; border-radius: 28px; color: #fff;
+  background:
+    radial-gradient(40% 80% at 100% 0%, rgba(255, 183, 54, 0.28), transparent 70%),
+    linear-gradient(120deg, var(--purple-900), var(--purple-700));
+  box-shadow: var(--shadow-lg);
+}
+.mp-cta > div:first-child { max-width: 600px; }
+.mp-cta__eyebrow { display: block; margin-bottom: 10px; color: var(--gold-400); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.mp-cta h2 { color: #fff; font-size: clamp(1.7rem, 3vw, 2.3rem); line-height: 1.15; margin: 0 0 10px; }
+.mp-cta p { margin: 0; color: rgba(255, 255, 255, 0.85); }
+.mp-cta__actions { flex: none; display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* ---- Responsive ------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .mp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mp-id { gap: 48px; }
+  .mp-cta { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 860px) {
+  .mp-section { padding: 80px 0; }
+  .mp-section--cta { padding-top: 0; }
+  .mp-heading { grid-template-columns: 1fr; gap: 12px; }
+  .mp-redeem { grid-template-columns: 1fr; }
+  .mp-redeem li + li { border-left: 0; border-top: 1px solid var(--line); }
+  .mp-redeem li { padding: 18px 22px; }
+  .mp-id { grid-template-columns: 1fr; }
+  .mp-id__media { max-width: 560px; }
+  /* grid with a minmax(0) column keeps the filter row from widening the page */
+  .mp-toolbar { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .mp-search { min-width: 0; }
+}
+@media (max-width: 600px) {
+  .mp .page-hero--glass .page-hero__inner { padding-bottom: 20px; }
+  .mp-redeem { margin-top: 20px; }
+  .mp-grid { grid-template-columns: 1fr; gap: 18px; }
+  .mp-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .mp-filters::-webkit-scrollbar { display: none; }
+  .mp-filter { flex: none; }
+  .mp-id__media { padding: 14px; }
+  .mp-id__badge { left: 8px; bottom: -22px; }
+  .mp-cta { padding: 32px 24px; }
+  .mp-cta__actions, .mp-cta__actions .btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mp-card { animation: none; }
+  .mp-card, .mp-card__logo img, .mp-id__media img { transition: none; }
+}

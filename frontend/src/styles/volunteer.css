@@ -1,0 +1,171 @@
+/* ==========================================================================
+   Volunteer page. Classes are prefixed "vol-" so they can't clash with Bootstrap.
+   ========================================================================== */
+
+.vol-section { padding: 104px 0; }
+.vol-section--tinted {
+  background:
+    radial-gradient(55% 45% at 0% 0%, rgba(92, 41, 124, 0.07), transparent 70%),
+    radial-gradient(45% 40% at 100% 100%, rgba(255, 183, 54, 0.08), transparent 70%),
+    var(--surface-2);
+}
+
+.vol-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; margin-bottom: 16px;
+  border-radius: 999px; background: var(--purple-50); color: var(--purple-700);
+  font-size: 0.74rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.vol-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold-500); }
+
+.vol-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: 48px; align-items: end; margin-bottom: 44px; }
+.vol-heading h2 { font-size: clamp(1.9rem, 3.6vw, 2.75rem); line-height: 1.12; margin: 0; }
+.vol-heading p { margin: 0; color: var(--muted); font-size: 1.05rem; }
+
+/* ---- Banner: leave room for the card that overlaps it --------------------- */
+.vol .page-hero--glass .page-hero__inner { padding-bottom: 40px; }
+
+/* ---- How it works ---------------------------------------------------------- */
+.vol-highlights {
+  position: relative; z-index: 3; list-style: none; margin: -52px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: var(--surface); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow-lg);
+}
+.vol-highlights li { display: flex; align-items: flex-start; gap: 16px; padding: 24px 26px; }
+.vol-highlights li + li { border-left: 1px solid var(--line); }
+.vol-highlights__icon {
+  flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; color: #fff;
+  background: linear-gradient(135deg, var(--purple-600), var(--purple-900));
+}
+.vol-highlights small { display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-700); }
+.vol-highlights strong { display: block; color: var(--ink); font-size: 1.02rem; margin: 2px 0; }
+.vol-highlights li > div span { color: var(--muted); font-size: 0.9rem; }
+
+/* ---- Role cards ------------------------------------------------------------ */
+.vol-roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.vol-role {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: 24px;
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s;
+}
+.vol-role:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
+.vol-role.is-selected { border-color: var(--purple-700); box-shadow: 0 0 0 4px var(--purple-50), var(--shadow); }
+.vol-role__media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--purple-50); }
+.vol-role__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease); }
+.vol-role:hover .vol-role__media img { transform: scale(1.06); }
+.vol-role__media::after {
+  content: ''; position: absolute; inset: auto 0 0; height: 50%; pointer-events: none;
+  background: linear-gradient(to top, rgba(46, 0, 70, 0.6), transparent);
+}
+.vol-role__num {
+  position: absolute; z-index: 1; left: 20px; bottom: 14px;
+  font-family: var(--font-display); font-size: 2rem; font-weight: 900; line-height: 1; color: var(--gold-400);
+}
+.vol-role__icon {
+  position: absolute; z-index: 1; right: 16px; bottom: 14px; display: grid; place-items: center; width: 48px; height: 48px;
+  border-radius: 14px; background: var(--gold-500); color: var(--ink); box-shadow: var(--shadow);
+}
+.vol-role__body { flex: 1; display: flex; flex-direction: column; align-items: flex-start; padding: 24px 26px 26px; }
+.vol-role__body h3 { font-size: 1.25rem; margin: 0 0 10px; }
+.vol-role__body p { color: var(--muted); font-size: 0.94rem; line-height: 1.65; margin: 0 0 22px; }
+.vol-role__body .btn { margin-top: auto; }
+
+/* ---- Sign-up layout ------------------------------------------------------- */
+.vol-layout { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.5fr); gap: 32px; align-items: start; }
+
+.vol-aside {
+  position: sticky; top: calc(var(--header-h, 80px) + 20px);
+  padding: 36px 32px; border-radius: 24px; color: #fff;
+  background:
+    radial-gradient(80% 60% at 100% 0%, rgba(255, 183, 54, 0.28), transparent 60%),
+    linear-gradient(150deg, var(--purple-700), var(--purple-900));
+  box-shadow: var(--shadow-lg);
+}
+.vol-aside__eyebrow { display: block; margin-bottom: 10px; color: var(--gold-400); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.vol-aside h2 { color: #fff; font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1.15; margin: 0 0 12px; }
+.vol-aside > p { color: rgba(255, 255, 255, 0.85); margin: 0 0 28px; }
+.vol-aside h3 { color: #fff; font-size: 0.82rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 16px; opacity: 0.8; }
+
+.vol-next { list-style: none; margin: 0 0 28px; padding: 0; counter-reset: vol-next; }
+.vol-next li { position: relative; padding: 0 0 20px 46px; counter-increment: vol-next; }
+.vol-next li::before {
+  content: counter(vol-next); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 30px; height: 30px;
+  border-radius: 50%; background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--gold-400); font-size: 0.85rem; font-weight: 800;
+}
+.vol-next li:not(:last-child)::after {
+  content: ''; position: absolute; left: 15px; top: 34px; bottom: 4px; width: 1px; background: rgba(255, 255, 255, 0.22);
+}
+.vol-next li:last-child { padding-bottom: 0; }
+.vol-next strong { display: block; color: #fff; font-size: 0.98rem; }
+.vol-next span { color: rgba(255, 255, 255, 0.78); font-size: 0.88rem; }
+
+.vol-aside__contact {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px; text-decoration: none;
+  background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; transition: background 0.2s;
+}
+.vol-aside__contact:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
+.vol-aside__contact-icon { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--gold-500); color: var(--ink); }
+.vol-aside__contact small { display: block; font-size: 0.78rem; color: rgba(255, 255, 255, 0.75); }
+.vol-aside__contact strong { color: #fff; word-break: break-all; }
+
+/* ---- Form card -------------------------------------------------------------- */
+.vol-card { padding: 36px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.vol-form fieldset + fieldset { padding-top: 26px; border-top: 1px dashed var(--line); }
+.vol-step { display: flex; align-items: center; gap: 12px; font-size: 1.1rem !important; margin-bottom: 18px !important; }
+.vol-step__num {
+  display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--purple-700); color: #fff; font-size: 0.9rem; font-weight: 800;
+}
+
+.vol-roles-pick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.vol-pick {
+  position: relative; display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 16px; cursor: pointer;
+  border: 1.5px solid var(--line); background: var(--surface); transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.vol-pick input { position: absolute; opacity: 0; pointer-events: none; }
+.vol-pick:hover { border-color: var(--purple-100); box-shadow: var(--shadow-sm); }
+.vol-pick:has(input:focus-visible) { outline: 3px solid var(--gold-500); outline-offset: 2px; }
+.vol-pick__icon {
+  display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 8px; border-radius: 12px;
+  background: var(--purple-50); color: var(--purple-700); transition: background 0.2s, color 0.2s;
+}
+.vol-pick strong { color: var(--ink); font-size: 0.94rem; line-height: 1.3; padding-right: 20px; }
+.vol-pick > span:not([class]) { color: var(--muted); font-size: 0.8rem; }
+.vol-pick__check {
+  position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--line); color: transparent; transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.vol-pick.is-selected { border-color: var(--purple-700); background: var(--purple-50); }
+.vol-pick.is-selected .vol-pick__icon { background: var(--purple-700); color: #fff; }
+.vol-pick.is-selected .vol-pick__check { background: var(--purple-700); border-color: var(--purple-700); color: #fff; }
+
+.vol-form__note { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; color: var(--muted); font-size: 0.82rem; }
+
+/* ---- Responsive ------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .vol-roles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vol-layout { grid-template-columns: 1fr; }
+  .vol-aside { position: static; }
+}
+@media (max-width: 860px) {
+  .vol-section { padding: 80px 0; }
+  .vol-heading { grid-template-columns: 1fr; gap: 12px; }
+  .vol-highlights { grid-template-columns: 1fr; }
+  .vol-highlights li + li { border-left: 0; border-top: 1px solid var(--line); }
+  .vol-highlights li { padding: 18px 22px; }
+}
+@media (max-width: 600px) {
+  .vol .page-hero--glass .page-hero__inner { padding-bottom: 20px; }
+  .vol-highlights { margin-top: 20px; }
+  .vol-roles { grid-template-columns: 1fr; gap: 20px; }
+  .vol-roles-pick { grid-template-columns: 1fr; }
+  .vol-pick { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 12px; }
+  .vol-pick__icon { margin-bottom: 0; }
+  .vol-pick strong { flex: 1; }
+  .vol-pick > span:not([class]) { flex-basis: 100%; padding-left: 52px; margin-top: -6px; }
+  .vol-card { padding: 22px 18px; }
+  .vol-aside { padding: 28px 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vol-role, .vol-role__media img { transition: none; }
+}

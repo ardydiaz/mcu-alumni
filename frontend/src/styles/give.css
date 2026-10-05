@@ -1,0 +1,208 @@
+/* ==========================================================================
+   Give page. Classes are prefixed "give-" so they can't clash with Bootstrap.
+   ========================================================================== */
+
+.give-section { padding: 104px 0; }
+.give-section--tinted {
+  background:
+    radial-gradient(55% 45% at 0% 0%, rgba(92, 41, 124, 0.07), transparent 70%),
+    radial-gradient(45% 40% at 100% 100%, rgba(255, 183, 54, 0.08), transparent 70%),
+    var(--surface-2);
+}
+
+.give-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; margin-bottom: 16px;
+  border-radius: 999px; background: var(--purple-50); color: var(--purple-700);
+  font-size: 0.74rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.give-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold-500); }
+
+.give-heading { max-width: 640px; margin-bottom: 40px; }
+.give-heading h2 { font-size: clamp(1.9rem, 3.6vw, 2.75rem); line-height: 1.12; margin: 0 0 12px; }
+.give-heading p { margin: 0; color: var(--muted); font-size: 1.08rem; }
+
+/* ---- Hero (500px) ---------------------------------------------------------- */
+.give-hero {
+  position: relative; height: 500px; display: flex; align-items: center;
+  background-color: var(--purple-900);
+  background-image: linear-gradient(90deg, rgba(46, 0, 70, 0.5) 0%, rgba(46, 0, 70, 0.15) 50%, rgba(46, 0, 70, 0) 75%), var(--hero-image);
+  background-size: cover; background-position: center 35%;
+}
+/* Bottom padding keeps the panel clear of the steps card that overlaps the banner */
+.give-hero > .container { width: 100%; padding-bottom: 56px; }
+.give-hero__panel {
+  max-width: 640px; padding: 28px 34px; border-radius: 24px; color: #fff;
+  
+}
+.give-hero__eyebrow {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+  color: var(--gold-400); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.give-hero__eyebrow::before { content: ''; width: 28px; height: 3px; border-radius: 2px; background: var(--gold-500); }
+.give-hero h1 { color: #fff; font-size: clamp(1.9rem, 3vw, 2.6rem); line-height: 1.1; margin: 0 0 12px; }
+.give-hero p { margin: 0; color: rgba(255, 255, 255, 0.9); font-size: 1.08rem; }
+.give-hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+
+/* ---- How to give: overlaps the banner ------------------------------------ */
+.give-steps {
+  position: relative; z-index: 3; list-style: none; margin: -56px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: var(--surface); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow-lg);
+}
+.give-steps__item { display: flex; gap: 16px; align-items: flex-start; padding: 24px 26px; }
+.give-steps__item + .give-steps__item { border-left: 1px solid var(--line); }
+.give-steps__icon {
+  flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; color: #fff;
+  background: linear-gradient(135deg, var(--purple-600), var(--purple-900));
+}
+.give-steps__item small { display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-700); }
+.give-steps__item strong { display: block; color: var(--ink); font-size: 1.02rem; margin: 2px 0; }
+.give-steps__item span { color: #fff; font-size: 0.9rem; }
+.give-steps__item .desc-give { color: #000; font-size: 0.9rem; }
+
+/* ---- Why give ------------------------------------------------------------- */
+.give-why { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: center; }
+.give-why__text h2 { font-size: clamp(2rem, 3.8vw, 2.9rem); line-height: 1.1; margin: 0 0 16px; }
+.give-why__intro { color: var(--muted); font-size: 1.08rem; margin-bottom: 28px; }
+.give-reasons { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.give-reasons li {
+  display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--line); transition: border-color 0.25s, box-shadow 0.25s;
+}
+.give-reasons li:hover { border-color: var(--purple-100); box-shadow: var(--shadow-sm); }
+.give-reasons__icon { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--purple-50); color: var(--purple-700); }
+.give-reasons strong { display: block; color: var(--ink); }
+.give-reasons span { color: var(--muted); font-size: 0.92rem; }
+
+.give-why__media { position: relative; }
+.give-why__media img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 26px; box-shadow: var(--shadow-lg); }
+.give-why__badge {
+  position: absolute; left: -24px; bottom: -24px; display: flex; flex-direction: column; gap: 2px; max-width: 220px;
+  padding: 18px 22px; border-radius: 18px; color: #fff;
+  background: linear-gradient(135deg, var(--purple-700), var(--purple-900)); box-shadow: var(--shadow-lg);
+}
+.give-why__badge strong { font-size: 2rem; font-weight: 900; line-height: 1; color: var(--gold-400); }
+.give-why__badge span { font-size: 0.86rem; color: rgba(255, 255, 255, 0.85); }
+
+/* ---- Pledge form ---------------------------------------------------------- */
+.give-layout2 { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.give-card { padding: 36px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.give-form fieldset + fieldset { padding-top: 26px; border-top: 1px dashed var(--line); }
+
+.give-step { display: flex; align-items: center; gap: 12px; font-size: 1.1rem !important; margin-bottom: 18px !important; }
+.give-step__num {
+  display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--purple-700); color: #fff; font-size: 0.9rem; font-weight: 800;
+}
+
+.give-campaigns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.give-campaign {
+  position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 16px; border-radius: 16px; cursor: pointer;
+  border: 1.5px solid var(--line); background: var(--surface); transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.give-campaign input { position: absolute; opacity: 0; pointer-events: none; }
+.give-campaign:hover { border-color: var(--purple-100); box-shadow: var(--shadow-sm); }
+.give-campaign:has(input:focus-visible) { outline: 3px solid var(--gold-500); outline-offset: 2px; }
+.give-campaign__icon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--purple-50); color: var(--purple-700); transition: background 0.2s, color 0.2s; }
+.give-campaign__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-right: 22px; }
+.give-campaign__text strong { color: var(--ink); font-size: 0.94rem; line-height: 1.3; }
+.give-campaign__text span { color: var(--muted); font-size: 0.82rem; }
+.give-campaign__check {
+  position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--line); color: transparent; transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.give-campaign.is-selected { border-color: var(--purple-700); background: var(--purple-50); }
+.give-campaign.is-selected .give-campaign__icon { background: var(--purple-700); color: #fff; }
+.give-campaign.is-selected .give-campaign__check { background: var(--purple-700); border-color: var(--purple-700); color: #fff; }
+
+.give-amount { display: flex; gap: 12px; align-items: stretch; }
+.give-currency { display: inline-flex; padding: 4px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); }
+.give-currency button {
+  border: 0; background: transparent; padding: 0 16px; border-radius: 10px; font-weight: 700; color: var(--muted); transition: background 0.2s, color 0.2s;
+}
+.give-currency button.is-active { background: var(--surface); color: var(--purple-700); box-shadow: var(--shadow-sm); }
+.give-amount__input {
+  flex: 1; display: flex; align-items: center; gap: 6px; padding: 0 18px; min-height: 60px; border-radius: 14px;
+  border: 1.5px solid var(--line); background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s;
+}
+.give-amount__input:focus-within { border-color: var(--purple-700); box-shadow: 0 0 0 4px var(--purple-50); }
+.give-amount__input.has-error { border-color: var(--danger); }
+.give-amount__symbol { font-size: 1.5rem; font-weight: 800; color: var(--purple-700); }
+.give-amount__input input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 1.5rem; font-weight: 800; color: var(--ink); }
+.give-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.give-preset {
+  padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+  font-weight: 700; font-size: 0.9rem; color: var(--ink-2); transition: 0.2s;
+}
+.give-preset:hover { border-color: var(--purple-700); color: var(--purple-700); }
+.give-preset.is-selected { background: var(--purple-700); border-color: var(--purple-700); color: #fff; }
+
+.give-form__note { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; color: var(--muted); font-size: 0.82rem; }
+
+/* ---- Bank details (sticky) ------------------------------------------------ */
+.give-aside2 { position: sticky; top: calc(var(--header-h) + 20px); }
+.give-bank { overflow: hidden; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); scroll-margin-top: calc(var(--header-h) + 20px); }
+.give-bank__head {
+  display: flex; gap: 14px; align-items: flex-start; padding: 24px; color: #fff;
+  background:
+    radial-gradient(80% 120% at 100% 0%, rgba(255, 183, 54, 0.3), transparent 60%),
+    linear-gradient(135deg, var(--purple-700), var(--purple-900));
+}
+.give-bank__head > svg { flex: none; margin-top: 4px; color: var(--gold-400); }
+.give-bank__head h2 { color: #fff; font-size: 1.2rem; margin: 0 0 4px; }
+.give-bank__head p { margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 0.9rem; }
+.give-bank__bank { padding: 20px 24px; }
+.give-bank__bank + .give-bank__bank { border-top: 1px solid var(--line); }
+.give-bank__brand { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.give-bank__brand img { width: 48px; height: 48px; object-fit: contain; border-radius: 12px; border: 1px solid var(--line); padding: 4px; background: #fff; }
+.give-bank__brand strong { display: block; color: var(--ink); }
+.give-bank__brand span { font-size: 0.82rem; color: var(--muted); }
+.give-bank__row {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px;
+  padding: 12px 14px; border-radius: 14px; background: var(--surface-2);
+}
+.give-bank__row small { display: block; color: var(--muted); font-size: 0.75rem; font-weight: 600; }
+.give-bank__row code { font-size: 1.08rem; font-weight: 700; color: var(--ink); letter-spacing: 0.03em; }
+.give-bank__swift code { font-size: 0.82rem; }
+.give-copy {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font-size: 0.8rem; font-weight: 700; transition: 0.2s;
+}
+.give-copy:hover { border-color: var(--purple-700); color: var(--purple-700); }
+.give-copy.is-copied { background: var(--success-bg); border-color: var(--success-bg); color: var(--success); }
+.give-bank__help {
+  display: flex; align-items: center; gap: 12px; margin: 0 24px 24px; padding: 14px 16px; border-radius: 16px;
+  background: var(--gold-100); border: 1px solid var(--gold-200); color: var(--gold-800);
+}
+.give-bank__help:hover { border-color: var(--gold-500); color: var(--gold-800); }
+.give-bank__help-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--gold-500); color: var(--ink); }
+.give-bank__help small { display: block; font-size: 0.78rem; }
+.give-bank__help strong { color: var(--ink); }
+
+/* ---- Responsive ----------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .give-layout2 { grid-template-columns: 1fr; }
+  .give-aside2 { position: static; }
+  .give-why { gap: 56px; }
+}
+
+@media (max-width: 860px) {
+  .give-section { padding: 72px 0; }
+  .give-steps { grid-template-columns: 1fr; }
+  .give-steps__item + .give-steps__item { border-left: 0; border-top: 1px solid var(--line); }
+  .give-why { grid-template-columns: 1fr; }
+  .give-why__badge { left: 16px; bottom: -20px; }
+}
+
+@media (max-width: 600px) {
+  .give-hero { align-items: flex-end; }
+  .give-hero > .container { padding-bottom: 76px; }
+  .give-hero__panel { max-width: none; padding: 24px 22px; border-radius: 20px; }
+  .give-hero h1 { font-size: clamp(1.7rem, 7vw, 2.1rem); }
+  .give-hero__actions .btn { flex: 1 1 auto; }
+  .give-card { padding: 22px 18px; }
+  .give-campaigns { grid-template-columns: 1fr; }
+  .give-amount { flex-direction: column; }
+  .give-currency { align-self: flex-start; }
+  .give-currency button { padding: 8px 18px; }
+}

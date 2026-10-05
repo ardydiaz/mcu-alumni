@@ -38,24 +38,27 @@ export default function HeroSlider({ slides }) {
         <Carousel.Item key={s.id ?? s.title}>
           <section className="hero hero-slider__slide" style={{ '--hero-image': `url("${assetUrl(s.image)}")` }}>
             <div className="container hero__inner">
-              {s.eyebrow && <span className="eyebrow eyebrow--light">{s.eyebrow}</span>}
-              {/* Only the first slide is the page's main heading. */}
-              {i === 0 ? <h1>{s.title}</h1> : <h2 className="hero-slider__title">{s.title}</h2>}
-              {s.subtitle && <p>{s.subtitle}</p>}
-              {(s.primaryLabel || s.secondaryLabel) && (
-                <div className="hero__actions">
-                  {s.primaryLabel && (
-                    <SlideButton href={s.primaryLink} className="btn btn-gold btn-lg">
-                      {s.primaryLabel} <Icon name="arrowRight" size={18} />
-                    </SlideButton>
-                  )}
-                  {s.secondaryLabel && (
-                    <SlideButton href={s.secondaryLink} className="btn btn-outline-light btn-lg">
-                      {s.secondaryLabel}
-                    </SlideButton>
-                  )}
-                </div>
-              )}
+              {/* Frosted-glass panel keeps the text readable on any photo and clear of faces on the right. */}
+              <div className="hero-slider__panel">
+                {s.eyebrow && <span className="eyebrow eyebrow--light">{s.eyebrow}</span>}
+                {/* Only the first slide is the page's main heading. */}
+                {i === 0 ? <h1 className="hero-slider__title">{s.title}</h1> : <h2 className="hero-slider__title">{s.title}</h2>}
+                {s.subtitle && <p>{s.subtitle}</p>}
+                {(s.primaryLabel || s.secondaryLabel) && (
+                  <div className="hero__actions">
+                    {s.primaryLabel && (
+                      <SlideButton href={s.primaryLink} className="btn btn-gold btn-lg">
+                        {s.primaryLabel} <Icon name="arrowRight" size={18} />
+                      </SlideButton>
+                    )}
+                    {s.secondaryLabel && (
+                      <SlideButton href={s.secondaryLink} className="btn btn-outline-light btn-lg">
+                        {s.secondaryLabel}
+                      </SlideButton>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </section>
         </Carousel.Item>
