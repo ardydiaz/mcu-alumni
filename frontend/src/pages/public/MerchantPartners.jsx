@@ -84,7 +84,7 @@ function PartnerCard({ partner, index }) {
   );
 }
 
-function PartnerGrid({ partners }) {
+export function PartnerGrid({ partners }) {
   const [filter, setFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [showEnded, setShowEnded] = useState(false);

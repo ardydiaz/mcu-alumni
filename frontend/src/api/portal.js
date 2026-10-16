@@ -1,0 +1,41 @@
+import { send } from './client.js';
+
+// Alumni Portal session. Separate from the staff session in client.js: different
+// storage key and token type, so signing in on one never signs in on the other.
+const TOKEN_KEY = 'mcu_alumni_portal';
+
+export const portalSession = {
+  get: () => {
+    try { return localStorage.getItem(TOKEN_KEY); } catch { return null; }
+  },
+  set: (token) => {
+    try { token ? localStorage.setItem(TOKEN_KEY, token) : localStorage.removeItem(TOKEN_KEY); } catch { /* storage unavailable */ }
+  },
+};
+
+// JSON, or multipart/form-data when a photo file is attached.
+export function withFile(data, file, field = 'photo') {
+  if (!(file instanceof File)) return data;
+  const form = new FormData();
+  for (const [key, value] of Object.entries(data)) if (value !== undefined && value !== null) form.append(key, value);
+  form.append(field, file);
+  return form;
+}
+
+export const portalApi = {
+  register: (data) => send('/portal/register', { method: 'POST', body: data }),
+  verifyEmail: (token) => send('/portal/verify-email', { method: 'POST', body: { token } }),
+  resendVerification: (email) => send('/portal/resend-verification', { method: 'POST', body: { email } }),
+  login: (credentials) => send('/portal/login', { method: 'POST', body: credentials }),
+  me: () => send('/portal/me', { token: portalSession.get() }),
+  // Graduate Tracer: pre-filled answers (account + latest submission), and submit (linked to the account)
+  tracer: () => send('/portal/tracer', { token: portalSession.get() }),
+  submitTracer: (data) => send('/portal/tracer', { method: 'POST', body: data, token: portalSession.get() }),
+
+  // My Profile (Step 4). Every call returns the full profile.
+  profile: async () => (await send('/portal/profile', { token: portalSession.get() })).data,
+  saveProfile: async (data, photo) => (await send('/portal/profile', { method: 'PATCH', body: withFile(data, photo), token: portalSession.get() })).data,
+  addItem: async (section, data) => (await send(`/portal/profile/${section}`, { method: 'POST', body: data, token: portalSession.get() })).data,
+  editItem: async (section, id, data) => (await send(`/portal/profile/${section}/${id}`, { method: 'PATCH', body: data, token: portalSession.get() })).data,
+  removeItem: async (section, id) => (await send(`/portal/profile/${section}/${id}`, { method: 'DELETE', token: portalSession.get() })).data,
+};

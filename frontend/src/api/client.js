@@ -28,6 +28,7 @@ const FORM_ENDPOINTS = {
   'alumni-update': '/alumni',
   tracer: '/tracer',
   volunteer: '/volunteers',
+  'portal-register': '/portal/register',
 };
 
 // ---- Session ---------------------------------------------------------------
@@ -59,7 +60,7 @@ export const getRefreshToken = () => storage.get();
 
 // ---- Requests --------------------------------------------------------------
 // Responses look like { success, message, data, meta?, errors? }.
-async function send(path, { method = 'GET', body, token } = {}) {
+export async function send(path, { method = 'GET', body, token } = {}) {
   const isForm = typeof FormData !== 'undefined' && body instanceof FormData;
   const headers = {};
   if (!isForm && body !== undefined) headers['Content-Type'] = 'application/json';
@@ -137,3 +138,21 @@ export const logout = (refreshToken) => send('/auth/logout', { method: 'POST', b
 
 // Files uploaded to the backend are stored as "/uploads/..."; external URLs pass through.
 export const assetUrl = (url) => (url && url.startsWith('/uploads/') ? `${BASE}${url}` : url);
+
+// ---- Alumni events ---------------------------------------------------------
+const toQuery = (params = {}) => {
+  const q = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined && v !== '' && v !== null));
+  return q.toString() ? `?${q}` : '';
+};
+// { from, to, upcoming, category, networkId, limit } -> { data, meta }
+export const getEvents = (params) => send(`/events${toQuery(params)}`);
+export const getEvent = async (slug) => (await send(`/events/${encodeURIComponent(slug)}`)).data;
+// Philippine address lists (PSGC): '/regions', '/regions/:code/provinces', '/provinces/:code/cities', '/cities/:code/barangays'
+const psgcCache = new Map();
+export function getPsgc(path) {
+  if (!psgcCache.has(path)) psgcCache.set(path, send(`/psgc${path}`).then((r) => r.data).catch((err) => { psgcCache.delete(path); throw err; }));
+  return psgcCache.get(path);
+}
+
+// "Add to my calendar" (.ics download)
+export const eventIcsUrl = (slug) => `${API}/events/${encodeURIComponent(slug)}/ics`;

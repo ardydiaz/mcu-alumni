@@ -8,12 +8,20 @@ export const adminNav = [
     group: 'Website content',
     items: [
       { label: 'Homepage slider', to: '/admin/slides', icon: 'image' },
+      { label: 'Events', to: '/admin/events', icon: 'calendar' },
       { label: 'Categories', to: '/admin/categories', icon: 'tag' },
       { label: 'Scholars', to: '/admin/scholars', icon: 'award' },
       { label: 'Networks', to: '/admin/networks', icon: 'users' },
       { label: 'Partners', to: '/admin/partners', icon: 'handshake' },
       { label: 'Projects', to: '/admin/projects', icon: 'building' },
       { label: 'Reports', to: '/admin/reports', icon: 'file' },
+    ],
+  },
+  {
+    group: 'Alumni',
+    items: [
+      { label: 'Alumni profiles', to: '/admin/profiles', icon: 'id' },
+      { label: 'Portal accounts', to: '/admin/alumni-accounts', icon: 'users' },
     ],
   },
   {

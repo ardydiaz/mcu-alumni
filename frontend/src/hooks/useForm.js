@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { submitForm } from '../api/client.js';
 
 // Manages values, field errors, and submission state for a backend form type.
-export function useForm(type, initialValues) {
+// `submit` replaces the default public endpoint (e.g. an Alumni Portal request that sends the alumni token).
+export function useForm(type, initialValues, { submit } = {}) {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState({ state: 'idle', message: '' });
@@ -19,7 +20,7 @@ export function useForm(type, initialValues) {
     e.preventDefault();
     setStatus({ state: 'submitting', message: '' });
     try {
-      const res = await submitForm(type, values);
+      const res = await (submit ? submit(values) : submitForm(type, values));
       setValues(initialValues);
       setErrors({});
       setStatus({ state: 'success', message: res.message });

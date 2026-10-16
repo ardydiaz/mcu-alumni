@@ -1,75 +1,178 @@
+import { useEffect, useState } from 'react';
 import PageHero from '../../components/ui/PageHero.jsx';
 import AsyncContent from '../../components/ui/AsyncContent.jsx';
 import Icon from '../../components/ui/Icon.jsx';
 import Field from '../../components/forms/Field.jsx';
 import FormStatus from '../../components/forms/FormStatus.jsx';
 import SubmitButton from '../../components/forms/SubmitButton.jsx';
+import DegreeField from '../../components/forms/DegreeField.jsx';
 import { useContent } from '../../hooks/useContent.js';
 import { useForm } from '../../hooks/useForm.js';
+import '../../styles/tracer.css';
+
+const OTHER = 'Other';
+const YES_NO = ['Yes', 'No'];
 
 const initialValues = {
-  firstName: '', lastName: '', email: '', phone: '', course: '', yearGraduated: '',
-  employmentStatus: '', employer: '', position: '', industry: '', workLocation: '',
-  relatedToCourse: '', timeToFirstJob: '', monthlyIncome: '', licensure: '', feedback: '', consent: false,
+  fullName: '', sex: '', email: '', phone: '', address: '', yearGraduated: '', degree: '',
+  isEmployed: '', employer: '', jobCategories: [], jobCategoryOther: '', position: '', relatedToDegree: '', timeToFirstJob: '',
+  furtherStudies: '', furtherStudiesTiming: '', consent: false,
 };
 
-function TracerForm({ courses, options }) {
-  const { values, field, status, onSubmit } = useForm('tracer', initialValues);
-  const working = ['Employed', 'Self-employed'].includes(values.employmentStatus);
+function Section({ icon, title, children }) {
+  return (
+    <section className="tracer-section">
+      <header className="tracer-section__head">
+        <Icon name={icon} size={18} />
+        <h2>{title}</h2>
+      </header>
+      <div className="tracer-section__body">{children}</div>
+    </section>
+  );
+}
+
+export function JobCategories({ options, values, otherValue, error, otherError, onToggle, onOther }) {
+  const hasOther = values.includes(OTHER);
+  return (
+    <fieldset className={`field tracer-checks ${error ? 'has-error' : ''}`}>
+      <legend>Job Category <span className="req" aria-hidden="true">*</span></legend>
+      <small className="field__hint">Check all that apply.</small>
+      <div className="tracer-checks__list">
+        {options.map((o) => (
+          <label key={o} className={`tracer-check ${values.includes(o) ? 'is-checked' : ''}`}>
+            <input type="checkbox" checked={values.includes(o)} onChange={() => onToggle(o)} />
+            <span className="tracer-check__box" aria-hidden="true"><Icon name="check" size={13} /></span>
+            <span>{o === OTHER ? 'Other:' : o}</span>
+          </label>
+        ))}
+      </div>
+      {hasOther && (
+        <input
+          className={`tracer-other ${otherError ? 'has-error' : ''}`}
+          placeholder="Please specify your job category"
+          aria-label="Other job category"
+          value={otherValue}
+          onChange={(e) => onOther(e.target.value)}
+        />
+      )}
+      {(error || otherError) && <small className="field__error">{error || otherError}</small>}
+    </fieldset>
+  );
+}
+
+// `initial` pre-fills fields (e.g. from the Alumni Portal account).
+export function TracerForm({ options, initial }) {
+  const { values, errors, field, setValue, status, onSubmit } = useForm('tracer', { ...initialValues, ...initial });
+  const employed = values.isEmployed === 'Yes';
+  // Sets a value the way typing does, so the field's error clears once it is answered.
+  const answer = (name, value) => field(name).onChange({ target: { name, value, type: 'text' } });
+
+  // The form clears after a successful submit; remount the degree picker so it leaves "Other" mode.
+  const [resetKey, setResetKey] = useState(0);
+  useEffect(() => {
+    if (status.state === 'success') setResetKey((k) => k + 1);
+  }, [status]);
+
+  const toggleCategory = (c) => {
+    const next = values.jobCategories.includes(c) ? values.jobCategories.filter((x) => x !== c) : [...values.jobCategories, c];
+    answer('jobCategories', next);
+  };
+
+  // "If No, choose N/A": filled in automatically.
+  const onFurtherStudies = (e) => {
+    field('furtherStudies').onChange(e);
+    if (e.target.value === 'No') answer('furtherStudiesTiming', 'N/A');
+    else if (values.furtherStudiesTiming === 'N/A') setValue('furtherStudiesTiming', '');
+  };
+  const timingOptions = values.furtherStudies === 'Yes' ? options.furtherStudiesTiming.filter((t) => t !== 'N/A') : options.furtherStudiesTiming;
 
   return (
-    <form onSubmit={onSubmit} className="form" noValidate>
-      <fieldset>
-        <legend>About you</legend>
+    <form onSubmit={onSubmit} className="form tracer-form" noValidate>
+      <Section icon="id" title="Graduate Profile">
+        <Field
+          label="Full Name (Last Name, Given Name, M.I.)"
+          hint="Please follow the format: Dela Cruz, Juan Carlo, M."
+          placeholder="Dela Cruz, Juan Carlo, M."
+          autoComplete="name"
+          required
+          {...field('fullName')}
+        />
         <div className="form-grid">
-          <Field label="First name" autoComplete="given-name" required {...field('firstName')} />
-          <Field label="Last name" autoComplete="family-name" required {...field('lastName')} />
-          <Field label="Email" type="email" autoComplete="email" required {...field('email')} />
-          <Field label="Mobile number" type="tel" autoComplete="tel" required {...field('phone')} />
-          <Field label="Course / Department" as="select" options={courses} required {...field('course')} />
-          <Field label="Year graduated" type="number" inputMode="numeric" required {...field('yearGraduated')} />
+          <Field label="Sex" as="select" options={options.sexes} required {...field('sex')} />
+          <Field label="Year Graduated" type="number" inputMode="numeric" min="1950" max={new Date().getFullYear()} required {...field('yearGraduated')} />
+          <Field label="Contact Email" type="email" autoComplete="email" required {...field('email')} />
+          <Field label="Contact Number" type="tel" autoComplete="tel" placeholder="09XX XXX XXXX" required {...field('phone')} />
         </div>
-      </fieldset>
+        <Field
+          label="Complete Address"
+          as="textarea"
+          rows={2}
+          hint="Please include house number, street, barangay, city/municipality, province and ZIP code."
+          autoComplete="street-address"
+          required
+          {...field('address')}
+        />
+        <DegreeField key={resetKey} groups={options.degreeGroups} value={values.degree} error={errors.degree} onChange={(v) => answer('degree', v)} />
+      </Section>
 
-      <fieldset>
-        <legend>Employment</legend>
+      <Section icon="building" title="Employment Information">
+        <Field label="Are you currently employed?" as="select" options={YES_NO} required className="tracer-short" {...field('isEmployed')} />
+        {!values.isEmployed && (
+          <p className="tracer-note">
+            <Icon name="building" size={16} /> Choose <strong>Yes</strong> to answer the questions about your company, job category and position.
+          </p>
+        )}
+        {employed && (
+          <div className="tracer-reveal">
+            <Field label="Company Name" hint="If retired, please specify your last employer." autoComplete="organization" required {...field('employer')} />
+            <JobCategories
+              options={options.jobCategories}
+              values={values.jobCategories}
+              otherValue={values.jobCategoryOther}
+              error={errors.jobCategories}
+              otherError={errors.jobCategoryOther}
+              onToggle={toggleCategory}
+              onOther={(v) => answer('jobCategoryOther', v)}
+            />
+            <Field label="Job Title / Position" hint="If retired, please specify your last position." autoComplete="organization-title" required {...field('position')} />
+            <div className="form-grid">
+              <Field label="Is your current job related to your degree?" as="select" options={YES_NO} required {...field('relatedToDegree')} />
+              <Field label="How long did it take you to get your first job after graduation?" as="select" options={options.timeToFirstJob} required {...field('timeToFirstJob')} />
+            </div>
+          </div>
+        )}
+      </Section>
+
+      <Section icon="book" title="Additional Information">
         <div className="form-grid">
-          <Field label="Current employment status" as="select" options={options.employmentStatus} required className="span-2" {...field('employmentStatus')} />
-          {working && (
-            <>
-              <Field label="Company / Employer" autoComplete="organization" {...field('employer')} />
-              <Field label="Position / Job title" autoComplete="organization-title" {...field('position')} />
-              <Field label="Industry" hint="e.g. Healthcare, Education, BPO" {...field('industry')} />
-              <Field label="Work location (city, country)" {...field('workLocation')} />
-              <Field label="Is your job related to your MCU course?" as="select" options={['Yes', 'No']} {...field('relatedToCourse')} />
-              <Field label="Monthly income" as="select" options={options.monthlyIncome} {...field('monthlyIncome')} />
-            </>
-          )}
-          <Field label="How long did it take to land your first job?" as="select" options={options.timeToFirstJob} className="span-2" {...field('timeToFirstJob')} />
-          <Field label="Licensure exam passed (if any)" hint="e.g. Nurse Licensure Exam, 2023" className="span-2" {...field('licensure')} />
+          <Field label="Did you pursue further studies?" as="select" options={YES_NO} required {...field('furtherStudies')} onChange={onFurtherStudies} />
+          <Field
+            label="If yes, how long after graduation did you pursue further studies?"
+            as="select"
+            options={timingOptions}
+            hint="If No, choose N/A."
+            required
+            disabled={values.furtherStudies === 'No'}
+            {...field('furtherStudiesTiming')}
+          />
         </div>
-      </fieldset>
+      </Section>
 
-      <fieldset>
-        <legend>Feedback</legend>
-        <Field label="How did your MCU education prepare you for your career?" as="textarea" {...field('feedback')} />
-      </fieldset>
-
-      <Field
-        as="checkbox"
-        label="I agree to let Manila Central University use my responses for graduate tracer studies and accreditation, in accordance with the Data Privacy Act of 2012."
-        required
-        {...field('consent')}
-      />
-
-      <FormStatus status={status} />
-      <SubmitButton status={status} className="btn-lg btn-block">Submit tracer form</SubmitButton>
+      <div className="tracer-submit">
+        <Field
+          as="checkbox"
+          label="I agree to let Manila Central University use my responses for graduate tracer studies and accreditation, in accordance with the Data Privacy Act of 2012."
+          required
+          {...field('consent')}
+        />
+        <FormStatus status={status} />
+        <SubmitButton status={status} className="btn-lg btn-block">Submit tracer form</SubmitButton>
+      </div>
     </form>
   );
 }
 
 export default function GraduateTracer() {
-  const courses = useContent('courses');
   const options = useContent('form-options');
 
   return (
@@ -88,13 +191,13 @@ export default function GraduateTracer() {
               <li><Icon name="check" size={18} /> Supports accreditation of your program</li>
               <li><Icon name="check" size={18} /> Connects you with industry partners</li>
             </ul>
-            <p className="muted">It takes about 5 minutes.</p>
+            <p className="muted">It takes about 5 minutes. Fields marked <span className="req">*</span> are required.</p>
           </aside>
-          <div className="card card--padded">
-            {courses.data && options.data ? (
-              <TracerForm courses={courses.data} options={options.data} />
+          <div>
+            {options.data?.degreeGroups ? (
+              <TracerForm options={options.data} />
             ) : (
-              <AsyncContent state={courses.error ? courses : options} skeleton={1}>{() => null}</AsyncContent>
+              <AsyncContent state={options} skeleton={1}>{() => null}</AsyncContent>
             )}
           </div>
         </div>

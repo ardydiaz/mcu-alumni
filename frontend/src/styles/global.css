@@ -42,7 +42,7 @@
   --shadow-lg: 0 24px 60px -20px rgba(46, 0, 70, 0.35);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 
-  --container: 1200px;
+  --container: 1440px;
   --header-h: 112px;
 }
 
@@ -150,22 +150,41 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
 /* ==========================================================================
    Header
    ========================================================================== */
-.site-header { position: sticky; top: 0; z-index: 100; }
-
-.topbar { background: var(--purple-900); color: rgba(255, 255, 255, 0.85); font-size: 0.8rem; }
-.topbar__inner { display: flex; gap: 24px; justify-content: flex-end; padding-top: 7px; padding-bottom: 7px; }
-.topbar span, .topbar a { display: inline-flex; align-items: center; gap: 6px; color: inherit; }
-.topbar a:hover { color: var(--gold-400); }
-
-.navbar {
-  transition: box-shadow 0.25s, border-color 0.25s;
-  display: flex; align-items: center; gap: 20px; height: 76px;
-  background: rgba(255, 255, 255, 0.92); backdrop-filter: saturate(180%) blur(14px);
-  max-width: 1440px;
-  padding: 0 clamp(20px, 2.5vw, 40px);
-  border-bottom: 1px solid transparent;
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  border-bottom: 3px solid var(--purple-800);
+  transition: box-shadow 0.25s;
 }
-.is-scrolled .navbar { box-shadow: 0 6px 24px -12px rgba(20, 22, 31, 0.25); border-bottom-color: var(--line); }
+/* Frosted white background on a layer of its own: a backdrop-filter on .site-header itself
+   would become the containing block of the fixed mobile drawer and break it. */
+.site-header::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: rgba(255, 255, 255, 0.94); backdrop-filter: saturate(180%) blur(14px);
+}
+.site-header.is-scrolled { box-shadow: 0 8px 28px -14px rgba(20, 22, 31, 0.35); }
+
+/* ---- Top bar: contact details left, Alumni Portal right ---- */
+.topbar { background: var(--purple-900); color: rgba(255, 255, 255, 0.88); font-size: 0.82rem; }
+.topbar__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 6px; padding-bottom: 6px; }
+.topbar__contact { display: flex; align-items: center; gap: 26px; min-width: 0; }
+.topbar span, .topbar a { display: inline-flex; align-items: center; gap: 7px; color: inherit; }
+.topbar__contact svg { color: var(--gold-500); }
+.topbar a:hover { color: var(--gold-400); }
+.topbar .topbar__portal {
+  flex: none; padding: 5px 14px; border-radius: 999px; color: #fff; font-weight: 700;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 183, 54, 0.55);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.topbar .topbar__portal svg { color: var(--gold-400); }
+.topbar .topbar__portal:hover { background: var(--gold-500); border-color: var(--gold-500); color: var(--ink); }
+.topbar .topbar__portal:hover svg { color: var(--ink); }
+.drawer__portal { margin-bottom: 4px; }
+
+/* ---- Main row: logo | centered links | search + Update Your Info ---- */
+.navbar {
+  display: flex; flex-wrap: nowrap; justify-content: flex-start; align-items: center; gap: 16px; height: 78px;
+  max-width: 1440px; padding: 0 clamp(20px, 2.5vw, 40px);
+}
 
 .navbar__brand { display: flex; align-items: center; gap: 12px; color: var(--ink); flex: none; }
 .navbar__brand img { height: 48px; width: auto; }
@@ -174,13 +193,53 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
   letter-spacing: 0.04em; text-transform: uppercase; color: var(--purple-800);
 }
 
-.navbar__links { display: flex; align-items: center; gap: 0; margin-left: auto; }
+.navbar__links { display: flex; align-items: center; gap: 2px; margin: 0 auto; }
 .nav-link {
-  display: inline-flex; align-items: center; gap: 4px; padding: 8px 10px; border-radius: 999px;
-  border: 0; background: none; color: var(--ink-2); font-weight: 600; font-size: 0.88rem; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 4px; padding: 9px 10px; border-radius: 999px;
+  border: 0; background: none; color: var(--ink-2); font-weight: 600; font-size: 0.9rem; white-space: nowrap;
+  transition: color 0.2s, background 0.2s;
 }
 .nav-link:hover { color: var(--purple-700); background: var(--purple-50); }
 .nav-link.active { color: var(--purple-700); background: var(--purple-50); }
+
+.navbar__actions { flex: none; display: flex; align-items: center; gap: 12px; }
+.navbar__search {
+  display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: var(--surface-2); color: var(--ink-2); cursor: pointer; transition: background 0.2s, color 0.2s;
+}
+.navbar__search:hover { background: var(--purple-50); color: var(--purple-700); }
+.navbar__search:focus-visible { outline: 3px solid var(--gold-500); outline-offset: 2px; }
+
+.navbar__update {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 18px 7px 7px; border: 0; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(135deg, var(--purple-700), var(--purple-900)); color: #fff;
+  font: inherit; font-size: 0.95rem; font-weight: 700; white-space: nowrap;
+  box-shadow: 0 10px 22px -10px rgba(92, 41, 124, 0.75); transition: transform 0.2s var(--ease), box-shadow 0.2s;
+}
+.navbar__update:hover { transform: translateY(-1px); box-shadow: 0 14px 26px -10px rgba(92, 41, 124, 0.85); }
+.navbar__update-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--gold-500); color: var(--ink); }
+
+/* Header search (SiteSearch) */
+.site-search {
+  width: min(620px, calc(100vw - 32px)); margin: 12vh auto auto; padding: 0; border: 0; border-radius: 22px;
+  background: var(--surface); box-shadow: 0 40px 100px -20px rgba(20, 0, 40, 0.5); overflow: hidden;
+}
+.site-search::backdrop { background: rgba(20, 0, 32, 0.55); backdrop-filter: blur(4px); }
+.site-search[open] { animation: site-search-in 0.2s var(--ease); }
+@keyframes site-search-in { from { opacity: 0; transform: translateY(-8px) scale(0.98); } }
+.site-search__field { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--line); color: var(--purple-700); }
+.site-search__field input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 1.05rem; color: var(--ink); background: transparent; }
+.site-search__field kbd { padding: 2px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface-2); color: var(--muted); font-size: 0.75rem; font-family: inherit; }
+.site-search__label { margin: 14px 20px 6px; color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.site-search__results { list-style: none; margin: 0; padding: 0 10px 12px; max-height: 50vh; overflow-y: auto; }
+.site-search__results button {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; border: 0; border-radius: 12px;
+  background: transparent; text-align: left; font: inherit; cursor: pointer; color: var(--muted);
+}
+.site-search__results button.is-active { background: var(--purple-50); color: var(--purple-700); }
+.site-search__results strong { display: block; color: var(--ink); font-size: 0.95rem; }
+.site-search__results small { display: block; color: var(--muted); font-size: 0.82rem; }
+.site-search__empty { margin: 8px 20px 22px; color: var(--muted); }
 
 .nav-dropdown { position: relative; }
 .nav-dropdown__menu {
@@ -198,7 +257,7 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
 .nav-dropdown__item:hover, .nav-dropdown__item.active { background: var(--purple-50); color: var(--purple-700); }
 
 .navbar__cta { flex: none; }
-.navbar__toggle { display: none; margin-left: auto; border: 0; background: none; color: var(--ink); padding: 8px; }
+.navbar__toggle { display: none; border: 0; background: none; color: var(--ink); padding: 8px; }
 
 .drawer { position: fixed; inset: 0; z-index: 200; pointer-events: none; }
 .drawer__backdrop { position: absolute; inset: 0; background: rgba(20, 22, 31, 0.5); opacity: 0; transition: opacity 0.25s; }
@@ -548,6 +607,8 @@ a.card:hover, .card.pillar:hover, .card.scholar:hover, .card.perk:hover, .card.n
 .field.has-error input, .field.has-error select, .field.has-error textarea { border-color: var(--danger); }
 .field__error { color: var(--danger); font-size: 0.8rem; font-weight: 600; }
 .field__hint { color: var(--muted); font-size: 0.8rem; }
+/* "Other (not listed)" text box under the degree dropdown (DegreeField) */
+.field .degree-other { margin-top: 8px; }
 
 .field--checkbox label { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; font-size: 0.9rem; cursor: pointer; }
 .field--checkbox input { width: 18px; height: 18px; margin-top: 2px; flex: none; accent-color: var(--purple-700); }
@@ -555,6 +616,38 @@ a.card:hover, .card.pillar:hover, .card.scholar:hover, .card.perk:hover, .card.n
 .alert { display: flex; gap: 8px; align-items: center; padding: 12px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.92rem; }
 .alert--success { background: var(--success-bg); color: var(--success); }
 .alert--error { background: var(--danger-bg); color: var(--danger); }
+
+/* Form result toast (FormStatus): top center, above the sticky header */
+.form-toast-wrap {
+  position: fixed; z-index: 2000; top: 20px; left: 0; right: 0; display: flex; justify-content: center;
+  padding: 0 16px; pointer-events: none;
+}
+.form-toast {
+  position: relative; overflow: hidden; pointer-events: auto; display: flex; align-items: center; gap: 12px;
+  width: max-content; max-width: min(560px, 100%); padding: 14px 14px 14px 16px; border-radius: 14px;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: 0 18px 40px -12px rgba(46, 0, 70, 0.35);
+  color: var(--ink); font-size: 0.94rem; font-weight: 600; line-height: 1.4;
+  animation: form-toast-in 0.35s var(--ease);
+}
+@keyframes form-toast-in { from { opacity: 0; transform: translateY(-16px) scale(0.98); } }
+.form-toast__icon { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; }
+.form-toast--success .form-toast__icon { background: var(--success-bg); color: var(--success); }
+.form-toast--error .form-toast__icon { background: var(--danger-bg); color: var(--danger); }
+.form-toast__message { flex: 1; min-width: 0; }
+.form-toast__close {
+  flex: none; display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--muted); cursor: pointer; transition: background 0.2s, color 0.2s;
+}
+.form-toast__close:hover { background: var(--surface-2); color: var(--ink); }
+/* Bar along the bottom that shrinks until the toast closes */
+.form-toast__timer { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; transform-origin: left; animation: form-toast-timer linear forwards; }
+.form-toast--success .form-toast__timer { background: var(--success); }
+.form-toast--error .form-toast__timer { background: var(--danger); }
+@keyframes form-toast-timer { to { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .form-toast { animation: none; }
+  .form-toast__timer { display: none; }
+}
 
 .spinner {
   width: 16px; height: 16px; border-radius: 50%;
@@ -637,9 +730,28 @@ a.card:hover, .card.pillar:hover, .card.scholar:hover, .card.perk:hover, .card.n
 /* ==========================================================================
    Responsive
    ========================================================================== */
+/* Full menu on one row: the header content is capped at 1440px, so these sizes apply on every desktop width */
+@media (min-width: 1341px) {
+  .navbar { gap: 12px; }
+  .navbar__brand img { height: 44px; }
+  .navbar__badge { font-size: 0.88rem; padding: 4px 8px; }
+  .navbar__links { gap: 0; }
+  .nav-link { padding: 8px 7px; font-size: 0.86rem; }
+  .navbar__actions { gap: 8px; }
+  .navbar__search { width: 40px; height: 40px; }
+  .navbar__update { padding: 6px 14px 6px 6px; font-size: 0.9rem; }
+  .navbar__update-icon { width: 28px; height: 28px; }
+}
+
+/* Small laptops (1341–1400px): a little less space between menu links so they still fit on one row */
+@media (min-width: 1341px) and (max-width: 1400px) {
+  .nav-link { padding-left: 4px; padding-right: 4px; }
+}
+
 @media (max-width: 1340px) {
   .navbar__links, .navbar__cta { display: none; }
   .navbar__toggle { display: inline-flex; }
+  .navbar__actions { margin-left: auto; gap: 6px; }
 }
 
 @media (max-width: 1024px) {

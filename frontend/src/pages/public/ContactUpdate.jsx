@@ -14,8 +14,9 @@ const initialValues = {
   requestAlumniId: false, consent: false,
 };
 
-function UpdateForm({ courses }) {
-  const { field, status, onSubmit } = useForm('alumni-update', initialValues);
+// `initial` pre-fills fields (e.g. from the Alumni Portal account).
+export function UpdateForm({ courses, initial }) {
+  const { field, status, onSubmit } = useForm('alumni-update', { ...initialValues, ...initial });
 
   return (
     <form onSubmit={onSubmit} className="form" noValidate>

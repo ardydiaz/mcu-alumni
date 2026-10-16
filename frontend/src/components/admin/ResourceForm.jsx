@@ -1,9 +1,10 @@
 import Field from '../forms/Field.jsx';
 import FileField from './FileField.jsx';
+import { toManilaInput, fromManilaInput } from '../events/eventUtils.js';
 
 /**
  * Field spec:
- *   { name, label, type: 'text'|'email'|'url'|'number'|'date'|'password'|'textarea'|'select'|'checkbox'|'image'|'document',
+ *   { name, label, type: 'text'|'email'|'url'|'number'|'date'|'datetime-local'|'password'|'textarea'|'select'|'checkbox'|'image'|'document',
  *     options, required, requiredOnCreate, hint, span: 2, uploadName, placeholder }
  */
 export default function ResourceForm({ fields, values, errors, files, isNew, onChange, onFile }) {
@@ -58,6 +59,7 @@ export function valuesFromRow(fields, row = {}, defaults = {}) {
       let v = row[f.name] ?? defaults[f.name];
       if (f.type === 'checkbox') v = Boolean(v ?? false);
       else if (f.type === 'date' && v) v = String(v).slice(0, 10);
+      else if (f.type === 'datetime-local') v = toManilaInput(v);
       else if (f.type === 'password') v = '';
       else v = v ?? '';
       return [f.name, v];
@@ -75,6 +77,7 @@ export function payloadFromValues(fields, values, files) {
     if (f.type === 'password' && !v) continue;
     if ((f.type === 'number' || f.type === 'date') && v === '') v = null;
     if (f.type === 'number' && v !== null) v = Number(v);
+    if (f.type === 'datetime-local') v = fromManilaInput(v); // entered in Philippine time
     data[f.name] = v;
   }
   const uploads = Object.fromEntries(

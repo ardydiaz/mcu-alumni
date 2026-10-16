@@ -16,6 +16,25 @@ import ContactUpdate from '../pages/public/ContactUpdate.jsx';
 import GraduateTracer from '../pages/public/GraduateTracer.jsx';
 import NotFound from '../pages/public/NotFound.jsx';
 
+// Alumni events calendar
+const Events = lazy(() => import('../pages/public/Events.jsx'));
+const EventDetail = lazy(() => import('../pages/public/EventDetail.jsx'));
+
+// Alumni Portal
+const PortalHome = lazy(() => import('../pages/portal/PortalHome.jsx'));
+const PortalRegister = lazy(() => import('../pages/portal/Register.jsx'));
+const PortalLogin = lazy(() => import('../pages/portal/PortalLogin.jsx'));
+const PortalVerify = lazy(() => import('../pages/portal/VerifyEmail.jsx'));
+const PortalAccount = lazy(() => import('../pages/portal/Account.jsx'));
+const PortalLayout = lazy(() => import('../pages/portal/PortalLayout.jsx'));
+const portalPage = (name) => lazy(() => import('../pages/portal/PortalServices.jsx').then((m) => ({ default: m[name] })));
+const PortalUpdateInfo = portalPage('PortalUpdateInfo');
+const PortalTracer = lazy(() => import('../pages/portal/PortalTracer.jsx'));
+const PortalProfile = lazy(() => import('../pages/portal/PortalProfile.jsx'));
+const PortalAlumniId = portalPage('PortalAlumniId');
+const PortalPerks = portalPage('PortalPerks');
+const PortalGive = portalPage('PortalGive');
+
 // Admin and auth screens load on demand so public visitors never download them.
 const AuthLayout = lazy(() => import('../layouts/AuthLayout.jsx'));
 const AdminLayout = lazy(() => import('../layouts/AdminLayout.jsx'));
@@ -31,6 +50,10 @@ const Partners = lazy(() => import('../pages/admin/Partners.jsx'));
 const Projects = lazy(() => import('../pages/admin/Projects.jsx'));
 const Reports = lazy(() => import('../pages/admin/Reports.jsx'));
 const Alumni = lazy(() => import('../pages/admin/Alumni.jsx'));
+const AlumniAccounts = lazy(() => import('../pages/admin/AlumniAccounts.jsx'));
+const AdminEvents = lazy(() => import('../pages/admin/Events.jsx'));
+const AlumniProfiles = lazy(() => import('../pages/admin/AlumniProfiles.jsx'));
+const AlumniProfileEdit = lazy(() => import('../pages/admin/AlumniProfileEdit.jsx'));
 const Tracer = lazy(() => import('../pages/admin/Tracer.jsx'));
 const Volunteers = lazy(() => import('../pages/admin/Volunteers.jsx'));
 const Messages = lazy(() => import('../pages/admin/Messages.jsx'));
@@ -58,6 +81,22 @@ export default function AppRoutes() {
           <Route path="transparency-reports" element={<TransparencyReports />} />
           <Route path="alumni-contact-update" element={<ContactUpdate />} />
           <Route path="graduate-tracer" element={<GraduateTracer />} />
+          <Route path="events" element={<Events />} />
+          <Route path="events/:slug" element={<EventDetail />} />
+          <Route path="portal" element={<PortalHome />} />
+          <Route path="portal/register" element={<PortalRegister />} />
+          <Route path="portal/login" element={<PortalLogin />} />
+          <Route path="portal/verify" element={<PortalVerify />} />
+          {/* Signed-in portal pages open inside the portal (sidebar layout) */}
+          <Route element={<PortalLayout />}>
+            <Route path="portal/account" element={<PortalAccount />} />
+            <Route path="portal/profile" element={<PortalProfile />} />
+            <Route path="portal/update-info" element={<PortalUpdateInfo />} />
+            <Route path="portal/graduate-tracer" element={<PortalTracer />} />
+            <Route path="portal/alumni-id" element={<PortalAlumniId />} />
+            <Route path="portal/perks" element={<PortalPerks />} />
+            <Route path="portal/give" element={<PortalGive />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Route>
 
@@ -71,6 +110,7 @@ export default function AppRoutes() {
         <Route path="admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="slides" element={<Slides />} />
+          <Route path="events" element={<AdminEvents />} />
           <Route path="categories" element={<Categories />} />
           <Route path="donations" element={<Donations />} />
           <Route path="scholars" element={<Scholars />} />
@@ -79,6 +119,9 @@ export default function AppRoutes() {
           <Route path="projects" element={<Projects />} />
           <Route path="reports" element={<Reports />} />
           <Route path="alumni" element={<Alumni />} />
+          <Route path="alumni-accounts" element={<AlumniAccounts />} />
+          <Route path="profiles" element={<AlumniProfiles />} />
+          <Route path="profiles/:id" element={<AlumniProfileEdit />} />
           <Route path="tracer" element={<Tracer />} />
           <Route path="volunteers" element={<Volunteers />} />
           <Route path="messages" element={<Messages />} />

@@ -55,12 +55,14 @@ function StepTitle({ n, children }) {
   );
 }
 
-function DonationForm({ campaigns, courses }) {
+// `initial` pre-fills fields (e.g. from the Alumni Portal account).
+export function DonationForm({ campaigns, courses, initial }) {
   const [params] = useSearchParams();
   const { values, field, setValue, status, onSubmit } = useForm('donation', {
     firstName: '', lastName: '', email: '', phone: '',
     course: '', country: 'Philippines', city: '',
     amount: '', currency: 'PHP', campaignId: '', message: '',
+    ...initial,
   });
   const symbol = CURRENCIES.find((c) => c.value === values.currency)?.symbol || '₱';
   const amountField = field('amount');
@@ -155,7 +157,7 @@ function DonationForm({ campaigns, courses }) {
   );
 }
 
-function BankDetails({ banks }) {
+export function BankDetails({ banks }) {
   return (
     <div className="give-bank" id="bank-details">
       <div className="give-bank__head">

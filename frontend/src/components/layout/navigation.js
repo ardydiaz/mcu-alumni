@@ -11,6 +11,7 @@ export const navigation = [
       { label: 'Industry Partners', to: '/industry-partners', description: 'Organizations that hire Centralinos' },
     ],
   },
+  { label: 'Events', to: '/events' },
   { label: 'Networks', to: '/networks' },
   { label: 'Transparency Reports', to: '/transparency-reports' },
 ];

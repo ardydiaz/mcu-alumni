@@ -1,0 +1,137 @@
+/* ==========================================================================
+   Alumni profile editor (portal "My Profile" and admin "Alumni profiles").
+   Classes are prefixed "pf-".
+   ========================================================================== */
+
+.pf { display: grid; gap: 18px; min-width: 0; }
+
+/* Header */
+.pf-head {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(220px, 300px); align-items: center; gap: 20px;
+  padding: 24px; border-radius: 24px; color: #fff;
+  background:
+    radial-gradient(45% 80% at 100% 0%, rgba(255, 183, 54, 0.22), transparent 65%),
+    linear-gradient(140deg, var(--purple-800), var(--purple-900));
+  box-shadow: var(--shadow-lg);
+}
+.pf-avatar {
+  display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; overflow: hidden;
+  background: linear-gradient(135deg, var(--gold-400), var(--gold-600)); color: var(--purple-900);
+  font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.18);
+}
+.pf-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.pf-head__who h2 { margin: 0 0 8px; color: #fff; font-size: clamp(1.4rem, 2.4vw, 1.9rem); line-height: 1.15; }
+.pf-head__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pf-head .pf-chip { background: rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.18); }
+.pf-head .pf-chip--gold { background: var(--gold-500); color: var(--ink); border-color: var(--gold-500); }
+
+.pf-progress { padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.16); }
+.pf-progress__top { display: flex; align-items: baseline; gap: 8px; }
+.pf-progress__top strong { font-family: var(--font-display); font-size: 1.6rem; font-weight: 900; color: var(--gold-400); }
+.pf-progress__top span { color: rgba(255, 255, 255, 0.85); font-size: 0.86rem; }
+.pf-progress__bar { height: 8px; margin: 8px 0 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.18); overflow: hidden; }
+.pf-progress__bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--gold-400), var(--gold-600)); transition: width 0.5s var(--ease); }
+.pf-progress small { color: rgba(255, 255, 255, 0.78); font-size: 0.78rem; }
+
+/* Chips */
+.pf-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; background: var(--purple-50); color: var(--purple-700); font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
+
+/* Tabs */
+.pf-tabs {
+  display: flex; gap: 4px; padding: 6px; overflow-x: auto; scrollbar-width: none;
+  border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+}
+.pf-tabs::-webkit-scrollbar { display: none; }
+.pf-tab {
+  flex: none; display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border: 0; border-radius: 12px; cursor: pointer;
+  background: transparent; color: var(--ink-2); font: inherit; font-size: 0.9rem; font-weight: 600; transition: background 0.2s, color 0.2s;
+}
+.pf-tab svg { color: var(--muted); }
+.pf-tab:hover { background: var(--purple-50); color: var(--purple-700); }
+.pf-tab.is-active { background: linear-gradient(135deg, var(--purple-700), var(--purple-900)); color: #fff; }
+.pf-tab.is-active svg { color: var(--gold-400); }
+.pf-tab__count { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); font-size: 0.72rem; font-weight: 800; text-align: center; }
+.pf-tab.is-active .pf-tab__count { background: var(--gold-500); color: var(--ink); }
+
+/* Panels / cards */
+.pf-panel { display: grid; gap: 16px; animation: pf-in 0.25s var(--ease); }
+@keyframes pf-in { from { opacity: 0; transform: translateY(6px); } }
+.pf-card { padding: 22px; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+.pf-card--locked { background: linear-gradient(160deg, var(--purple-50), var(--surface) 60%); }
+.pf-card__head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+.pf-card__head > div { flex: 1; min-width: 0; }
+.pf-card__head h3 { margin: 0; font-size: 1.08rem; }
+.pf-card__head p { margin: 2px 0 0; color: var(--muted); font-size: 0.88rem; }
+.pf-card__icon { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--purple-50); color: var(--purple-700); }
+.pf-card--locked .pf-card__icon { background: var(--purple-700); color: var(--gold-400); }
+.pf-link { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--purple-700); font-size: 0.84rem; font-weight: 700; text-decoration: none; }
+.pf-link:hover { border-color: var(--purple-700); }
+
+.pf-values { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 20px; margin: 0; }
+.pf-values dt { color: var(--muted); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.pf-values dd { margin: 2px 0 0; color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+
+.pf-photo { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px dashed var(--line); }
+.pf-photo__img { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; overflow: hidden; background: var(--purple-50); color: var(--purple-700); }
+.pf-photo__img img { width: 100%; height: 100%; object-fit: cover; }
+.pf-photo label { cursor: pointer; }
+.pf-photo small { flex-basis: 100%; }
+
+.pf-country { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.pf-choice {
+  display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 12px; cursor: pointer;
+  border: 1.5px solid var(--line); background: var(--surface); color: var(--ink-2); font: inherit; font-weight: 700; transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+.pf-choice.is-selected { border-color: var(--purple-700); background: var(--purple-50); color: var(--purple-700); }
+
+.pf-savebar { display: flex; align-items: center; justify-content: flex-end; gap: 14px; flex-wrap: wrap; }
+.pf-msg { display: inline-flex; align-items: center; gap: 6px; font-size: 0.88rem; font-weight: 700; }
+.pf-msg.is-ok { color: #17693a; }
+.pf-msg.is-error { color: var(--danger); }
+
+/* Section entries */
+.pf-entries { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pf-entry { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s; }
+.pf-entry:hover { border-color: var(--purple-100); box-shadow: var(--shadow-sm); }
+.pf-entry > div:first-child { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.pf-entry strong { color: var(--ink); }
+.pf-entry span { color: var(--muted); font-size: 0.88rem; }
+.pf-entry__badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.pf-entry__actions { flex: none; display: flex; gap: 6px; }
+.pf-entry__actions button {
+  display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--purple-700); font: inherit; font-size: 0.82rem; font-weight: 700;
+}
+.pf-entry__actions button:hover { border-color: var(--purple-700); }
+.pf-entry__actions button.is-danger { color: var(--danger); }
+.pf-entry__actions button.is-danger:hover { border-color: var(--danger); background: var(--danger-bg); }
+.pf-entry-form { margin-bottom: 12px; padding: 18px; border-radius: 16px; background: var(--surface-2); border: 1px solid var(--purple-100); }
+.pf-entries li.is-editing .pf-entry-form { margin: 0; }
+.pf-entry-form__actions { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.pf-entry-form__actions .pf-msg { margin-right: auto; }
+.pf-empty { margin: 0; padding: 18px; border-radius: 14px; border: 1px dashed var(--purple-100); color: var(--muted); text-align: center; }
+
+/* Change history (admin) */
+.pf-history { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pf-history > li { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; padding: 12px 14px; border-radius: 14px; background: var(--surface-2); }
+.pf-history time { color: var(--muted); font-size: 0.82rem; }
+.pf-history strong { color: var(--ink); font-size: 0.92rem; }
+.pf-history ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 3px; font-size: 0.86rem; color: var(--ink-2); }
+.pf-history del { color: var(--muted); }
+
+@media (max-width: 900px) {
+  .pf-head { grid-template-columns: auto minmax(0, 1fr); }
+  .pf-progress { grid-column: 1 / -1; }
+  .pf-values { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .pf-head { padding: 18px; gap: 14px; }
+  .pf-avatar { width: 64px; height: 64px; font-size: 1.4rem; }
+  .pf-values { grid-template-columns: minmax(0, 1fr); }
+  .pf-card { padding: 18px 16px; }
+  .pf-card__head { flex-wrap: wrap; }
+  .pf-card__head .btn, .pf-link { width: 100%; justify-content: center; }
+  .pf-entry { flex-direction: column; }
+  .pf-history > li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .pf-savebar .btn { width: 100%; }
+}

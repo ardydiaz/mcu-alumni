@@ -375,6 +375,11 @@
 .access-requests__list { list-style: none; margin: 0; padding: 0; }
 .access-requests__list li { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid var(--line); }
 .access-requests__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* Alumni accounts: tracer history in the details dialog */
+.tracer-history { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tracer-history li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); }
+.tracer-history li > span:last-child { flex-basis: 100%; color: var(--muted); font-size: 0.88rem; }
 .notice-banner {
   display: flex; align-items: center; gap: 12px; padding: 14px 18px; margin-bottom: 20px; border-radius: var(--radius);
   background: var(--gold-100); border: 1px solid var(--gold-200); color: var(--gold-800);

@@ -101,11 +101,11 @@ export default function Dashboard() {
           </div>
           <div className="stat-inline">
             <div><strong>{formatNumber(tracer.total)}</strong><span>responses</span></div>
-            <div><strong>{tracer.employmentRate}%</strong><span>employed or self-employed</span></div>
+            <div><strong>{tracer.employmentRate}%</strong><span>currently employed</span></div>
           </div>
           <BarList
-            title="Employment status"
-            items={Object.entries(tracer.employmentStatus).map(([label, value]) => ({ label, value }))}
+            title="Employment"
+            items={tracer.total ? Object.entries(tracer.employment).map(([label, value]) => ({ label, value })) : []}
             emptyMessage="No tracer responses yet."
           />
         </section>

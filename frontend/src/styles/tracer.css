@@ -1,0 +1,74 @@
+/* ==========================================================================
+   Graduate Tracer form: one card per section with an MCU purple header,
+   following the official tracer form. Classes are prefixed "tracer-".
+   ========================================================================== */
+
+.tracer-form { display: grid; gap: 22px; }
+
+.tracer-section {
+  overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow-sm);
+}
+.tracer-section__head {
+  display: flex; align-items: center; gap: 10px; padding: 16px 24px; color: #fff;
+  background:
+    radial-gradient(60% 140% at 100% 0%, rgba(255, 183, 54, 0.25), transparent 60%),
+    linear-gradient(120deg, var(--purple-700), var(--purple-900));
+}
+.tracer-section__head svg { color: var(--gold-400); }
+.tracer-section__head h2 { margin: 0; color: #fff; font-size: 0.95rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.tracer-section__body { display: grid; gap: 20px; padding: 26px 24px 28px; }
+
+/* Hints sit under the label, like the official form */
+.tracer-form .field label { font-size: 0.92rem; font-weight: 700; color: var(--ink); }
+.tracer-form .field__hint { font-style: italic; }
+.tracer-short { max-width: 260px; }
+.tracer-form select:disabled { background: var(--surface-2); color: var(--muted); cursor: not-allowed; }
+
+.tracer-other {
+  margin-top: 8px; width: 100%; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px;
+  font: inherit; color: var(--ink); background: var(--surface);
+}
+.tracer-other:focus { outline: 0; border-color: var(--purple-700); box-shadow: 0 0 0 4px var(--purple-50); }
+.tracer-other.has-error { border-color: var(--danger); }
+
+.tracer-note {
+  display: flex; align-items: center; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 12px;
+  background: var(--purple-50); color: var(--purple-700); font-size: 0.88rem;
+}
+.tracer-note svg { flex: none; }
+
+/* Fields that appear when "Are you currently employed?" is Yes */
+.tracer-reveal { display: grid; gap: 20px; padding-top: 20px; border-top: 1px dashed var(--line); animation: tracer-in 0.35s var(--ease); }
+@keyframes tracer-in { from { opacity: 0; transform: translateY(-6px); } }
+
+/* Job category checkboxes */
+.tracer-checks { border: 0; margin: 0; padding: 0; }
+.tracer-checks legend { float: none; padding: 0; margin: 0 0 2px; font-size: 0.92rem; font-weight: 700; color: var(--ink); }
+.tracer-checks__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.tracer-check {
+  position: relative; display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px; cursor: pointer;
+  border: 1.5px solid var(--line); background: var(--surface); font-size: 0.92rem; font-weight: 500; color: var(--ink-2);
+  transition: border-color 0.2s, background 0.2s;
+}
+.tracer-check:hover { border-color: var(--purple-100); }
+.tracer-check input { position: absolute; opacity: 0; pointer-events: none; }
+.tracer-check:has(input:focus-visible) { outline: 3px solid var(--gold-500); outline-offset: 2px; }
+.tracer-check__box {
+  flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 6px;
+  border: 1.5px solid var(--muted); color: transparent; transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.tracer-check.is-checked { border-color: var(--purple-700); background: var(--purple-50); color: var(--ink); }
+.tracer-check.is-checked .tracer-check__box { background: var(--purple-700); border-color: var(--purple-700); color: #fff; }
+.tracer-checks.has-error .tracer-check { border-color: rgba(180, 35, 27, 0.35); }
+
+.tracer-submit {
+  display: grid; gap: 18px; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 600px) {
+  .tracer-section__head { padding: 14px 18px; }
+  .tracer-section__body { padding: 20px 18px 22px; }
+  .tracer-checks__list { grid-template-columns: 1fr; }
+  .tracer-short { max-width: none; }
+  .tracer-submit { padding: 20px 18px; }
+}
