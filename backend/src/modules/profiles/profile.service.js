@@ -5,6 +5,7 @@ import { psgc } from '../psgc/psgc.service.js';
 import { ApiError, deleteUploadedFile } from '../../utils/helpers.js';
 import { canonicalStudentNumber } from '../../utils/studentNumber.js';
 import { inviteWhere } from '../portal/portal.invite.js';
+import { AlumniAccount } from '../portal/alumniAccount.model.js';
 import { getPagination, buildMeta, getSort } from '../../utils/pagination.js';
 
 const PH = 'Philippines';
@@ -17,6 +18,11 @@ const systemActor = (name) => ({ type: 'system', id: null, name });
 
 // MCU-A-{year verified}-{profile id, 6 digits}: unique, never reused.
 export const alumniNumberFor = (id, verifiedAt) => `MCU-A-${new Date(verifiedAt || Date.now()).getFullYear()}-${String(id).padStart(6, '0')}`;
+
+const ADDRESS_FIELDS = ['houseStreet', 'barangay', 'city', 'province', 'region', 'zipCode', 'country'];
+// "123 Rizal St., Barangay 1, City of Caloocan, Metro Manila" (+ country when abroad)
+export const oneLineAddress = (p) =>
+  [p.houseStreet, p.barangay, p.city, p.province, p.country && p.country !== PH ? p.country : null, p.zipCode].filter(Boolean).join(', ');
 
 const blankToNull = (data) => Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v === '' ? null : v]));
 const plain = (v) => (v instanceof Date ? v.toISOString() : v ?? null);
@@ -208,6 +214,14 @@ export const profileService = {
     const changes = diff(before, profile.toJSON(), Object.keys(clean));
     if (Object.keys(changes).length) await log(profile.id, actor, 'profile', 'update', changes);
     if (changes.photo && oldPhoto) await deleteUploadedFile(oldPhoto);
+    // The portal account keeps a one-line copy of the address and the latest phone (shown on the dashboard and
+    // pre-filled in the Graduate Tracer): keep it in step with the profile.
+    if (profile.alumniAccountId && ADDRESS_FIELDS.concat('phone').some((f) => f in changes)) {
+      const mirror = {};
+      if (ADDRESS_FIELDS.some((f) => f in changes)) mirror.address = oneLineAddress(profile) || null;
+      if ('phone' in changes && profile.phone) mirror.phone = profile.phone;
+      await AlumniAccount.update(mirror, { where: { id: profile.alumniAccountId } });
+    }
     return this.full(profile);
   },
 
