@@ -49,6 +49,7 @@ AlumniProfile.init(
     country: { type: DataTypes.STRING(60) },
 
     verifiedAt: { type: DataTypes.DATE },
+    alumniUpdatedAt: { type: DataTypes.DATE }, // last update by the alumnus (My Profile / Graduate Tracer), migration 13
 
     // Where the record came from (migration 10): portal | eao | import, and which imported file.
     source: { type: DataTypes.STRING(20) },

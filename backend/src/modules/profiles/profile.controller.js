@@ -14,6 +14,10 @@ export const profileController = {
     sendPaginated(res, await profileService.list(req.query));
   }),
 
+  overview: asyncHandler(async (req, res) => {
+    sendSuccess(res, { data: await profileService.overview() });
+  }),
+
   get: asyncHandler(async (req, res) => {
     sendSuccess(res, { data: await profileService.full(req.params.id) });
   }),

@@ -4,7 +4,7 @@ import { ImportBatch } from './import.model.js';
 import { decodeFile, parseCsv, mapHeader, cleanRow } from './import.clean.js';
 import { AlumniProfile, SectionModels, ProfileChange } from '../profiles/profile.model.js';
 import { SECTION_KEYS } from '../profiles/profile.sections.js';
-import { alumniNumberFor } from '../profiles/profile.service.js';
+import { alumniNumberFor, profileService } from '../profiles/profile.service.js';
 import { ApiError } from '../../utils/helpers.js';
 
 // Step 5: Alumni Database Migration.
@@ -289,11 +289,9 @@ export const importService = {
   },
 
   // All profiles as CSV in the template's layout (plus system columns), for Excel or another system.
+  // Same filters as the Alumni profiles list, so EAO exports exactly what they searched for.
   async exportCsv(query = {}) {
-    const where = {};
-    if (query.yearGraduated) where.yearGraduated = query.yearGraduated;
-    if (query.source) where.source = query.source;
-    const profiles = await AlumniProfile.findAll({ where, order: [['yearGraduated', 'DESC'], ['surname', 'ASC'], ['firstName', 'ASC']] });
+    const profiles = await AlumniProfile.findAll({ where: profileService.where(query), order: [['yearGraduated', 'DESC'], ['surname', 'ASC'], ['firstName', 'ASC']] });
     const jobs = new Map();
     const ids = profiles.map((p) => p.id);
     for (let i = 0; i < ids.length; i += 1000) {
@@ -301,13 +299,13 @@ export const importService = {
       for (const w of work) if (!jobs.has(w.profileId)) jobs.set(w.profileId, w);
     }
     const mdy = (d) => (d ? `${String(d).slice(5, 7)}/${String(d).slice(8, 10)}/${String(d).slice(0, 4)}` : '');
-    const header = ['Alumni No.', 'Student No.', 'Year', 'Course', 'Surname', 'Given Name', 'Middle Name', 'Suffix', 'Maiden Name', 'Contact No.', 'Email Address', 'Home Address', 'Barangay', 'City', 'Province', 'Region', 'Country', 'Birthdate', 'Gender', 'Civil Status', 'Nationality', 'Company Name', 'Position', 'Portal Account', 'Source'];
+    const header = ['Alumni No.', 'Student No.', 'Year', 'Course', 'Surname', 'Given Name', 'Middle Name', 'Suffix', 'Maiden Name', 'Contact No.', 'Email Address', 'Home Address', 'Barangay', 'City', 'Province', 'Region', 'Country', 'Birthdate', 'Gender', 'Civil Status', 'Nationality', 'Company Name', 'Position', 'Portal Account', 'Source', 'Last Updated by Alumnus'];
     const lines = profiles.map((p) => {
       const job = jobs.get(p.id);
       return [
         p.alumniNumber, p.studentNumber, p.yearGraduated, p.program, p.surname, p.firstName, p.middleName, p.suffix, p.maidenName, p.phone, p.email,
         p.houseStreet, p.barangay, p.city, p.province, p.region, p.country, mdy(p.birthDate), p.sex, p.civilStatus, p.nationality,
-        job?.company, job?.position, p.alumniAccountId ? 'Yes' : 'No', p.source,
+        job?.company, job?.position, p.alumniAccountId ? 'Yes' : 'No', p.source, p.alumniUpdatedAt ? mdy(new Date(p.alumniUpdatedAt).toISOString()) : '',
       ];
     });
     const cell = (v) => {

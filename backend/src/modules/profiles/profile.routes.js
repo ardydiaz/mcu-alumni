@@ -20,6 +20,7 @@ import { authenticateAlumni } from '../portal/portal.middleware.js';
 export const staffProfileRoutes = Router();
 staffProfileRoutes.use(authenticate, adminPanelOnly);
 staffProfileRoutes.get('/', validate(listProfilesQuerySchema, 'query'), profileController.list);
+staffProfileRoutes.get('/overview', profileController.overview);
 staffProfileRoutes.get('/invitations/summary', validate(inviteSummaryQuerySchema, 'query'), profileController.inviteSummary);
 staffProfileRoutes.post('/invitations', validate(sendInvitesSchema), profileController.sendInvites);
 staffProfileRoutes.post('/', uploadImage('photo', 'profiles'), validate(staffCreateProfileSchema), profileController.create);

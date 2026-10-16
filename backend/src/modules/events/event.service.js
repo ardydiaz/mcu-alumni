@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import { Event } from './event.model.js';
+import { eventRegistrations } from './event.registration.js';
 import { ApiError, createCrudService, isStaff } from '../../utils/helpers.js';
 import { getPagination, buildMeta, getSort } from '../../utils/pagination.js';
 
@@ -52,6 +53,7 @@ export const eventService = {
       limit,
       offset, // the include is belongsTo (one network per event), so rows are never duplicated
     });
+    await eventRegistrations.decorate(rows); // registeredCount, spotsLeft, registrationClosed
     return { rows, meta: buildMeta({ page, limit }, count) };
   },
 
@@ -60,7 +62,7 @@ export const eventService = {
     const where = /^\d+$/.test(key) ? { id: key } : { slug: key };
     const event = await Event.findOne({ where, include });
     if (!event || (!isStaff(user) && !PUBLIC_STATUS.includes(event.status))) throw ApiError.notFound('Event not found');
-    return event;
+    return eventRegistrations.decorate(event);
   },
 
   async create(data) {

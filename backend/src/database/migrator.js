@@ -12,6 +12,7 @@ import * as createAlumniProfiles from './migrations/20261016-09-create-alumni-pr
 import * as createImportBatches from './migrations/20261016-10-create-import-batches.js';
 import * as logExportAction from './migrations/20261016-11-log-export-action.js';
 import * as profileInvitations from './migrations/20261016-12-profile-invitations.js';
+import * as eaoMonitoring from './migrations/20261016-13-eao-monitoring-event-registrations.js';
 
 // Versioned schema migrations, applied in order and recorded in `schema_migrations`.
 // Add new migrations to the end of this list; never rename or reorder applied ones.
@@ -28,6 +29,7 @@ const MIGRATIONS = [
   ['20261016-10-create-import-batches', createImportBatches],
   ['20261016-11-log-export-action', logExportAction],
   ['20261016-12-profile-invitations', profileInvitations],
+  ['20261016-13-eao-monitoring-event-registrations', eaoMonitoring],
 ];
 
 export function createMigrator(sequelize) {

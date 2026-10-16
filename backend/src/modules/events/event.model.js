@@ -26,7 +26,8 @@ Event.init(
     image: { type: DataTypes.STRING(500) },
     registrationDeadline: { type: DataTypes.DATE },
     capacity: { type: DataTypes.INTEGER.UNSIGNED },
-    registrationUrl: { type: DataTypes.STRING(500) }, // optional external sign-up link (portal registration comes in phase 2)
+    registrationUrl: { type: DataTypes.STRING(500) }, // optional external sign-up link
+    portalRegistration: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false }, // alumni register in the portal (migration 13)
     networkId: { type: DataTypes.INTEGER.UNSIGNED }, // chapter hosting the event
     status: { type: DataTypes.ENUM(...EVENT_STATUS), allowNull: false, defaultValue: 'draft' },
   },
@@ -39,3 +40,28 @@ Event.init(
 );
 
 Event.belongsTo(Network, { foreignKey: 'networkId', as: 'network', constraints: false });
+
+export const REGISTRATION_STATUS = ['registered', 'attended', 'cancelled'];
+
+// An alumnus registered for an event through the Alumni Portal (table from migration 13).
+export class EventRegistration extends Model {}
+
+EventRegistration.init(
+  {
+    id: { type: DataTypes.INTEGER.UNSIGNED, autoIncrement: true, primaryKey: true },
+    eventId: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
+    alumniAccountId: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
+    status: { type: DataTypes.STRING(20), allowNull: false, defaultValue: 'registered' },
+    cancelledAt: { type: DataTypes.DATE },
+    attendedAt: { type: DataTypes.DATE },
+  },
+  {
+    sequelize,
+    modelName: 'EventRegistration',
+    tableName: 'event_registrations',
+    indexes: [{ unique: true, fields: ['event_id', 'alumni_account_id'] }, { fields: ['alumni_account_id'] }],
+  }
+);
+
+Event.hasMany(EventRegistration, { foreignKey: 'eventId', as: 'registrations', constraints: false });
+EventRegistration.belongsTo(Event, { foreignKey: 'eventId', as: 'event', constraints: false });

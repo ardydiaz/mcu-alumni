@@ -61,6 +61,13 @@ export const listProfilesQuerySchema = listQuerySchema.keys({
   source: Joi.string().valid('portal', 'eao', 'import'),
   importBatchId: Joi.number().integer().min(1),
   invite: Joi.string().valid('not_invited', 'invited', 'expired', 'claimed', 'no_email'),
+  // EAO search (Step 11)
+  program: Joi.string().trim().max(150),
+  regionCode: Joi.string().trim().pattern(/^R?\d{9,10}$/),
+  location: Joi.string().trim().max(100),
+  employment: Joi.string().valid('employed', 'none'),
+  employer: Joi.string().trim().max(100), // current company, position or job category
+  updated: Joi.string().valid('recent', 'stale', 'never'),
 });
 
 // Portal invitations (staff): who to invite. At least one of the three scopes is required.

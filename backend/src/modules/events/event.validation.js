@@ -1,5 +1,5 @@
 import { Joi, listQuerySchema } from '../../middleware/validation.middleware.js';
-import { EVENT_CATEGORIES, EVENT_STATUS } from './event.model.js';
+import { EVENT_CATEGORIES, EVENT_STATUS, REGISTRATION_STATUS } from './event.model.js';
 
 // Optional values may arrive as '' (forms) or null (cleared); the service stores both as NULL.
 const optional = (schema) => schema.allow('', null);
@@ -33,6 +33,7 @@ const fields = {
   registrationDeadline: optional(dateTime()),
   capacity: optional(Joi.number().integer().min(1).max(100000)),
   registrationUrl: url(),
+  portalRegistration: Joi.boolean(),
   networkId: optional(Joi.number().integer().min(1)),
   status: Joi.string().valid(...EVENT_STATUS),
 };
@@ -52,6 +53,11 @@ export const listEventsQuerySchema = listQuerySchema.keys({
   to: Joi.date().iso(),
   upcoming: Joi.boolean(), // not yet ended
 });
+
+// Registrations (staff)
+export const registrationParamSchema = Joi.object({ id: Joi.number().integer().min(1).required(), registrationId: Joi.number().integer().min(1) });
+export const registrationListQuerySchema = Joi.object({ status: Joi.string().valid(...REGISTRATION_STATUS), search: Joi.string().trim().max(100).allow('') });
+export const registrationStatusSchema = Joi.object({ status: Joi.string().valid(...REGISTRATION_STATUS).required() });
 
 // Public URLs use the slug; the admin panel uses the numeric id.
 export const eventKeySchema = Joi.object({ key: Joi.string().trim().max(220).pattern(/^[a-z0-9-]+$/).required() });

@@ -5,6 +5,7 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import { adminPanelOnly } from '../../middleware/role.middleware.js';
 import { validate, idParamSchema, Joi } from '../../middleware/validation.middleware.js';
 import { ApiError } from '../../utils/helpers.js';
+import { listProfilesQuerySchema } from '../profiles/profile.validation.js';
 
 const MAX_MB = 10;
 
@@ -20,10 +21,8 @@ const uploadCsv = (req, res, next) =>
   });
 
 const modeSchema = Joi.object({ mode: Joi.string().valid('fill', 'skip').default('fill') });
-const exportQuerySchema = Joi.object({
-  yearGraduated: Joi.number().integer().min(1904).max(2100),
-  source: Joi.string().valid('portal', 'eao', 'import'),
-});
+// Export takes the same filters as the Alumni profiles list.
+const exportQuerySchema = listProfilesQuerySchema;
 
 // Staff (EAO): /api/v1/imports — Step 5: Alumni Database Migration
 const router = Router();

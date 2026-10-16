@@ -1,6 +1,16 @@
 import { Router } from 'express';
 import { eventController } from './event.controller.js';
-import { createEventSchema, updateEventSchema, listEventsQuerySchema, eventKeySchema } from './event.validation.js';
+import {
+  createEventSchema,
+  updateEventSchema,
+  listEventsQuerySchema,
+  eventKeySchema,
+  registrationParamSchema,
+  registrationListQuerySchema,
+  registrationStatusSchema,
+} from './event.validation.js';
+import { authenticateAlumni } from '../portal/portal.middleware.js';
+import { createRateLimiter } from '../../utils/helpers.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { adminPanelOnly } from '../../middleware/role.middleware.js';
 import { validate, idParamSchema } from '../../middleware/validation.middleware.js';
@@ -18,4 +28,17 @@ router.post('/', authenticate, adminPanelOnly, uploadImage('image', 'events'), v
 router.patch('/:id', authenticate, adminPanelOnly, validate(idParamSchema, 'params'), uploadImage('image', 'events'), validate(updateEventSchema), eventController.update);
 router.delete('/:id', authenticate, adminPanelOnly, validate(idParamSchema, 'params'), eventController.remove);
 
+// Staff: who registered through the Alumni Portal, attendance, CSV
+const staff = [authenticate, adminPanelOnly];
+router.get('/:id/registrations', ...staff, validate(registrationParamSchema, 'params'), validate(registrationListQuerySchema, 'query'), eventController.registrations);
+router.get('/:id/registrations/export', ...staff, validate(registrationParamSchema, 'params'), eventController.exportRegistrations);
+router.patch('/:id/registrations/:registrationId', ...staff, validate(registrationParamSchema, 'params'), validate(registrationStatusSchema), eventController.setRegistrationStatus);
+
 export default router;
+
+// Alumni (portal): /api/v1/portal/events — register / cancel, and which events they registered for.
+export const portalEventRoutes = Router();
+portalEventRoutes.use(authenticateAlumni);
+portalEventRoutes.get('/', eventController.myRegistrations);
+portalEventRoutes.post('/:id/register', createRateLimiter({ max: 30 }), validate(idParamSchema, 'params'), eventController.register);
+portalEventRoutes.delete('/:id/register', validate(idParamSchema, 'params'), eventController.cancelRegistration);

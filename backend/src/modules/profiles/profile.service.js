@@ -1,4 +1,5 @@
-import { Op } from 'sequelize';
+import { Op, literal, fn, col } from 'sequelize';
+import { sequelize } from '../../config/database.js';
 import { AlumniProfile, SectionModels, ProfileChange } from './profile.model.js';
 import { SECTIONS, SECTION_KEYS } from './profile.sections.js';
 import { psgc } from '../psgc/psgc.service.js';
@@ -36,8 +37,15 @@ export function splitName(fullName = '') {
   return { surname, firstName: words.join(' ') || surname, middleName: middle || null };
 }
 
+// A profile counts as "updated" when the alumnus touched it within this many days (EAO monitoring).
+export const UPDATED_WITHIN_DAYS = 365;
+
+// The alumnus reviewed or changed their own record (My Profile edit, or a Graduate Tracer submission).
+const touchedByAlumni = (profileId, options = {}) => AlumniProfile.update({ alumniUpdatedAt: new Date() }, { where: { id: profileId }, transaction: options.transaction });
+
 async function log(profileId, actor, section, action, changes, options = {}) {
   await ProfileChange.create({ profileId, actorType: actor.type, actorId: actor.id, actorName: actor.name, section, action, changes }, options);
+  if (actor.type === 'alumni') await touchedByAlumni(profileId, options);
 }
 
 function diff(before, after, fields) {
@@ -118,25 +126,78 @@ export const profileService = {
     return profile;
   },
 
-  async list(query = {}) {
-    const { page, limit, offset } = getPagination(query);
-    const where = {};
-    if (query.yearGraduated) where.yearGraduated = query.yearGraduated;
-    if (query.linked !== undefined) where.alumniAccountId = query.linked ? { [Op.ne]: null } : null;
-    if (query.source) where.source = query.source;
-    if (query.importBatchId) where.importBatchId = query.importBatchId;
-    if (query.invite) Object.assign(where, inviteWhere(query.invite));
+  // Filters shared by the list and the CSV export (EAO search, Step 11).
+  where(query = {}) {
+    const and = [];
+    if (query.yearGraduated) and.push({ yearGraduated: query.yearGraduated });
+    if (query.program) and.push({ program: query.program });
+    if (query.linked !== undefined) and.push({ alumniAccountId: query.linked ? { [Op.ne]: null } : null });
+    if (query.source) and.push({ source: query.source });
+    if (query.importBatchId) and.push({ importBatchId: query.importBatchId });
+    if (query.invite) and.push(inviteWhere(query.invite));
     if (query.search) {
       const like = { [Op.like]: `%${query.search}%` };
-      where[Op.or] = ['surname', 'firstName', 'studentNumber', 'alumniNumber', 'email', 'program'].map((f) => ({ [f]: like }));
+      and.push({ [Op.or]: ['surname', 'firstName', 'studentNumber', 'alumniNumber', 'email', 'phone', 'program'].map((f) => ({ [f]: like })) });
     }
+    // Location: the PSGC region, and/or any part of the address (imported addresses are free text).
+    if (query.regionCode) and.push({ regionCode: query.regionCode });
+    if (query.location) {
+      const like = { [Op.like]: `%${query.location}%` };
+      and.push({ [Op.or]: ['houseStreet', 'barangay', 'city', 'province', 'region', 'country'].map((f) => ({ [f]: like })) });
+    }
+    // Employment: from the current job in the Work section (kept up to date by the Graduate Tracer).
+    const esc = (v) => sequelize.escape(v);
+    if (query.employment === 'employed') and.push({ id: { [Op.in]: literal('(SELECT profile_id FROM profile_work WHERE is_current = 1)') } });
+    if (query.employment === 'none') and.push({ id: { [Op.notIn]: literal('(SELECT profile_id FROM profile_work WHERE is_current = 1)') } });
+    if (query.employer) {
+      const like = esc(`%${query.employer}%`);
+      and.push({ id: { [Op.in]: literal(`(SELECT profile_id FROM profile_work WHERE is_current = 1 AND (company LIKE ${like} OR position LIKE ${like} OR job_category LIKE ${like}))`) } });
+    }
+    // Updated by the alumnus in the last 12 months (My Profile or Graduate Tracer), not since, or never.
+    const yearAgo = new Date(Date.now() - UPDATED_WITHIN_DAYS * 86400000);
+    if (query.updated === 'recent') and.push({ alumniUpdatedAt: { [Op.gte]: yearAgo } });
+    if (query.updated === 'stale') and.push({ alumniUpdatedAt: { [Op.lt]: yearAgo } });
+    if (query.updated === 'never') and.push({ alumniUpdatedAt: null });
+    return and.length ? { [Op.and]: and } : {};
+  },
+
+  async list(query = {}) {
+    const { page, limit, offset } = getPagination(query);
     const { rows, count } = await AlumniProfile.findAndCountAll({
-      where,
-      order: getSort(query, ['surname', 'yearGraduated', 'alumniNumber', 'createdAt', 'updatedAt'], [['surname', 'ASC'], ['firstName', 'ASC']]),
+      where: this.where(query),
+      order: getSort(query, ['surname', 'yearGraduated', 'alumniNumber', 'createdAt', 'updatedAt', 'alumniUpdatedAt'], [['surname', 'ASC'], ['firstName', 'ASC']]),
       limit,
       offset,
     });
-    return { rows, meta: buildMeta({ page, limit }, count) };
+    // Current job for the list (one query for the page).
+    const jobs = new Map();
+    if (rows.length) {
+      const work = await SectionModels.work.findAll({ where: { profileId: rows.map((r) => r.id), isCurrent: true }, order: [['updatedAt', 'DESC']], attributes: ['profileId', 'company', 'position'] });
+      for (const w of work) if (!jobs.has(w.profileId)) jobs.set(w.profileId, { company: w.company, position: w.position });
+    }
+    return { rows: rows.map((r) => ({ ...r.toJSON(), currentJob: jobs.get(r.id) || null })), meta: buildMeta({ page, limit }, count) };
+  },
+
+  // EAO monitoring: counts for the tiles above the list, and the values for the filter dropdowns.
+  async overview() {
+    const yearAgo = new Date(Date.now() - UPDATED_WITHIN_DAYS * 86400000);
+    const employed = literal('(SELECT profile_id FROM profile_work WHERE is_current = 1)');
+    const [total, activated, recent, stale, never, withJob, programs, years] = await Promise.all([
+      AlumniProfile.count(),
+      AlumniProfile.count({ where: { alumniAccountId: { [Op.ne]: null } } }),
+      AlumniProfile.count({ where: { alumniUpdatedAt: { [Op.gte]: yearAgo } } }),
+      AlumniProfile.count({ where: { alumniUpdatedAt: { [Op.lt]: yearAgo } } }),
+      AlumniProfile.count({ where: { alumniUpdatedAt: null } }),
+      AlumniProfile.count({ where: { id: { [Op.in]: employed } } }),
+      AlumniProfile.findAll({ attributes: [[fn('DISTINCT', col('program')), 'program']], raw: true }),
+      AlumniProfile.findAll({ attributes: [[fn('DISTINCT', col('year_graduated')), 'year']], raw: true }),
+    ]);
+    return {
+      counts: { total, activated, updatedRecent: recent, updatedStale: stale, neverUpdated: never, employed: withJob },
+      updatedWithinDays: UPDATED_WITHIN_DAYS,
+      programs: programs.map((p) => p.program).filter(Boolean).sort(),
+      years: years.map((y) => Number(y.year)).filter(Boolean).sort((a, b) => b - a),
+    };
   },
 
   async assignAlumniNumber(profile, options = {}) {
@@ -269,6 +330,7 @@ export const profileService = {
     const profile = await AlumniProfile.findOne({ where: { alumniAccountId: accountId }, transaction });
     if (!profile) return;
     const actor = systemActor('Graduate Tracer');
+    await touchedByAlumni(profile.id, { transaction }); // submitting the tracer confirms the record, even with no changes
 
     const personal = blankToNull({ sex: data.sex, phone: data.phone });
     const before = profile.toJSON();
