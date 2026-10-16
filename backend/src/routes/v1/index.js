@@ -16,6 +16,10 @@ import volunteerRoutes from '../../modules/volunteers/volunteer.routes.js';
 import messageRoutes from '../../modules/messages/message.routes.js';
 import logRoutes from '../../modules/logs/log.routes.js';
 import slideRoutes from '../../modules/slides/slide.routes.js';
+import portalRoutes from '../../modules/portal/portal.routes.js';
+import eventRoutes from '../../modules/events/event.routes.js';
+import { staffProfileRoutes, portalProfileRoutes } from '../../modules/profiles/profile.routes.js';
+import psgcRoutes from '../../modules/psgc/psgc.routes.js';
 
 const router = Router();
 
@@ -38,5 +42,10 @@ router.use('/volunteers', volunteerRoutes);
 router.use('/messages', messageRoutes);
 router.use('/logs', logRoutes);
 router.use('/slides', slideRoutes);
+router.use('/portal/profile', portalProfileRoutes); // alumnus's own profile (Step 4)
+router.use('/portal', portalRoutes); // Alumni Portal accounts
+router.use('/profiles', staffProfileRoutes); // Alumni profiles / data entry (EAO)
+router.use('/psgc', psgcRoutes); // Philippine address lists
+router.use('/events', eventRoutes); // Alumni Events and Activities calendar
 
 export default router;

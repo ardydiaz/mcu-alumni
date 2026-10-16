@@ -62,6 +62,13 @@ export const env = {
     allowedDomains: list(process.env.M365_ALLOWED_DOMAINS || '').map((d) => d.toLowerCase()),
   },
 
+  // Outgoing email through Microsoft Graph, using the same Entra app as Microsoft 365 sign-in.
+  // The app needs the Microsoft Graph *application* permission Mail.Send (admin consent).
+  mail: {
+    from: (process.env.MAIL_FROM || '').trim(), // mailbox that sends, e.g. alumni@mcu.edu.ph
+    fromName: process.env.MAIL_FROM_NAME || 'MCU Alumni Relations',
+  },
+
   seedAdmin: {
     email: process.env.SEED_ADMIN_EMAIL || 'admin@mcu.edu.ph',
     fullname: process.env.SEED_ADMIN_FULLNAME || 'MCU Administrator',
@@ -69,6 +76,8 @@ export const env = {
 
   frontendDist: path.resolve(rootDir, '..', 'frontend', 'dist'),
 };
+
+env.mail.enabled = Boolean(env.mail.from && env.m365.tenantId && env.m365.clientId && env.m365.clientSecret);
 
 env.m365.enabled =
   process.env.M365_ENABLED === 'true' && Boolean(env.m365.tenantId && env.m365.clientId && env.m365.clientSecret);

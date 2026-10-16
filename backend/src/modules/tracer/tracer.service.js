@@ -4,12 +4,12 @@ import { createCrudService } from '../../utils/helpers.js';
 
 const crud = createCrudService(TracerResponse, {
   label: 'Tracer response',
-  searchFields: ['firstName', 'lastName', 'email', 'employer'],
-  filterFields: ['course', 'yearGraduated', 'employmentStatus'],
-  sortFields: ['lastName', 'course', 'yearGraduated', 'employmentStatus', 'createdAt'],
+  searchFields: ['fullName', 'email', 'employer', 'degree'],
+  filterFields: ['degree', 'yearGraduated', 'isEmployed'],
+  sortFields: ['fullName', 'degree', 'yearGraduated', 'isEmployed', 'createdAt'],
 });
 
-// Counts responses per value of `field`, e.g. { Employed: 40, Unemployed: 3 }.
+// Counts responses per value of `field`, e.g. { 'Within 6 months': 40, '1 to 2 years': 3 }.
 async function countBy(field, where) {
   const rows = await TracerResponse.findAll({
     where,
@@ -20,37 +20,62 @@ async function countBy(field, where) {
   return Object.fromEntries(rows.map((r) => [r[field] ?? 'Not answered', Number(r.count)]));
 }
 
+// Boolean columns come back as 1/0 (MySQL) or true/false (SQLite).
+const yesNoCounts = (counts) => ({ Yes: counts[1] || counts.true || 0, No: counts[0] || counts.false || 0 });
+
+// Job categories are multi-select (a JSON array), so they are tallied here.
+async function countJobCategories(where) {
+  const rows = await TracerResponse.findAll({ where: { ...where, isEmployed: true }, attributes: ['jobCategories'], raw: true });
+  const counts = {};
+  for (const { jobCategories } of rows) {
+    const list = typeof jobCategories === 'string' ? JSON.parse(jobCategories) : jobCategories || [];
+    for (const c of list) counts[c] = (counts[c] || 0) + 1;
+  }
+  return counts;
+}
+
+const toBool = (v) => v === 'Yes';
+
 export const tracerService = {
   ...crud,
 
-  async create({ consent, relatedToCourse, ...data }) {
-    const clean = Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v === '' ? null : v]));
-    const response = await TracerResponse.create({
-      ...clean,
-      relatedToCourse: relatedToCourse ? relatedToCourse === 'Yes' : null,
-      consentAt: new Date(),
-    });
+  // `options` is passed to Sequelize (e.g. { transaction } when the portal also updates the account).
+  async create({ consent, isEmployed, relatedToDegree, furtherStudies, jobCategories, ...data }, options = {}) {
+    const employed = toBool(isEmployed);
+    const response = await TracerResponse.create(
+      {
+        ...data,
+        isEmployed: employed,
+        jobCategories: employed ? jobCategories : null,
+        relatedToDegree: employed ? toBool(relatedToDegree) : null,
+        furtherStudies: toBool(furtherStudies),
+        consentAt: new Date(),
+      },
+      options
+    );
     return { id: response.id };
   },
 
   // Aggregates for tracer studies / accreditation reports.
   async summary(filters = {}) {
     const where = Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== undefined));
-    const [total, employmentStatus, timeToFirstJob, monthlyIncome, relatedToCourse] = await Promise.all([
+    const [total, employed, relatedToDegree, timeToFirstJob, furtherStudies, jobCategories] = await Promise.all([
       TracerResponse.count({ where }),
-      countBy('employmentStatus', where),
-      countBy('timeToFirstJob', where),
-      countBy('monthlyIncome', where),
-      countBy('relatedToCourse', where),
+      countBy('isEmployed', where),
+      countBy('relatedToDegree', { ...where, isEmployed: true }),
+      countBy('timeToFirstJob', { ...where, isEmployed: true }),
+      countBy('furtherStudies', where),
+      countJobCategories(where),
     ]);
-    const employed = (employmentStatus.Employed || 0) + (employmentStatus['Self-employed'] || 0);
+    const { Yes: employedCount, No: notEmployed } = yesNoCounts(employed);
     return {
       total,
-      employmentRate: total ? Math.round((employed / total) * 1000) / 10 : 0,
-      employmentStatus,
+      employmentRate: total ? Math.round((employedCount / total) * 1000) / 10 : 0,
+      employment: { Employed: employedCount, 'Not employed': notEmployed },
+      relatedToDegree: yesNoCounts(relatedToDegree),
       timeToFirstJob,
-      monthlyIncome,
-      relatedToCourse: { Yes: relatedToCourse[1] || relatedToCourse.true || 0, No: relatedToCourse[0] || relatedToCourse.false || 0 },
+      furtherStudies: yesNoCounts(furtherStudies),
+      jobCategories,
     };
   },
 };

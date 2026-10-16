@@ -30,9 +30,45 @@ export const COURSES = [
   'Other',
 ];
 
-export const EMPLOYMENT_STATUS = ['Employed', 'Self-employed', 'Unemployed', 'Further studies', 'Not seeking employment'];
-export const TIME_TO_FIRST_JOB = ['Less than 3 months', '3 to 6 months', '6 months to 1 year', '1 to 2 years', 'More than 2 years', 'Not yet employed'];
-export const INCOME_RANGES = ['Below PHP 20,000', 'PHP 20,000 - 39,999', 'PHP 40,000 - 59,999', 'PHP 60,000 - 99,999', 'PHP 100,000 and above', 'Prefer not to say'];
+// ---- Graduate Tracer choices ----------------------------------------------
+export const SEXES = ['Male', 'Female'];
+
+// "Recent Course / Degree Completed", grouped by college for the dropdown.
+// Graduates whose degree is not listed pick "Other" and type it in.
+export const DEGREE_GROUPS = [
+  { college: 'College of Arts and Sciences', degrees: ['AB Communication', 'AB Political Science', 'BS Biology'] },
+  { college: 'College of Business and Accountancy', degrees: ['BS Accountancy', 'BSBA Financial Management', 'BSBA Human Resource Management', 'BSBA Marketing Management'] },
+  { college: 'College of Computer Studies', degrees: ['BS Computer Science', 'BS Information Technology'] },
+  { college: 'College of Criminology', degrees: ['BS Criminology'] },
+  { college: 'College of Dentistry', degrees: ['Doctor of Dental Medicine'] },
+  { college: 'College of Engineering', degrees: ['BS Civil Engineering', 'BS Electrical Engineering', 'BS Mechanical Engineering'] },
+  { college: 'College of Medical Technology', degrees: ['BS Medical Technology'] },
+  { college: 'College of Medicine', degrees: ['Doctor of Medicine'] },
+  { college: 'College of Midwifery', degrees: ['BS Midwifery', 'Diploma in Midwifery'] },
+  { college: 'College of Nursing', degrees: ['BS Nursing'] },
+  { college: 'College of Nutrition and Dietetics', degrees: ['BS Nutrition and Dietetics'] },
+  { college: 'College of Optometry', degrees: ['Doctor of Optometry'] },
+  { college: 'College of Pharmacy', degrees: ['BS Pharmacy'] },
+  { college: 'College of Physical Therapy', degrees: ['BS Physical Therapy'] },
+  { college: 'College of Psychology', degrees: ['BS Psychology'] },
+  { college: 'College of Radiologic Technology', degrees: ['BS Radiologic Technology'] },
+  { college: 'College of Respiratory Therapy', degrees: ['BS Respiratory Therapy'] },
+  { college: 'College of Teacher Education', degrees: ['Bachelor of Elementary Education', 'Bachelor of Secondary Education'] },
+  { college: 'Graduate School', degrees: ["Master's Degree", 'Doctorate / PhD'] },
+];
+
+export const JOB_CATEGORIES = [
+  'Entry Level / Associate',
+  'Supervisor / Manager',
+  'Head / Director',
+  'Senior Executive (e.g., CEO, VP, President)',
+  'Academic / Educator',
+  'Other',
+];
+export const TIME_AFTER_GRADUATION = ['Within 6 months', '7 months to 1 year', '1 to 2 years', 'More than 2 years'];
+// "If No, choose N/A"
+export const FURTHER_STUDIES_TIMING = [...TIME_AFTER_GRADUATION, 'N/A'];
+
 export const VOLUNTEER_ROLES = ['expertise', 'community', 'mentor'];
 
 export const sections = {
@@ -75,24 +111,28 @@ export const sections = {
     features: [
       {
         title: 'Alumni E-Newsletter',
+        tag: 'Newsletter', tone: 'purple', cover: '/images/networks-banner.webp', cta: 'Read newsletter',
         text: 'Stories, milestones, and updates from the Centralino community.',
         image: `${UPLOADS}/2025/06/ChatGPT-Image-Jun-25-2025-01_12_14-PM.webp`,
         url: 'https://alumni.mcu.edu.ph/alumni-e-newsletter/',
       },
       {
         title: 'Centralino Spotlight',
+        tag: 'Spotlight', tone: 'gold', cover: '/images/industry-partners-banner.webp', cta: 'Read story',
         text: 'Meet alumni making a difference in their fields and communities.',
         image: `${UPLOADS}/2025/06/IN-MEMORIAM-3.webp`,
         url: 'https://alumni.mcu.edu.ph/centralino-spotlight',
       },
       {
         title: 'News and Updates',
+        tag: 'Campus News', tone: 'purple', cover: '/images/campus-development-banner.webp', cta: 'Read updates',
         text: 'The latest announcements, events, and reunions.',
         image: `${UPLOADS}/2025/06/EAO-WEBSITE.webp`,
         url: 'https://alumni.mcu.edu.ph/news-and-updates',
       },
       {
         title: 'In Memoriam',
+        tag: 'In Memoriam', tone: 'dark', cta: 'Read tributes',
         text: 'Honoring the Centralinos who have gone before us.',
         image: `${UPLOADS}/2025/06/IN-MEMORIAM.webp`,
         url: 'https://alumni.mcu.edu.ph/in-memoriam/',
@@ -156,8 +196,10 @@ export const sections = {
   courses: COURSES,
 
   'form-options': {
-    employmentStatus: EMPLOYMENT_STATUS,
-    timeToFirstJob: TIME_TO_FIRST_JOB,
-    monthlyIncome: INCOME_RANGES,
+    sexes: SEXES,
+    degreeGroups: DEGREE_GROUPS,
+    jobCategories: JOB_CATEGORIES,
+    timeToFirstJob: TIME_AFTER_GRADUATION,
+    furtherStudiesTiming: FURTHER_STUDIES_TIMING,
   },
 };

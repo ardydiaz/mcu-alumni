@@ -1,35 +1,46 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../../config/database.js';
-import { EMPLOYMENT_STATUS, TIME_TO_FIRST_JOB, INCOME_RANGES } from '../content/content.data.js';
+import { SEXES, TIME_AFTER_GRADUATION, FURTHER_STUDIES_TIMING } from '../content/content.data.js';
 
-// A Graduate Tracer survey response.
+// A Graduate Tracer survey response (Graduate Profile, Employment Information, Additional Information).
+// The table is created by migration 20261008-05-tracer-graduate-profile; keep the two in step.
 export class TracerResponse extends Model {}
 
 TracerResponse.init(
   {
     id: { type: DataTypes.INTEGER.UNSIGNED, autoIncrement: true, primaryKey: true },
-    firstName: { type: DataTypes.STRING(80), allowNull: false },
-    lastName: { type: DataTypes.STRING(80), allowNull: false },
+
+    // Graduate profile
+    fullName: { type: DataTypes.STRING(200), allowNull: false }, // "Dela Cruz, Juan Carlo, M."
+    sex: { type: DataTypes.ENUM(...SEXES), allowNull: false },
     email: { type: DataTypes.STRING(120), allowNull: false },
     phone: { type: DataTypes.STRING(30), allowNull: false },
-    course: { type: DataTypes.STRING(120), allowNull: false },
+    address: { type: DataTypes.STRING(500), allowNull: false },
     yearGraduated: { type: DataTypes.SMALLINT.UNSIGNED, allowNull: false },
-    employmentStatus: { type: DataTypes.ENUM(...EMPLOYMENT_STATUS), allowNull: false },
-    employer: { type: DataTypes.STRING(150) },
+    degree: { type: DataTypes.STRING(150), allowNull: false },
+
+    // Employment information (only when currently employed)
+    isEmployed: { type: DataTypes.BOOLEAN, allowNull: false },
+    employer: { type: DataTypes.STRING(150) }, // last employer if retired
+    jobCategories: { type: DataTypes.JSON }, // one or more of JOB_CATEGORIES
+    jobCategoryOther: { type: DataTypes.STRING(120) },
     position: { type: DataTypes.STRING(120) },
-    industry: { type: DataTypes.STRING(120) },
-    workLocation: { type: DataTypes.STRING(120) },
-    relatedToCourse: { type: DataTypes.BOOLEAN },
-    timeToFirstJob: { type: DataTypes.ENUM(...TIME_TO_FIRST_JOB) },
-    monthlyIncome: { type: DataTypes.ENUM(...INCOME_RANGES) },
-    licensure: { type: DataTypes.STRING(150) },
-    feedback: { type: DataTypes.TEXT },
+    relatedToDegree: { type: DataTypes.BOOLEAN },
+    timeToFirstJob: { type: DataTypes.ENUM(...TIME_AFTER_GRADUATION) },
+
+    // Additional information
+    furtherStudies: { type: DataTypes.BOOLEAN, allowNull: false },
+    furtherStudiesTiming: { type: DataTypes.ENUM(...FURTHER_STUDIES_TIMING), allowNull: false },
+
     consentAt: { type: DataTypes.DATE, allowNull: false },
+
+    // Set when submitted from the Alumni Portal (NULL for the public form). One row per submission = tracer history.
+    alumniAccountId: { type: DataTypes.INTEGER.UNSIGNED },
   },
   {
     sequelize,
     modelName: 'TracerResponse',
     tableName: 'tracer_responses',
-    indexes: [{ fields: ['course', 'year_graduated'] }, { fields: ['employment_status'] }],
+    indexes: [{ fields: ['degree', 'year_graduated'] }, { fields: ['is_employed'] }, { fields: ['alumni_account_id'] }],
   }
 );

@@ -1,0 +1,154 @@
+import { Op } from 'sequelize';
+import { AlumniAccount } from './alumniAccount.model.js';
+import { hashPassword, verifyPassword, createEmailToken, hashToken, signAlumniToken } from './portal.security.js';
+import { env } from '../../config/env.js';
+import { sendMail } from '../../utils/mailer.js';
+import { ApiError, createCrudService } from '../../utils/helpers.js';
+import { profileService, staffActor } from '../profiles/profile.service.js';
+
+const MAX_FAILED_LOGINS = 5;
+const LOCK_MINUTES = 15;
+const SIGN_IN_ERROR = 'Incorrect email or password';
+
+// "Dela Cruz, Juan Carlo, M." -> "Juan" for email greetings
+const firstName = (fullName = '') => (fullName.split(',')[1] || fullName).trim().split(/\s+/)[0];
+
+const crud = createCrudService(AlumniAccount, {
+  label: 'Alumni account',
+  searchFields: ['fullName', 'email', 'studentNumber', 'program'],
+  filterFields: ['status', 'yearGraduated'],
+  sortFields: ['fullName', 'yearGraduated', 'status', 'createdAt'],
+});
+
+// Only what the alumnus needs to see about their own account.
+export const toPortalProfile = (a) => ({
+  id: a.id,
+  fullName: a.fullName,
+  studentNumber: a.studentNumber,
+  program: a.program,
+  yearGraduated: a.yearGraduated,
+  email: a.email,
+  phone: a.phone,
+  sex: a.sex,
+  address: a.address,
+  status: a.status,
+  reviewNote: a.status === 'rejected' ? a.reviewNote : null,
+  createdAt: a.createdAt,
+});
+
+function sendVerificationEmail(account, token) {
+  const link = `${env.frontendUrl}/portal/verify?token=${encodeURIComponent(token)}`;
+  return sendMail({
+    to: account.email,
+    subject: 'Verify your MCU Alumni Portal account',
+    text: `Hi ${firstName(account.fullName)},\n\nPlease confirm your email address to continue your MCU Alumni Portal registration:\n${link}\n\nThis link expires in 24 hours. If you did not register, you can ignore this email.`,
+  });
+}
+
+export const portalService = {
+  ...crud,
+
+  async register({ password, confirmPassword, consent, ...data }) {
+    const taken = await AlumniAccount.findOne({
+      where: { [Op.or]: [{ email: data.email }, { studentNumber: data.studentNumber }] },
+    });
+    if (taken?.email === data.email) {
+      throw ApiError.conflict('An account with this email already exists. Log in instead, or request a new verification link.', {
+        email: 'This email is already registered',
+      });
+    }
+    if (taken) {
+      throw ApiError.conflict('This student number is already registered. Please contact the Alumni Relations Office.', {
+        studentNumber: 'This student number is already registered',
+      });
+    }
+
+    const { token, hash, expiresAt } = createEmailToken();
+    const account = await AlumniAccount.create({
+      ...data,
+      passwordHash: await hashPassword(password),
+      emailTokenHash: hash,
+      emailTokenExpiresAt: expiresAt,
+      consentAt: new Date(),
+    });
+    await sendVerificationEmail(account, token);
+    return { email: account.email };
+  },
+
+  // Email confirmed -> waits for the Alumni Office (status "pending").
+  async verifyEmail(token) {
+    const account = await AlumniAccount.scope('withSecrets').findOne({ where: { emailTokenHash: hashToken(token) } });
+    if (!account || account.emailTokenExpiresAt < new Date()) {
+      throw ApiError.badRequest('This verification link is invalid or has expired. Please request a new one.');
+    }
+    await account.update({
+      status: account.status === 'email_unverified' ? 'pending' : account.status,
+      emailVerifiedAt: account.emailVerifiedAt || new Date(),
+      emailTokenHash: null,
+      emailTokenExpiresAt: null,
+    });
+    return { status: account.status };
+  },
+
+  // Always succeeds from the caller's point of view, so it can't be used to discover accounts.
+  async resendVerification(email) {
+    const account = await AlumniAccount.findOne({ where: { email } });
+    if (!account || account.status !== 'email_unverified') return;
+    const { token, hash, expiresAt } = createEmailToken();
+    await account.update({ emailTokenHash: hash, emailTokenExpiresAt: expiresAt });
+    await sendVerificationEmail(account, token);
+  },
+
+  async login({ email, password }) {
+    const account = await AlumniAccount.scope('withSecrets').findOne({ where: { email } });
+    if (!account) throw ApiError.unauthorized(SIGN_IN_ERROR);
+
+    if (account.lockedUntil && account.lockedUntil > new Date()) {
+      const minutes = Math.ceil((account.lockedUntil - Date.now()) / 60000);
+      throw new ApiError(429, `Too many failed attempts. Please try again in ${minutes} minute${minutes === 1 ? '' : 's'}.`);
+    }
+
+    if (!(await verifyPassword(password, account.passwordHash))) {
+      const failed = account.failedLogins + 1;
+      const locked = failed >= MAX_FAILED_LOGINS;
+      await account.update({ failedLogins: locked ? 0 : failed, lockedUntil: locked ? new Date(Date.now() + LOCK_MINUTES * 60000) : null });
+      throw ApiError.unauthorized(SIGN_IN_ERROR);
+    }
+
+    if (account.status === 'email_unverified') {
+      throw new ApiError(403, 'Please verify your email address first. Check your inbox for the verification link.', { reason: 'email_unverified' });
+    }
+    if (account.status === 'rejected') {
+      throw new ApiError(403, 'Your registration was not approved. Please contact the Alumni Relations Office.', { reason: 'rejected' });
+    }
+
+    await account.update({ failedLogins: 0, lockedUntil: null, lastLoginAt: new Date() });
+    return { token: signAlumniToken(account), account: toPortalProfile(account) };
+  },
+
+  // ---- Staff review ----
+  async approve(id, actor) {
+    const account = await crud.getById(id, { internal: true });
+    if (account.status === 'email_unverified') throw ApiError.badRequest('This person has not verified their email address yet.');
+    await account.update({ status: 'verified', reviewedById: actor.id, reviewedAt: new Date(), reviewNote: null });
+    // Verified alumni get their master profile (or are linked to one EAO already encoded) with an Alumni Number.
+    await profileService.createForAccount(account, staffActor(actor));
+    await sendMail({
+      to: account.email,
+      subject: 'Your MCU Alumni Portal account is verified',
+      text: `Hi ${firstName(account.fullName)},\n\nGood news! The Alumni Relations Office has verified your account. You can now log in:\n${env.frontendUrl}/portal/login`,
+    });
+    return account;
+  },
+
+  async reject(id, { reason } = {}, actor) {
+    const account = await crud.getById(id, { internal: true });
+    await account.update({ status: 'rejected', reviewedById: actor.id, reviewedAt: new Date(), reviewNote: reason || null });
+    await sendMail({
+      to: account.email,
+      subject: 'About your MCU Alumni Portal registration',
+      text: `Hi ${firstName(account.fullName)},\n\nWe could not verify your registration${reason ? `: ${reason}` : '.'}\nPlease contact the Alumni Relations Office at alumni@mcu.edu.ph.`,
+    });
+    return account;
+  },
+};
