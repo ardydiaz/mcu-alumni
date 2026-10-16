@@ -2,21 +2,30 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Icon from '../../components/ui/Icon.jsx';
 import { getEvent, eventIcsUrl, assetUrl } from '../../api/client.js';
+import { portalApi } from '../../api/portal.js';
+import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import { categoryOf, longDate, timeRange, deadlineInfo, isPast, shortDate, time } from '../../components/events/eventUtils.js';
 import '../../styles/events.css';
 
-function useEvent(slug) {
+// `version` reloads quietly (keeps the page) after registering, so the slot count updates.
+function useEvent(slug, version = 0) {
   const [state, setState] = useState({ data: null, loading: true, error: null });
+  const [loaded, setLoaded] = useState(null);
   useEffect(() => {
     let active = true;
-    setState({ data: null, loading: true, error: null });
+    if (loaded !== slug) setState({ data: null, loading: true, error: null });
     getEvent(slug)
-      .then((data) => active && setState({ data, loading: false, error: null }))
+      .then((data) => {
+        if (!active) return;
+        setState({ data, loading: false, error: null });
+        setLoaded(slug);
+      })
       .catch((error) => active && setState({ data: null, loading: false, error }));
     return () => {
       active = false;
     };
-  }, [slug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, version]);
   return state;
 }
 
@@ -38,9 +47,74 @@ function CopyLink() {
   );
 }
 
+// Registration through the Alumni Portal: register / cancel, spots left, or why it's closed.
+function PortalRegistration({ event, onChange }) {
+  const { status, account } = usePortalAuth();
+  const [registered, setRegistered] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return setRegistered(false);
+    portalApi.myEvents().then((rows) => setRegistered(rows.some((r) => r.eventId === event.id))).catch(() => setRegistered(false));
+  }, [status, event.id]);
+
+  const act = async (fn) => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const res = await fn(event.id);
+      setRegistered(fn === portalApi.registerEvent);
+      setMessage({ ok: true, text: res.message });
+      onChange();
+    } catch (err) {
+      setMessage({ ok: false, text: err.message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const spots = event.capacity ? `${event.spotsLeft.toLocaleString()} of ${event.capacity.toLocaleString()} slots left` : `${event.registeredCount.toLocaleString()} registered`;
+  const next = encodeURIComponent(`/events/${event.slug}`);
+
+  return (
+    <div className="ev-register">
+      <div className="ev-register__head">
+        <Icon name="users" size={16} />
+        <span>{spots}</span>
+        {registered && <span className="ev-chip ev-chip--ok"><Icon name="check" size={12} /> You're registered</span>}
+      </div>
+      {status !== 'authenticated' ? (
+        event.registrationClosed ? (
+          <p className="ev-register__closed">{event.registrationClosed}</p>
+        ) : (
+          <>
+            <Link to={`/portal/login?next=${next}`} className="btn btn-gold btn-lg btn-block">Log in to register</Link>
+            <p className="ev-register__hint">Registration is for MCU alumni with an Alumni Portal account. <Link to="/portal/register">Create one</Link></p>
+          </>
+        )
+      ) : account?.status !== 'verified' ? (
+        <p className="ev-register__closed">You can register once the Alumni Relations Office verifies your account.</p>
+      ) : registered ? (
+        <button type="button" className="btn btn-outline btn-block" disabled={busy} onClick={() => act(portalApi.cancelEvent)}>
+          {busy ? 'Cancelling…' : 'Cancel my registration'}
+        </button>
+      ) : event.registrationClosed ? (
+        <p className="ev-register__closed">{event.registrationClosed}</p>
+      ) : (
+        <button type="button" className="btn btn-gold btn-lg btn-block" disabled={busy || registered === null} onClick={() => act(portalApi.registerEvent)}>
+          {busy ? 'Registering…' : 'Register for this event'}
+        </button>
+      )}
+      {message && <p className={`ev-register__msg ${message.ok ? 'is-ok' : 'is-error'}`} role="status">{message.text}</p>}
+    </div>
+  );
+}
+
 export default function EventDetail() {
   const { slug } = useParams();
-  const { data: e, loading, error } = useEvent(slug);
+  const [version, setVersion] = useState(0);
+  const { data: e, loading, error } = useEvent(slug, version);
 
   if (loading) {
     return (
@@ -125,8 +199,9 @@ export default function EventDetail() {
                   </div>
                 )}
               </dl>
+              {e.portalRegistration && !cancelled && !past && <PortalRegistration event={e} onChange={() => setVersion((v) => v + 1)} />}
               <div className="ev-info__actions">
-                {canRegister && (
+                {canRegister && !e.portalRegistration && (
                   <a href={e.registrationUrl} target="_blank" rel="noreferrer" className="btn btn-gold btn-lg btn-block">
                     Register now <Icon name="external" size={16} />
                   </a>

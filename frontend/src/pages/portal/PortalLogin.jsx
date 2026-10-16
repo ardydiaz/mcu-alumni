@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import Icon from '../../components/ui/Icon.jsx';
 import Field from '../../components/forms/Field.jsx';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
@@ -9,10 +9,13 @@ import '../../styles/portal.css';
 export default function PortalLogin() {
   const { status, login } = usePortalAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const [values, setValues] = useState({ email: '', password: '' });
   const [state, setState] = useState({ busy: false, error: '', fields: {}, reason: null });
 
-  if (status === 'authenticated') return <Navigate to="/portal/account" replace />;
+  // ?next=/events/... returns the alumnus to the page they came from (only paths on this site).
+  const next = /^\/(?!\/)/.test(params.get('next') || '') ? params.get('next') : '/portal/account';
+  if (status === 'authenticated') return <Navigate to={next} replace />;
 
   const onChange = (e) => setValues((v) => ({ ...v, [e.target.name]: e.target.value }));
 
@@ -21,7 +24,7 @@ export default function PortalLogin() {
     setState({ busy: true, error: '', fields: {}, reason: null });
     try {
       await login(values);
-      navigate('/portal/account', { replace: true });
+      navigate(next, { replace: true });
     } catch (err) {
       setState({ busy: false, error: err.message, fields: err.fields?.reason ? {} : err.fields || {}, reason: err.fields?.reason || null });
     }

@@ -1,6 +1,7 @@
 import ResourcePage from '../../components/admin/ResourcePage.jsx';
 import Badge from '../../components/admin/Badge.jsx';
 import { TitleCell } from '../../components/admin/cells.jsx';
+import EventRegistrants from '../../components/admin/EventRegistrants.jsx';
 import { useContent } from '../../hooks/useContent.js';
 import { CATEGORIES, categoryOf, longDate, timeRange, shortDate, time } from '../../components/events/eventUtils.js';
 
@@ -33,13 +34,19 @@ export default function AdminEvents() {
         { key: 'title', label: 'Event', render: (r) => <TitleCell title={r.title} subtitle={categoryOf(r.category).label + (r.network ? ` · ${r.network.name}` : '')} /> },
         { key: 'venue', label: 'Venue', render: (r) => r.venue || (r.onlineUrl ? 'Online' : '—') },
         { key: 'registrationDeadline', label: 'Registration until', render: (r) => (r.registrationDeadline ? `${shortDate(r.registrationDeadline)}, ${time(r.registrationDeadline)}` : '—') },
+        {
+          key: 'registeredCount',
+          label: 'Registered',
+          className: 'num',
+          render: (r) => (r.portalRegistration ? `${(r.registeredCount || 0).toLocaleString()}${r.capacity ? ` / ${r.capacity.toLocaleString()}` : ''}` : <span className="muted">—</span>),
+        },
         { key: 'status', label: 'Status', render: (r) => <StatusBadge value={r.status} /> },
       ]}
       filters={[
         { name: 'status', label: 'Status', options: STATUS_OPTIONS.map((o) => ({ value: o.value, label: o.label.replace(' (not public yet)', '') })) },
         { name: 'category', label: 'Type', options: CATEGORY_OPTIONS },
       ]}
-      initialValues={{ status: 'draft', category: 'alumni', allDay: false }}
+      initialValues={{ status: 'draft', category: 'alumni', allDay: false, portalRegistration: true }}
       fields={[
         { name: 'image', label: 'Cover photo (optional)', type: 'image', hint: 'Landscape photo, at least 1600 × 900 px (JPG, PNG or WEBP, up to 5 MB). Shown behind the title on the event page.' },
         { name: 'title', label: 'Event title', required: true, placeholder: 'Grand Alumni Homecoming 2027', span: 2 },
@@ -54,7 +61,8 @@ export default function AdminEvents() {
         { name: 'onlineUrl', label: 'Online link (optional)', type: 'url', placeholder: 'https://…', hint: 'For online or hybrid events' },
         { name: 'registrationDeadline', label: 'Registration deadline (optional)', type: 'datetime-local' },
         { name: 'capacity', label: 'Slots (optional)', type: 'number', placeholder: '200' },
-        { name: 'registrationUrl', label: 'Registration link (optional)', type: 'url', placeholder: 'https://forms.office.com/…', hint: 'Shows a "Register now" button until the deadline', span: 2 },
+        { name: 'portalRegistration', label: 'Alumni register through the Alumni Portal (registrant list, attendance and slots tracked here)', type: 'checkbox', span: 2 },
+        { name: 'registrationUrl', label: 'External registration link (optional)', type: 'url', placeholder: 'https://forms.office.com/…', hint: 'Only used when portal registration is off: shows a "Register now" button until the deadline', span: 2 },
         { name: 'status', label: 'Status', type: 'select', options: STATUS_OPTIONS, required: true, hint: 'Drafts are only visible here' },
       ]}
       details={[
@@ -68,6 +76,7 @@ export default function AdminEvents() {
         { key: 'registrationDeadline', label: 'Registration deadline', render: (r) => (r.registrationDeadline ? `${longDate(r.registrationDeadline)}, ${time(r.registrationDeadline)}` : '—') },
         { key: 'capacity', label: 'Slots' },
         { key: 'link', label: 'Public page', wide: true, render: (r) => (r.status === 'draft' ? 'Not public (draft)' : <a href={`/events/${r.slug}`} target="_blank" rel="noreferrer">/events/{r.slug}</a>) },
+        { key: 'registrants', label: 'Registrants', wide: true, render: (r) => <EventRegistrants event={r} /> },
         { key: 'summary', label: 'Summary', wide: true },
         { key: 'description', label: 'Description', wide: true },
       ]}

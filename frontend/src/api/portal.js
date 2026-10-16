@@ -35,6 +35,11 @@ export const portalApi = {
   tracer: () => send('/portal/tracer', { token: portalSession.get() }),
   submitTracer: (data) => send('/portal/tracer', { method: 'POST', body: data, token: portalSession.get() }),
 
+  // Event registrations (Step 11)
+  myEvents: async () => (await send('/portal/events', { token: portalSession.get() })).data,
+  registerEvent: (id) => send(`/portal/events/${id}/register`, { method: 'POST', token: portalSession.get() }),
+  cancelEvent: (id) => send(`/portal/events/${id}/register`, { method: 'DELETE', token: portalSession.get() }),
+
   // My Profile (Step 4). Every call returns the full profile.
   profile: async () => (await send('/portal/profile', { token: portalSession.get() })).data,
   saveProfile: async (data, photo) => (await send('/portal/profile', { method: 'PATCH', body: withFile(data, photo), token: portalSession.get() })).data,

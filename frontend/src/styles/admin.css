@@ -95,6 +95,46 @@
 .link-btn { border: 0; background: none; padding: 0; color: var(--purple-700); font-weight: 700; font-size: 0.86rem; cursor: pointer; }
 .link-btn:hover { text-decoration: underline; }
 .admin-toolbar .link-btn { padding-bottom: 10px; }
+/* Alumni profiles: monitoring tiles and filters (Step 11) */
+.pm-tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; min-height: 92px; }
+.pm-tile {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 14px 16px; border-radius: 16px; cursor: pointer; text-align: left;
+  border: 1.5px solid var(--line); background: var(--surface); font: inherit; transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.pm-tile:hover { border-color: var(--purple-100); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.pm-tile.is-active { border-color: var(--purple-700); background: var(--purple-50); }
+.pm-tile strong { font-family: var(--font-display); font-size: 1.6rem; font-weight: 900; line-height: 1.1; color: var(--purple-700); }
+.pm-tile span { color: var(--ink); font-size: 0.88rem; font-weight: 700; }
+.pm-tile small { color: var(--muted); font-size: 0.76rem; }
+.pm-tile--ok strong { color: var(--success); }
+.pm-tile--warn strong { color: var(--gold-800); }
+.pm-tile--muted strong { color: var(--muted); }
+.pm-more { align-self: flex-end; }
+.pm-more svg { transition: transform 0.2s; }
+.pm-more.is-open svg { transform: rotate(180deg); }
+.pm-filters { padding: 14px; border-radius: 14px; background: var(--surface-2); }
+.pm-filters .admin-filter { flex: 1 1 180px; }
+.pm-count { margin: -4px 0 10px; font-size: 0.85rem; }
+@media (max-width: 1100px) { .pm-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .pm-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Event registrants */
+.er { display: grid; gap: 12px; }
+.er-stats { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 22px; padding: 12px 14px; border-radius: 14px; background: var(--purple-50); }
+.er-stats > div:not(.er-stats__bar) { display: flex; align-items: baseline; gap: 6px; }
+.er-stats strong { font-family: var(--font-display); font-size: 1.4rem; font-weight: 900; color: var(--purple-700); }
+.er-stats span { color: var(--ink-2); font-size: 0.86rem; font-weight: 600; }
+.er-stats__bar { flex-basis: 100%; height: 6px; border-radius: 999px; background: var(--surface); overflow: hidden; }
+.er-stats__bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--purple-700), var(--gold-500)); }
+.er-toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+.er-toolbar input { flex: 1 1 200px; }
+.er-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.er-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); }
+.er-list li.is-cancelled { background: var(--surface-2); }
+.er-list__who { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 0.86rem; }
+.er-list__who strong { font-size: 0.95rem; }
+.er-list__actions { display: flex; gap: 6px; }
+
 /* Portal invitations dialog */
 .iv-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .iv-rows li { display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-radius: 12px; background: var(--surface-2); }

@@ -175,6 +175,16 @@
 .ev-info dd small { color: var(--muted); font-weight: 500; }
 .ev-info dd a { color: var(--purple-700); }
 .ev-info__actions { display: grid; gap: 10px; }
+
+/* Registration through the Alumni Portal */
+.ev-register { display: grid; gap: 10px; margin-bottom: 10px; padding: 14px; border-radius: 16px; background: var(--purple-50); border: 1px solid var(--purple-100); }
+.ev-register__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--purple-700); font-size: 0.9rem; font-weight: 700; }
+.ev-register__head .ev-chip { margin-left: auto; }
+.ev-register__closed { margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--surface); color: var(--ink-2); font-size: 0.9rem; font-weight: 600; }
+.ev-register__hint { margin: 0; color: var(--muted); font-size: 0.82rem; text-align: center; }
+.ev-register__msg { margin: 0; font-size: 0.86rem; font-weight: 700; text-align: center; }
+.ev-register__msg.is-ok { color: #17693a; }
+.ev-register__msg.is-error { color: var(--danger); }
 .ev-help { display: flex; gap: 12px; align-items: flex-start; padding: 16px 18px; border-radius: 18px; background: var(--purple-50); color: var(--purple-700); }
 .ev-help p { margin: 0; color: var(--ink-2); font-size: 0.9rem; }
 .ev-help a { color: var(--purple-700); font-weight: 700; }

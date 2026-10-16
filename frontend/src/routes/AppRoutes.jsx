@@ -56,6 +56,7 @@ const AdminEvents = lazy(() => import('../pages/admin/Events.jsx'));
 const AlumniProfiles = lazy(() => import('../pages/admin/AlumniProfiles.jsx'));
 const AlumniProfileEdit = lazy(() => import('../pages/admin/AlumniProfileEdit.jsx'));
 const AlumniImport = lazy(() => import('../pages/admin/AlumniImport.jsx'));
+const AlumniReports = lazy(() => import('../pages/admin/AlumniReports.jsx'));
 const Tracer = lazy(() => import('../pages/admin/Tracer.jsx'));
 const Volunteers = lazy(() => import('../pages/admin/Volunteers.jsx'));
 const Messages = lazy(() => import('../pages/admin/Messages.jsx'));
@@ -126,6 +127,7 @@ export default function AppRoutes() {
           <Route path="profiles" element={<AlumniProfiles />} />
           <Route path="profiles/:id" element={<AlumniProfileEdit />} />
           <Route path="imports" element={<AlumniImport />} />
+          <Route path="alumni-reports" element={<AlumniReports />} />
           <Route path="tracer" element={<Tracer />} />
           <Route path="volunteers" element={<Volunteers />} />
           <Route path="messages" element={<Messages />} />

@@ -14,7 +14,7 @@ export const adminNav = [
       { label: 'Networks', to: '/admin/networks', icon: 'users' },
       { label: 'Partners', to: '/admin/partners', icon: 'handshake' },
       { label: 'Projects', to: '/admin/projects', icon: 'building' },
-      { label: 'Reports', to: '/admin/reports', icon: 'file' },
+      { label: 'Transparency reports', to: '/admin/reports', icon: 'file' },
     ],
   },
   {
@@ -22,6 +22,7 @@ export const adminNav = [
     items: [
       { label: 'Alumni profiles', to: '/admin/profiles', icon: 'id' },
       { label: 'Import / export', to: '/admin/imports', icon: 'upload' },
+      { label: 'Alumni reports', to: '/admin/alumni-reports', icon: 'file' },
       { label: 'Portal accounts', to: '/admin/alumni-accounts', icon: 'users' },
     ],
   },
