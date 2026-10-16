@@ -7,6 +7,8 @@ import {
   listProfilesQuerySchema,
   sectionParamSchema,
   validateSectionBody,
+  sendInvitesSchema,
+  inviteSummaryQuerySchema,
 } from './profile.validation.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { adminPanelOnly } from '../../middleware/role.middleware.js';
@@ -18,6 +20,8 @@ import { authenticateAlumni } from '../portal/portal.middleware.js';
 export const staffProfileRoutes = Router();
 staffProfileRoutes.use(authenticate, adminPanelOnly);
 staffProfileRoutes.get('/', validate(listProfilesQuerySchema, 'query'), profileController.list);
+staffProfileRoutes.get('/invitations/summary', validate(inviteSummaryQuerySchema, 'query'), profileController.inviteSummary);
+staffProfileRoutes.post('/invitations', validate(sendInvitesSchema), profileController.sendInvites);
 staffProfileRoutes.post('/', uploadImage('photo', 'profiles'), validate(staffCreateProfileSchema), profileController.create);
 staffProfileRoutes.get('/:id', validate(idParamSchema, 'params'), profileController.get);
 staffProfileRoutes.patch('/:id', validate(idParamSchema, 'params'), uploadImage('photo', 'profiles'), validate(staffUpdateProfileSchema), profileController.update);

@@ -4,7 +4,7 @@ import { hashPassword, verifyPassword, createEmailToken, hashToken, signAlumniTo
 import { env } from '../../config/env.js';
 import { sendMail } from '../../utils/mailer.js';
 import { ApiError, createCrudService } from '../../utils/helpers.js';
-import { profileService, staffActor } from '../profiles/profile.service.js';
+import { profileService, staffActor, splitName } from '../profiles/profile.service.js';
 
 const MAX_FAILED_LOGINS = 5;
 const LOCK_MINUTES = 15;
@@ -127,6 +127,30 @@ export const portalService = {
   },
 
   // ---- Staff review ----
+  // The record EAO encoded or imported from the Registrar (Step 5) under this student number, compared field
+  // by field with what the alumnus typed when registering. Verifying links the account to this record.
+  async recordMatch(id) {
+    const account = await crud.getById(id, { internal: true });
+    const record = account.status === 'verified' ? await profileService.forAccount(account.id) : await profileService.unclaimedFor(account.studentNumber);
+    if (!record) return null;
+    const fold = (s) => String(s || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9@.]/g, '');
+    const typed = splitName(account.fullName);
+    const digits = (s) => String(s || '').replace(/\D/g, '').slice(-10);
+    const row = (label, mine, theirs, same) => ({ label, account: mine || null, record: theirs || null, match: theirs ? same : null });
+    return {
+      profileId: record.id,
+      alumniNumber: record.alumniNumber,
+      source: record.source,
+      checks: [
+        row('Name', account.fullName, `${record.surname}, ${record.firstName}${record.middleName ? ` ${record.middleName}` : ''}`, fold(typed.surname) === fold(record.surname) && fold(record.firstName).startsWith(fold(typed.firstName).slice(0, 4))),
+        row('Program', account.program, record.program, fold(account.program) === fold(record.program)),
+        row('Year graduated', account.yearGraduated, record.yearGraduated, Number(account.yearGraduated) === Number(record.yearGraduated)),
+        row('Email', account.email, record.email, fold(account.email) === fold(record.email)),
+        row('Contact number', account.phone, record.phone, digits(account.phone) === digits(record.phone)),
+      ],
+    };
+  },
+
   async approve(id, actor) {
     const account = await crud.getById(id, { internal: true });
     if (account.status === 'email_unverified') throw ApiError.badRequest('This person has not verified their email address yet.');

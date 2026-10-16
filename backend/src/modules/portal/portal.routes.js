@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { portalController } from './portal.controller.js';
-import { registerSchema, verifyEmailSchema, resendSchema, loginSchema, listAccountsQuerySchema, rejectSchema } from './portal.validation.js';
+import { registerSchema, verifyEmailSchema, resendSchema, loginSchema, listAccountsQuerySchema, rejectSchema, activateSchema, inviteTokenQuerySchema } from './portal.validation.js';
 import { authenticateAlumni } from './portal.middleware.js';
 import { lockIdentity } from './portal.tracer.js';
 import { createTracerSchema } from '../tracer/tracer.validation.js';
@@ -17,6 +17,8 @@ router.post('/register', createRateLimiter({ max: 10 }), validate(registerSchema
 router.post('/verify-email', createRateLimiter({ max: 20 }), validate(verifyEmailSchema), portalController.verifyEmail);
 router.post('/resend-verification', createRateLimiter({ max: 5 }), validate(resendSchema), portalController.resendVerification);
 router.post('/login', createRateLimiter({ max: 20 }), validate(loginSchema), portalController.login);
+router.get('/invite', createRateLimiter({ max: 30 }), validate(inviteTokenQuerySchema, 'query'), portalController.invitePreview);
+router.post('/activate', createRateLimiter({ max: 10 }), validate(activateSchema), portalController.activate);
 router.get('/me', authenticateAlumni, portalController.me);
 router.get('/tracer', authenticateAlumni, portalController.tracerPrefill);
 // lockIdentity runs before validation: name, email, degree and year always come from the verified account.
@@ -28,6 +30,7 @@ router.get('/accounts/:id', ...staff, validate(idParamSchema, 'params'), portalC
 router.post('/accounts/:id/approve', ...staff, validate(idParamSchema, 'params'), portalController.approve);
 router.post('/accounts/:id/reject', ...staff, validate(idParamSchema, 'params'), validate(rejectSchema), portalController.reject);
 router.get('/accounts/:id/tracer', ...staff, validate(idParamSchema, 'params'), portalController.tracerHistory);
+router.get('/accounts/:id/record', ...staff, validate(idParamSchema, 'params'), portalController.recordMatch);
 router.delete('/accounts/:id', ...staff, validate(idParamSchema, 'params'), portalController.remove);
 
 export default router;

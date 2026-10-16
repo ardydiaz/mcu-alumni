@@ -9,6 +9,9 @@ import * as createAlumniAccounts from './migrations/20261008-06-create-alumni-ac
 import * as tracerAccountLink from './migrations/20261012-07-tracer-account-link.js';
 import * as createEvents from './migrations/20261012-08-create-events.js';
 import * as createAlumniProfiles from './migrations/20261016-09-create-alumni-profiles.js';
+import * as createImportBatches from './migrations/20261016-10-create-import-batches.js';
+import * as logExportAction from './migrations/20261016-11-log-export-action.js';
+import * as profileInvitations from './migrations/20261016-12-profile-invitations.js';
 
 // Versioned schema migrations, applied in order and recorded in `schema_migrations`.
 // Add new migrations to the end of this list; never rename or reorder applied ones.
@@ -22,6 +25,9 @@ const MIGRATIONS = [
   ['20261012-07-tracer-account-link', tracerAccountLink],
   ['20261012-08-create-events', createEvents],
   ['20261016-09-create-alumni-profiles', createAlumniProfiles],
+  ['20261016-10-create-import-batches', createImportBatches],
+  ['20261016-11-log-export-action', logExportAction],
+  ['20261016-12-profile-invitations', profileInvitations],
 ];
 
 export function createMigrator(sequelize) {

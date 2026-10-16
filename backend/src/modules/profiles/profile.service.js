@@ -3,6 +3,8 @@ import { AlumniProfile, SectionModels, ProfileChange } from './profile.model.js'
 import { SECTIONS, SECTION_KEYS } from './profile.sections.js';
 import { psgc } from '../psgc/psgc.service.js';
 import { ApiError, deleteUploadedFile } from '../../utils/helpers.js';
+import { canonicalStudentNumber } from '../../utils/studentNumber.js';
+import { inviteWhere } from '../portal/portal.invite.js';
 import { getPagination, buildMeta, getSort } from '../../utils/pagination.js';
 
 const PH = 'Philippines';
@@ -12,6 +14,9 @@ const MCU = 'Manila Central University';
 export const alumniActor = (account) => ({ type: 'alumni', id: account.id, name: account.fullName });
 export const staffActor = (user) => ({ type: 'staff', id: user.id, name: user.fullname || user.email });
 const systemActor = (name) => ({ type: 'system', id: null, name });
+
+// MCU-A-{year verified}-{profile id, 6 digits}: unique, never reused.
+export const alumniNumberFor = (id, verifiedAt) => `MCU-A-${new Date(verifiedAt || Date.now()).getFullYear()}-${String(id).padStart(6, '0')}`;
 
 const blankToNull = (data) => Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v === '' ? null : v]));
 const plain = (v) => (v instanceof Date ? v.toISOString() : v ?? null);
@@ -112,6 +117,9 @@ export const profileService = {
     const where = {};
     if (query.yearGraduated) where.yearGraduated = query.yearGraduated;
     if (query.linked !== undefined) where.alumniAccountId = query.linked ? { [Op.ne]: null } : null;
+    if (query.source) where.source = query.source;
+    if (query.importBatchId) where.importBatchId = query.importBatchId;
+    if (query.invite) Object.assign(where, inviteWhere(query.invite));
     if (query.search) {
       const like = { [Op.like]: `%${query.search}%` };
       where[Op.or] = ['surname', 'firstName', 'studentNumber', 'alumniNumber', 'email', 'program'].map((f) => ({ [f]: like }));
@@ -127,8 +135,7 @@ export const profileService = {
 
   async assignAlumniNumber(profile, options = {}) {
     if (profile.alumniNumber) return profile;
-    const year = new Date(profile.verifiedAt || Date.now()).getFullYear();
-    return profile.update({ alumniNumber: `MCU-A-${year}-${String(profile.id).padStart(6, '0')}` }, options);
+    return profile.update({ alumniNumber: alumniNumberFor(profile.id, profile.verifiedAt) }, options);
   },
 
   async addMcuEducation(profile, options = {}) {
@@ -144,20 +151,26 @@ export const profileService = {
     if (await AlumniProfile.count({ where: { studentNumber: clean.studentNumber } })) {
       throw ApiError.conflict('A profile with this student number already exists.', { studentNumber: 'Already has a profile' });
     }
-    const profile = await AlumniProfile.create({ nationality: 'Filipino', country: PH, ...clean, verifiedAt: new Date() });
+    const profile = await AlumniProfile.create({ nationality: 'Filipino', country: PH, ...clean, source: 'eao', verifiedAt: new Date() });
     await this.assignAlumniNumber(profile);
     await this.addMcuEducation(profile);
     await log(profile.id, actor, 'profile', 'create', { alumniNumber: [null, profile.alumniNumber] });
     return profile;
   },
 
+  // A record EAO encoded or imported (Step 5) that a portal account with this student number would claim.
+  async unclaimedFor(studentNumber) {
+    return AlumniProfile.findOne({ where: { studentNumber: canonicalStudentNumber(studentNumber), alumniAccountId: null } });
+  },
+
   // When the Alumni Office verifies a portal account: link an existing profile (same student number) or create one.
   async createForAccount(account, actor) {
     let profile = await AlumniProfile.findOne({ where: { alumniAccountId: account.id } });
     if (profile) return profile;
-    profile = await AlumniProfile.findOne({ where: { studentNumber: account.studentNumber, alumniAccountId: null } });
+    profile = await this.unclaimedFor(account.studentNumber);
     if (profile) {
-      await profile.update({ alumniAccountId: account.id, email: profile.email || account.email, phone: profile.phone || account.phone, verifiedAt: profile.verifiedAt || new Date() });
+      // Registered on their own: any invitation link still in their inbox stops working.
+      await profile.update({ alumniAccountId: account.id, email: profile.email || account.email, phone: profile.phone || account.phone, verifiedAt: profile.verifiedAt || new Date(), inviteTokenHash: null, inviteExpiresAt: null });
       await this.assignAlumniNumber(profile);
       await log(profile.id, actor, 'profile', 'verify', { alumniAccountId: [null, account.id] });
       return profile;
@@ -165,7 +178,7 @@ export const profileService = {
     const name = splitName(account.fullName);
     profile = await AlumniProfile.create({
       alumniAccountId: account.id,
-      studentNumber: account.studentNumber,
+      studentNumber: canonicalStudentNumber(account.studentNumber),
       ...name,
       sex: account.sex || null,
       nationality: 'Filipino',
@@ -175,6 +188,7 @@ export const profileService = {
       phone: account.phone,
       houseStreet: account.address || null,
       country: PH,
+      source: 'portal',
       verifiedAt: new Date(),
     });
     await this.assignAlumniNumber(profile);

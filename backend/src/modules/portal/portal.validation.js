@@ -1,12 +1,14 @@
 import { Joi, listQuerySchema, phone, year } from '../../middleware/validation.middleware.js';
 import { ACCOUNT_STATUS } from './alumniAccount.model.js';
+import { canonicalStudentNumber } from '../../utils/studentNumber.js';
 
 const email = () => Joi.string().trim().lowercase().email().max(120);
 
 export const registerSchema = Joi.object({
   fullName: Joi.string().trim().max(200).pattern(/^[^,]+,\s*[^,]+/).required()
     .messages({ 'string.pattern.base': 'Please follow the format: Dela Cruz, Juan Carlo, M.' }),
-  studentNumber: Joi.string().trim().max(30).pattern(/^[A-Za-z0-9-]+$/).required()
+  // Stored as 2021-10348C (uppercase, dashed) so it matches the record imported from the Registrar (Step 5).
+  studentNumber: Joi.string().trim().max(30).pattern(/^[A-Za-z0-9-]+$/).custom(canonicalStudentNumber).required()
     .messages({ 'string.pattern.base': 'Use letters, numbers and dashes only' }),
   program: Joi.string().trim().max(150).required(),
   yearGraduated: year().required(),
@@ -20,6 +22,16 @@ export const registerSchema = Joi.object({
 });
 
 export const verifyEmailSchema = Joi.object({ token: Joi.string().trim().max(200).required() });
+
+// Activating an account from a portal invitation (the record already exists; only the password is new).
+export const activateSchema = Joi.object({
+  token: Joi.string().trim().max(200).required(),
+  phone: phone().allow(''), // asked only when the record has no mobile number
+  password: registerSchema.extract('password'),
+  confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({ 'any.only': 'Passwords do not match' }),
+  consent: registerSchema.extract('consent'),
+});
+export const inviteTokenQuerySchema = Joi.object({ token: Joi.string().trim().max(200).required() });
 
 export const resendSchema = Joi.object({ email: email().required() });
 

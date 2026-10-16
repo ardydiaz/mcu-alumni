@@ -2,7 +2,7 @@ import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../../config/database.js';
 import { User } from '../users/user.model.js';
 
-export const LOG_ACTIONS = ['login', 'login_failed', 'logout', 'create', 'update', 'delete', 'password_change'];
+export const LOG_ACTIONS = ['login', 'login_failed', 'logout', 'create', 'update', 'delete', 'password_change', 'export']; // export: migration 11
 
 // Audit trail of staff actions (who changed what, when, from where).
 export class ActivityLog extends Model {}

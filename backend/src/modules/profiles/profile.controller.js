@@ -1,5 +1,6 @@
 import { profileService, alumniActor, staffActor } from './profile.service.js';
 import { logService } from '../logs/log.service.js';
+import { portalInvite } from '../portal/portal.invite.js';
 import { ApiError, asyncHandler } from '../../utils/helpers.js';
 import { sendCreated, sendPaginated, sendSuccess, sendNoContent } from '../../utils/response.js';
 
@@ -52,6 +53,19 @@ export const profileController = {
     const profile = await profileService.getById(req.params.id);
     await profileService.removeItem(profile, req.params.section, req.params.itemId, staffActor(req.user));
     sendSuccess(res, { data: await profileService.full(profile), message: 'Removed' });
+  }),
+
+  // Portal invitations: email activation links to graduates in the database who have no portal account yet.
+  sendInvites: asyncHandler(async (req, res) => {
+    const { resend, ...scope } = req.body;
+    const result = await portalInvite.send(scope, { resend }, staffActor(req.user));
+    await logService.record(req, { action: 'create', entity: 'Alumni profile', description: `Sent ${result.sent} portal invitation${result.sent === 1 ? '' : 's'}${result.failed ? ` (${result.failed} failed)` : ''}` });
+    const message = result.sent ? `${result.sent} invitation${result.sent === 1 ? '' : 's'} sent` : 'No invitations were sent';
+    sendSuccess(res, { data: result, message: result.failed ? `${message}; ${result.failed} could not be delivered` : message });
+  }),
+
+  inviteSummary: asyncHandler(async (req, res) => {
+    sendSuccess(res, { data: await portalInvite.summary(req.query) });
   }),
 
   changes: asyncHandler(async (req, res) => {

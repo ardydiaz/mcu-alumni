@@ -37,7 +37,7 @@ export const SEXES = ['Male', 'Female'];
 // Graduates whose degree is not listed pick "Other" and type it in.
 export const DEGREE_GROUPS = [
   { college: 'College of Arts and Sciences', degrees: ['AB Communication', 'AB Political Science', 'BS Biology'] },
-  { college: 'College of Business and Accountancy', degrees: ['BS Accountancy', 'BSBA Financial Management', 'BSBA Human Resource Management', 'BSBA Marketing Management'] },
+  { college: 'College of Business and Accountancy', degrees: ['BS Accountancy', 'BSBA Financial Management', 'BSBA Human Resource Management', 'BSBA Marketing Management', 'BSBA Operations Management'] },
   { college: 'College of Computer Studies', degrees: ['BS Computer Science', 'BS Information Technology'] },
   { college: 'College of Criminology', degrees: ['BS Criminology'] },
   { college: 'College of Dentistry', degrees: ['Doctor of Dental Medicine'] },
@@ -54,7 +54,10 @@ export const DEGREE_GROUPS = [
   { college: 'College of Radiologic Technology', degrees: ['BS Radiologic Technology'] },
   { college: 'College of Respiratory Therapy', degrees: ['BS Respiratory Therapy'] },
   { college: 'College of Teacher Education', degrees: ['Bachelor of Elementary Education', 'Bachelor of Secondary Education'] },
-  { college: 'Graduate School', degrees: ["Master's Degree", 'Doctorate / PhD'] },
+  {
+    college: 'Graduate School',
+    degrees: ['Master of Arts in Education', 'Master of Arts in Nursing', 'Master in Business Administration', 'Master of Science in Dentistry', "Master's Degree", 'Doctorate / PhD'],
+  },
 ];
 
 export const JOB_CATEGORIES = [

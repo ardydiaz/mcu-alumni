@@ -1,5 +1,6 @@
 import { portalService, toPortalProfile } from './portal.service.js';
 import { portalTracer } from './portal.tracer.js';
+import { portalInvite } from './portal.invite.js';
 import { logService } from '../logs/log.service.js';
 import { asyncHandler, createCrudController } from '../../utils/helpers.js';
 import { sendCreated, sendSuccess } from '../../utils/response.js';
@@ -21,6 +22,16 @@ export const portalController = {
   resendVerification: asyncHandler(async (req, res) => {
     await portalService.resendVerification(req.body.email);
     sendSuccess(res, { message: 'If that email is registered and not yet verified, a new verification link is on its way.' });
+  }),
+
+  // Portal invitation: who the link is for, then set a password (account created verified, signed in).
+  invitePreview: asyncHandler(async (req, res) => {
+    sendSuccess(res, { data: await portalInvite.preview(req.query.token) });
+  }),
+
+  activate: asyncHandler(async (req, res) => {
+    const { token, account } = await portalInvite.accept(req.body);
+    sendCreated(res, { token, account: toPortalProfile(account) }, 'Welcome to the MCU Alumni Portal! Your account is active.');
   }),
 
   login: asyncHandler(async (req, res) => {
@@ -48,6 +59,11 @@ export const portalController = {
   tracerHistory: asyncHandler(async (req, res) => {
     await portalService.getById(req.params.id, { internal: true }); // 404 if the account does not exist
     sendSuccess(res, { data: await portalTracer.history(req.params.id) });
+  }),
+
+  // Staff: the Registrar/EAO record this registration matches (null if none)
+  recordMatch: asyncHandler(async (req, res) => {
+    sendSuccess(res, { data: await portalService.recordMatch(req.params.id) });
   }),
 
   // ---- Staff ----

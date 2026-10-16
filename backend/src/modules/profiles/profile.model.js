@@ -49,12 +49,25 @@ AlumniProfile.init(
     country: { type: DataTypes.STRING(60) },
 
     verifiedAt: { type: DataTypes.DATE },
+
+    // Where the record came from (migration 10): portal | eao | import, and which imported file.
+    source: { type: DataTypes.STRING(20) },
+    importBatchId: { type: DataTypes.INTEGER.UNSIGNED },
+
+    // Portal invitation (migration 12): emailed one-time link to activate an account for this record.
+    inviteTokenHash: { type: DataTypes.STRING(64) }, // SHA-256 of the token in the link
+    inviteExpiresAt: { type: DataTypes.DATE },
+    invitedAt: { type: DataTypes.DATE }, // last invitation sent
+    inviteCount: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
   },
   {
     sequelize,
     modelName: 'AlumniProfile',
     tableName: 'alumni_profiles',
     indexes: [{ fields: ['surname', 'first_name'] }, { fields: ['year_graduated'] }],
+    // The invitation token hash never leaves the model unless asked for with .scope('withInvite')
+    defaultScope: { attributes: { exclude: ['inviteTokenHash'] } },
+    scopes: { withInvite: {} },
   }
 );
 

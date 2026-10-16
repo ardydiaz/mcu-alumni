@@ -2,6 +2,7 @@ import { Joi, listQuerySchema, phone, year, validate } from '../../middleware/va
 import { SEXES } from '../content/content.data.js';
 import { CIVIL_STATUS } from './profile.model.js';
 import { SECTIONS, SECTION_KEYS } from './profile.sections.js';
+import { canonicalStudentNumber } from '../../utils/studentNumber.js';
 
 const text = (n) => Joi.string().trim().max(n).allow('', null);
 const oneOf = (list) => Joi.string().valid(...list).allow('', null);
@@ -33,7 +34,7 @@ const SELF_SERVICE = {
 
 // Verified record: only the Alumni Office (EAO) changes these. The Alumni Number is system-generated.
 const VERIFIED = {
-  studentNumber: Joi.string().trim().max(30).pattern(/^[A-Za-z0-9-]+$/).messages({ 'string.pattern.base': 'Use letters, numbers and dashes only' }),
+  studentNumber: Joi.string().trim().max(30).pattern(/^[A-Za-z0-9-]+$/).custom(canonicalStudentNumber).messages({ 'string.pattern.base': 'Use letters, numbers and dashes only' }),
   surname: Joi.string().trim().max(80),
   firstName: Joi.string().trim().max(80),
   middleName: text(80),
@@ -57,6 +58,22 @@ export const staffCreateProfileSchema = Joi.object({ ...VERIFIED, ...SELF_SERVIC
 export const listProfilesQuerySchema = listQuerySchema.keys({
   yearGraduated: year(),
   linked: Joi.boolean(), // has an Alumni Portal account
+  source: Joi.string().valid('portal', 'eao', 'import'),
+  importBatchId: Joi.number().integer().min(1),
+  invite: Joi.string().valid('not_invited', 'invited', 'expired', 'claimed', 'no_email'),
+});
+
+// Portal invitations (staff): who to invite. At least one of the three scopes is required.
+export const sendInvitesSchema = Joi.object({
+  profileIds: Joi.array().items(Joi.number().integer().min(1)).max(20000),
+  importBatchId: Joi.number().integer().min(1),
+  yearGraduated: year(),
+  resend: Joi.boolean().default(false),
+}).or('profileIds', 'importBatchId', 'yearGraduated');
+
+export const inviteSummaryQuerySchema = Joi.object({
+  importBatchId: Joi.number().integer().min(1),
+  yearGraduated: year(),
 });
 
 export const sectionParamSchema = Joi.object({
