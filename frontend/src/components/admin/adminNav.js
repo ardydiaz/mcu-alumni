@@ -21,6 +21,7 @@ export const adminNav = [
     group: 'Alumni',
     items: [
       { label: 'Alumni profiles', to: '/admin/profiles', icon: 'id' },
+      { label: 'Import / export', to: '/admin/imports', icon: 'upload' },
       { label: 'Portal accounts', to: '/admin/alumni-accounts', icon: 'users' },
     ],
   },

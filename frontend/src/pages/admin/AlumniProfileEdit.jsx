@@ -7,10 +7,12 @@ import ProfileEditor from '../../components/profile/ProfileEditor.jsx';
 import { LABELS, SECTIONS } from '../../components/profile/profileConfig.js';
 import { useContent } from '../../hooks/useContent.js';
 import { adminApi } from '../../api/admin.js';
+import { inviteStatus } from '../../components/admin/InviteDialog.jsx';
+import { formatDate } from '../../components/admin/format.js';
 import '../../styles/profile.css';
 
 const SECTION_LABEL = { profile: 'Profile', ...Object.fromEntries(SECTIONS.map((s) => [s.key, s.label])) };
-const ACTION_LABEL = { create: 'Created profile', verify: 'Verified and linked to portal account', update: 'Updated', add: 'Added', edit: 'Edited', remove: 'Removed' };
+const ACTION_LABEL = { create: 'Created profile', import: 'Imported', invite: 'Invited to the portal', verify: 'Verified and linked to portal account', update: 'Updated', add: 'Added', edit: 'Edited', remove: 'Removed' };
 const ACTOR_LABEL = { alumni: 'Alumnus', staff: 'EAO staff', system: 'System' };
 const dateTime = (d) => new Date(d).toLocaleString('en-PH', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 const val = (v) => (v === null || v === '' || v === undefined ? 'empty' : String(v));
@@ -101,6 +103,25 @@ export default function AlumniProfileEdit() {
   );
   const extraTabs = useMemo(() => [{ key: 'history', label: 'History', icon: 'clock', render: () => <History profileId={id} version={version} /> }], [id, version]);
 
+  // Portal invitation for this one graduate (a new link each time; the previous one stops working).
+  const [inviting, setInviting] = useState(false);
+  const invite = async () => {
+    setInviting(true);
+    try {
+      const res = await adminApi.send('/profiles/invitations', 'POST', { profileIds: [Number(id)], resend: true });
+      const { sent, skipped } = res.data;
+      if (sent) notify(`Invitation sent to ${profile.email}`);
+      else if (skipped.registered) notify('This graduate already registered on the portal. Verify them in Portal accounts.', 'error');
+      else notify(res.message, 'error');
+      setProfile(await adminApi.get('/profiles', id));
+      setVersion((v) => v + 1);
+    } catch (err) {
+      notify(err.message, 'error');
+    } finally {
+      setInviting(false);
+    }
+  };
+
   const remove = async () => {
     if (!window.confirm(`Delete the profile of ${profile.firstName} ${profile.surname}? This removes all sections and history and cannot be undone.`)) return;
     try {
@@ -119,9 +140,26 @@ export default function AlumniProfileEdit() {
     <>
       <PageHeader
         title="Alumni profile"
-        description={profile.alumniAccountId ? `Linked to Alumni Portal account #${profile.alumniAccountId}. The alumnus can also update the non-verified fields.` : 'Encoded by EAO. Not linked to an Alumni Portal account yet.'}
+        description={
+          profile.alumniAccountId
+            ? `Linked to Alumni Portal account #${profile.alumniAccountId}. The alumnus can also update the non-verified fields.`
+            : `${profile.source === 'import' ? "Imported from the Registrar's records" : 'Encoded by EAO'}. No Alumni Portal account yet. ${
+                inviteStatus(profile) === 'invited'
+                  ? `Invitation sent ${formatDate(profile.invitedAt)} to ${profile.email}; the link is valid until ${formatDate(profile.inviteExpiresAt)}.`
+                  : inviteStatus(profile) === 'expired'
+                    ? `The invitation sent ${formatDate(profile.invitedAt)} has expired.`
+                    : profile.email
+                      ? 'Send an invitation so they can activate their account, or they can register with their Student No.'
+                      : `Add an email address to invite them, or they can register with Student No. ${profile.studentNumber}.`
+              }`
+        }
         actions={
           <>
+            {!profile.alumniAccountId && profile.email && (
+              <button type="button" className="btn btn-primary btn-sm" onClick={invite} disabled={inviting}>
+                <Icon name="mail" size={14} /> {inviting ? 'Sending…' : profile.invitedAt ? 'Resend invitation' : 'Send invitation'}
+              </button>
+            )}
             <Link to="/admin/profiles" className="btn admin-btn-ghost btn-sm"><Icon name="arrowRight" size={14} style={{ transform: 'rotate(180deg)' }} /> All profiles</Link>
             <button type="button" className="btn btn-sm btn-danger-ghost" onClick={remove}>Delete</button>
           </>

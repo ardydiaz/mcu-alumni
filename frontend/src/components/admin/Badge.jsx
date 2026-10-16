@@ -3,7 +3,7 @@ import { humanize } from './format.js';
 // Status values -> tone. Status colors are always paired with a text label.
 const TONES = {
   success: ['confirmed', 'released', 'active', 'completed', 'published', 'true', 'login', 'super admin', 'read', 'employed'],
-  warning: ['pledged', 'requested', 'contacted', 'unpublished', 'login_failed', 'pending'],
+  warning: ['pledged', 'requested', 'contacted', 'unpublished', 'login_failed', 'pending', 'export'],
   info: ['processing', 'new', 'ongoing', 'create', 'update', 'administrator', 'merchant', 'unread'],
   danger: ['cancelled', 'delete'],
 };

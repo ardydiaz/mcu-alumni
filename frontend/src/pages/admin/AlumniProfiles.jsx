@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/admin/PageHeader.jsx';
 import DataTable from '../../components/admin/DataTable.jsx';
 import Pagination from '../../components/admin/Pagination.jsx';
 import Modal from '../../components/admin/Modal.jsx';
 import ResourceForm, { payloadFromValues } from '../../components/admin/ResourceForm.jsx';
 import Badge from '../../components/admin/Badge.jsx';
+import { InviteBadge, INVITE_STATUS } from '../../components/admin/InviteDialog.jsx';
 import { TitleCell } from '../../components/admin/cells.jsx';
 import { useToast } from '../../components/admin/Toast.jsx';
 import Icon from '../../components/ui/Icon.jsx';
 import { adminApi } from '../../api/admin.js';
+import { authDownload, saveBlob } from '../../api/client.js';
 
 // Step 4: alumni master records. Portal accounts get a profile when verified; EAO encodes walk-ins here.
 const NEW_FIELDS = [
@@ -33,11 +35,30 @@ function useDebounced(value, ms = 300) {
   return v;
 }
 
+// Where a record came from (alumni_profiles.source); records from before migration 10 fall back to the portal link.
+const SOURCES = {
+  portal: { tone: 'info', label: 'Alumni Portal' },
+  eao: { tone: 'neutral', label: 'EAO encoded' },
+  import: { tone: 'warning', label: 'Imported' },
+};
+const SourceBadge = ({ row }) => {
+  const s = SOURCES[row.source || (row.alumniAccountId ? 'portal' : 'eao')];
+  return (
+    <>
+      <Badge value={row.source} tone={s.tone} label={s.label} />
+    </>
+  );
+};
+
 export default function AlumniProfiles() {
   const navigate = useNavigate();
   const notify = useToast();
+  const [params, setParams] = useSearchParams();
+  const batch = params.get('batch') || '';
   const [search, setSearch] = useState('');
-  const [linked, setLinked] = useState('');
+  const [invite, setInvite] = useState('');
+  const [source, setSource] = useState('');
+  const [exporting, setExporting] = useState(false);
   const [page, setPage] = useState(1);
   const [result, setResult] = useState({ rows: [], meta: null, loading: true });
   const [creating, setCreating] = useState(false);
@@ -49,17 +70,29 @@ export default function AlumniProfiles() {
   const load = useCallback(() => {
     setResult((r) => ({ ...r, loading: true }));
     adminApi
-      .list('/profiles', { search: q, linked, page, limit: 20 })
+      .list('/profiles', { search: q, invite, source, importBatchId: batch, page, limit: 20 })
       .then((res) => setResult({ rows: res.data, meta: res.meta, loading: false }))
       .catch((err) => {
         notify(err.message, 'error');
         setResult({ rows: [], meta: null, loading: false });
       });
-  }, [q, linked, page, notify]);
+  }, [q, invite, source, batch, page, notify]);
   useEffect(() => {
     load();
   }, [load]);
-  useEffect(() => setPage(1), [q, linked]);
+  useEffect(() => setPage(1), [q, invite, source, batch]);
+
+  const exportCsv = async () => {
+    setExporting(true);
+    try {
+      const { blob, fileName } = await authDownload(`/imports/export${source ? `?source=${source}` : ''}`);
+      saveBlob(blob, fileName);
+    } catch (err) {
+      notify(err.message, 'error');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const create = async (e) => {
     e.preventDefault();
@@ -83,25 +116,45 @@ export default function AlumniProfiles() {
     <>
       <PageHeader
         title="Alumni profiles"
-        description="The master record of each graduate: profile, address, family, education, skills, trainings, work and references. Profiles are created when a portal account is verified, or encoded here for walk-ins."
+        description="The master record of each graduate: profile, address, family, education, skills, trainings, work and references. Profiles are imported from the Registrar's records, created when a portal account is verified, or encoded here for walk-ins."
         actions={
-          <button type="button" className="btn btn-primary" onClick={() => { setValues({}); setErrors({}); setCreating(true); }}>
-            <Icon name="plus" size={16} /> New profile
-          </button>
+          <>
+            <Link to="/admin/imports" className="btn admin-btn-ghost">
+              <Icon name="upload" size={16} /> Import
+            </Link>
+            <button type="button" className="btn admin-btn-ghost" onClick={exportCsv} disabled={exporting}>
+              <Icon name="download" size={16} /> {exporting ? 'Exporting…' : 'Export CSV'}
+            </button>
+            <button type="button" className="btn btn-primary" onClick={() => { setValues({}); setErrors({}); setCreating(true); }}>
+              <Icon name="plus" size={16} /> New profile
+            </button>
+          </>
         }
       />
       <section className="admin-card">
+        {batch && (
+          <p className="admin-filter-note">
+            Showing the records created by import #{batch}.{' '}
+            <button type="button" className="link-btn" onClick={() => setParams({})}>Show all profiles</button>
+          </p>
+        )}
         <div className="admin-toolbar">
           <label className="search">
             <Icon name="search" size={18} />
             <input type="search" placeholder="Search name, alumni no., student ID, email or program" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search profiles" />
           </label>
           <label className="admin-filter">
-            <span>Portal account</span>
-            <select value={linked} onChange={(e) => setLinked(e.target.value)}>
+            <span>Portal</span>
+            <select value={invite} onChange={(e) => setInvite(e.target.value)}>
               <option value="">All</option>
-              <option value="true">Has portal account</option>
-              <option value="false">Encoded by EAO only</option>
+              {Object.entries(INVITE_STATUS).map(([value, s]) => <option key={value} value={value}>{s.label}</option>)}
+            </select>
+          </label>
+          <label className="admin-filter">
+            <span>Source</span>
+            <select value={source} onChange={(e) => setSource(e.target.value)}>
+              <option value="">All</option>
+              {Object.entries(SOURCES).map(([value, s]) => <option key={value} value={value}>{s.label}</option>)}
             </select>
           </label>
         </div>
@@ -116,7 +169,8 @@ export default function AlumniProfiles() {
             { key: 'studentNumber', label: 'Student ID' },
             { key: 'program', label: 'Program' },
             { key: 'yearGraduated', label: 'Batch', className: 'num' },
-            { key: 'alumniAccountId', label: 'Source', render: (r) => (r.alumniAccountId ? <Badge value="portal" tone="info" label="Alumni Portal" /> : <Badge value="eao" tone="neutral" label="EAO encoded" />) },
+            { key: 'source', label: 'Source', render: (r) => <SourceBadge row={r} /> },
+            { key: 'portal', label: 'Portal', render: (r) => <InviteBadge profile={r} /> },
           ]}
         />
         <Pagination meta={result.meta} onPage={setPage} />

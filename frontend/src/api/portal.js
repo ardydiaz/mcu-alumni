@@ -27,6 +27,9 @@ export const portalApi = {
   verifyEmail: (token) => send('/portal/verify-email', { method: 'POST', body: { token } }),
   resendVerification: (email) => send('/portal/resend-verification', { method: 'POST', body: { email } }),
   login: (credentials) => send('/portal/login', { method: 'POST', body: credentials }),
+  // Portal invitation (record imported by the Alumni Office): who the link is for, then set a password.
+  invitePreview: async (token) => (await send(`/portal/invite?token=${encodeURIComponent(token)}`)).data,
+  activate: (data) => send('/portal/activate', { method: 'POST', body: data }),
   me: () => send('/portal/me', { token: portalSession.get() }),
   // Graduate Tracer: pre-filled answers (account + latest submission), and submit (linked to the account)
   tracer: () => send('/portal/tracer', { token: portalSession.get() }),

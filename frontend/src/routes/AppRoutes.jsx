@@ -25,6 +25,7 @@ const PortalHome = lazy(() => import('../pages/portal/PortalHome.jsx'));
 const PortalRegister = lazy(() => import('../pages/portal/Register.jsx'));
 const PortalLogin = lazy(() => import('../pages/portal/PortalLogin.jsx'));
 const PortalVerify = lazy(() => import('../pages/portal/VerifyEmail.jsx'));
+const PortalActivate = lazy(() => import('../pages/portal/Activate.jsx'));
 const PortalAccount = lazy(() => import('../pages/portal/Account.jsx'));
 const PortalLayout = lazy(() => import('../pages/portal/PortalLayout.jsx'));
 const portalPage = (name) => lazy(() => import('../pages/portal/PortalServices.jsx').then((m) => ({ default: m[name] })));
@@ -54,6 +55,7 @@ const AlumniAccounts = lazy(() => import('../pages/admin/AlumniAccounts.jsx'));
 const AdminEvents = lazy(() => import('../pages/admin/Events.jsx'));
 const AlumniProfiles = lazy(() => import('../pages/admin/AlumniProfiles.jsx'));
 const AlumniProfileEdit = lazy(() => import('../pages/admin/AlumniProfileEdit.jsx'));
+const AlumniImport = lazy(() => import('../pages/admin/AlumniImport.jsx'));
 const Tracer = lazy(() => import('../pages/admin/Tracer.jsx'));
 const Volunteers = lazy(() => import('../pages/admin/Volunteers.jsx'));
 const Messages = lazy(() => import('../pages/admin/Messages.jsx'));
@@ -87,6 +89,7 @@ export default function AppRoutes() {
           <Route path="portal/register" element={<PortalRegister />} />
           <Route path="portal/login" element={<PortalLogin />} />
           <Route path="portal/verify" element={<PortalVerify />} />
+          <Route path="portal/activate" element={<PortalActivate />} />
           {/* Signed-in portal pages open inside the portal (sidebar layout) */}
           <Route element={<PortalLayout />}>
             <Route path="portal/account" element={<PortalAccount />} />
@@ -122,6 +125,7 @@ export default function AppRoutes() {
           <Route path="alumni-accounts" element={<AlumniAccounts />} />
           <Route path="profiles" element={<AlumniProfiles />} />
           <Route path="profiles/:id" element={<AlumniProfileEdit />} />
+          <Route path="imports" element={<AlumniImport />} />
           <Route path="tracer" element={<Tracer />} />
           <Route path="volunteers" element={<Volunteers />} />
           <Route path="messages" element={<Messages />} />

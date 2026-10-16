@@ -1,4 +1,4 @@
-import { Link, useOutletContext } from 'react-router-dom';
+import { Link, useLocation, useOutletContext } from 'react-router-dom';
 import Icon from '../../components/ui/Icon.jsx';
 import { StatusBadge, Journey, firstName } from './portalShared.jsx';
 import { displayName } from './PortalLayout.jsx';
@@ -18,6 +18,7 @@ const memberSince = (date) => new Date(date).toLocaleDateString('en-PH', { month
 
 export default function Account() {
   const { account } = useOutletContext();
+  const welcome = useLocation().state?.welcome; // just activated from an invitation
   const events = useUpcomingEvents(3);
   const verified = account.status === 'verified';
   const details = [
@@ -34,8 +35,8 @@ export default function Account() {
       <section className="portal-hello">
         <div>
           <span className="portal-hello__eyebrow">My Alumni Account</span>
-          <h1>Welcome back, {firstName(account.fullName)}!</h1>
-          <p>{account.program} · Batch {account.yearGraduated}</p>
+          <h1>{welcome ? 'Welcome to the Alumni Portal' : 'Welcome back'}, {firstName(account.fullName)}!</h1>
+          <p>{welcome ? 'Your account is active and your profile is already filled in from your records. Check it and complete what is missing.' : `${account.program} · Batch ${account.yearGraduated}`}</p>
         </div>
         <div className="portal-hello__card" aria-hidden="true">
           <span className="portal-hello__card-brand">MCU · ALUMNI</span>

@@ -95,6 +95,22 @@
 .link-btn { border: 0; background: none; padding: 0; color: var(--purple-700); font-weight: 700; font-size: 0.86rem; cursor: pointer; }
 .link-btn:hover { text-decoration: underline; }
 .admin-toolbar .link-btn { padding-bottom: 10px; }
+/* Portal invitations dialog */
+.iv-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.iv-rows li { display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-radius: 12px; background: var(--surface-2); }
+.iv-rows li.is-zero { opacity: 0.55; }
+.iv-rows strong { min-width: 56px; font-family: var(--font-display); font-size: 1.3rem; font-weight: 900; color: var(--purple-700); text-align: right; }
+.iv-rows span { display: flex; flex-direction: column; font-weight: 700; color: var(--ink); }
+.iv-rows small { color: var(--muted); font-weight: 500; font-size: 0.8rem; }
+.iv-resend { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--purple-100); cursor: pointer; font-size: 0.9rem; }
+.iv-resend input { margin-top: 3px; accent-color: var(--purple-700); }
+.iv-note { margin: 12px 0 0; font-size: 0.84rem; }
+.iv-result { display: flex; gap: 14px; align-items: flex-start; }
+.iv-result__icon { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--success-bg); color: var(--success); }
+.iv-result strong { font-size: 1.05rem; }
+.iv-result ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.88rem; }
+.iv-result .is-error { color: var(--danger); }
+.admin-filter-note { margin: 0 0 14px; padding: 10px 14px; border-radius: 12px; background: var(--purple-50); color: var(--purple-700); font-size: 0.88rem; font-weight: 600; }
 
 /* ---- Table --------------------------------------------------------------- */
 .table-wrap { position: relative; overflow-x: auto; margin: 0 -20px; padding: 0 20px; }
@@ -373,7 +389,8 @@
 }
 .access-requests { border-color: var(--gold-200); background: linear-gradient(180deg, var(--gold-100), var(--surface) 70%); }
 .access-requests__list { list-style: none; margin: 0; padding: 0; }
-.access-requests__list li { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid var(--line); }
+.access-requests__who { flex: 1 1 420px; min-width: 0; }
+.access-requests__list > li { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid var(--line); }
 .access-requests__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 /* Alumni accounts: tracer history in the details dialog */

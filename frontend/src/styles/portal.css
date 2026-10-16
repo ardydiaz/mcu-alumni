@@ -87,6 +87,10 @@
 .portal-card__head h1 { font-size: 1.8rem; margin: 0 0 6px; }
 .portal-card__head p { margin: 0; color: var(--muted); }
 .portal-card__icon { display: inline-grid; place-items: center; width: 56px; height: 56px; margin-bottom: 14px; border-radius: 16px; background: linear-gradient(135deg, var(--purple-600), var(--purple-900)); color: var(--gold-400); }
+.portal-activate__record { display: grid; gap: 8px; margin: 0 0 22px; padding: 16px 18px; border-radius: 16px; background: var(--purple-50); border: 1px solid var(--purple-100); }
+.portal-activate__record > div { display: flex; justify-content: space-between; gap: 12px; }
+.portal-activate__record dt { color: var(--muted); font-size: 0.84rem; }
+.portal-activate__record dd { margin: 0; color: var(--ink); font-weight: 700; text-align: right; overflow-wrap: anywhere; }
 .portal-card__foot { margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--line); text-align: center; color: var(--muted); font-size: 0.92rem; }
 .portal-card__foot a, .portal-form__alt a { color: var(--purple-700); font-weight: 700; }
 .portal-card__title { font-size: 1.05rem; margin: 0 0 16px; }

@@ -116,6 +116,33 @@ export async function authRequest(path, options = {}) {
   }
 }
 
+// Authenticated file download (e.g. a CSV export) -> { blob, fileName }.
+export async function authDownload(path) {
+  if (!accessToken && storage.get()) await refreshSession();
+  const get = () => fetch(`${API}${path}`, { headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {} });
+  let res = await get();
+  if (res.status === 401 && storage.get()) {
+    await refreshSession();
+    res = await get();
+  }
+  if (!res.ok) {
+    const payload = await res.json().catch(() => ({}));
+    throw Object.assign(new Error(payload.message || `Download failed (${res.status})`), { status: res.status });
+  }
+  const fileName = /filename="([^"]+)"/.exec(res.headers.get('content-disposition') || '')?.[1] || 'download';
+  return { blob: await res.blob(), fileName };
+}
+
+// Saves a Blob through the browser's download prompt.
+export function saveBlob(blob, fileName) {
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), { href: url, download: fileName });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 // ---- Public site -----------------------------------------------------------
 export async function getContent(name) {
   const endpoint = CONTENT_ENDPOINTS[name];

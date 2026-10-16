@@ -4,7 +4,9 @@ import Badge from '../../components/admin/Badge.jsx';
 import { TitleCell } from '../../components/admin/cells.jsx';
 import { formatDate, formatDateTime } from '../../components/admin/format.js';
 import { useToast } from '../../components/admin/Toast.jsx';
+import Icon from '../../components/ui/Icon.jsx';
 import { adminApi } from '../../api/admin.js';
+import '../../styles/import.css';
 
 const STATUS_OPTIONS = [
   { value: 'pending', label: 'Pending review', tone: 'warning' },
@@ -37,6 +39,44 @@ function TracerHistory({ accountId }) {
         </li>
       ))}
     </ol>
+  );
+}
+
+// The Registrar/EAO record with this student number (Step 5 import), compared with what the alumnus typed.
+function RecordMatch({ accountId }) {
+  const [match, setMatch] = useState(undefined);
+  useEffect(() => {
+    adminApi.fetch(`/portal/accounts/${accountId}/record`).then(setMatch).catch(() => setMatch(null));
+  }, [accountId]);
+
+  if (match === undefined) return <span className="muted">Checking records…</span>;
+  if (!match) {
+    return (
+      <div className="im-match">
+        <div className="im-match__head"><Badge value="none" tone="neutral" label="No Registrar record" /> No imported or encoded record has this student number. Verifying creates a new profile.</div>
+      </div>
+    );
+  }
+  const compared = match.checks.filter((c) => c.match !== null);
+  const same = compared.filter((c) => c.match).length;
+  return (
+    <div className="im-match">
+      <div className="im-match__head">
+        <Badge value="match" tone={same === compared.length ? 'success' : 'warning'} label={`Registrar record ${match.alumniNumber || ''}`} />
+        {same} of {compared.length} details match
+      </div>
+      <ul>
+        {match.checks.map((c) => (
+          <li key={c.label} className={c.match === null ? 'is-none' : c.match ? 'is-ok' : 'is-diff'}>
+            <Icon name={c.match === null ? 'clock' : c.match ? 'check' : 'alert'} size={14} />
+            <span>{c.label}</span>
+            <span>
+              {c.match === null ? <em>Not in the record</em> : c.match ? c.record : <>Typed <strong>{c.account}</strong> · record says <strong>{c.record}</strong></>}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -85,10 +125,13 @@ function PendingReview({ onChange }) {
       <ul className="access-requests__list">
         {accounts.map((a) => (
           <li key={a.id}>
-            <TitleCell
-              title={`${a.fullName} · ${a.studentNumber}`}
-              subtitle={`${a.program}, ${a.yearGraduated} · ${a.email} · registered ${formatDateTime(a.createdAt)}`}
-            />
+            <div className="access-requests__who">
+              <TitleCell
+                title={`${a.fullName} · ${a.studentNumber}`}
+                subtitle={`${a.program}, ${a.yearGraduated} · ${a.email} · registered ${formatDateTime(a.createdAt)}`}
+              />
+              <RecordMatch accountId={a.id} />
+            </div>
             {rejecting === a.id ? (
               <div className="access-requests__actions">
                 <input
@@ -154,6 +197,7 @@ export default function AlumniAccounts() {
         { key: 'reviewNote', label: 'Rejection reason', wide: true },
         { key: 'lastLoginAt', label: 'Last login', render: (r) => formatDateTime(r.lastLoginAt) },
         { key: 'consentAt', label: 'Consent given', render: (r) => formatDateTime(r.consentAt) },
+        { key: 'record', label: 'Registrar record', wide: true, render: (r) => <RecordMatch accountId={r.id} /> },
         { key: 'tracer', label: 'Graduate Tracer history', wide: true, render: (r) => <TracerHistory accountId={r.id} /> },
       ]}
     />

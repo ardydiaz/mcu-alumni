@@ -34,12 +34,20 @@ export function PortalAuthProvider({ children }) {
     return data.account;
   }, []);
 
+  // Activating from an invitation signs the graduate in straight away.
+  const activate = useCallback(async (data) => {
+    const res = await portalApi.activate(data);
+    portalSession.set(res.data.token);
+    setState({ account: res.data.account, status: 'authenticated' });
+    return res;
+  }, []);
+
   const logout = useCallback(() => {
     portalSession.set(null);
     setState({ account: null, status: 'anonymous' });
   }, []);
 
-  const value = useMemo(() => ({ ...state, login, logout, refresh }), [state, login, logout, refresh]);
+  const value = useMemo(() => ({ ...state, login, activate, logout, refresh }), [state, login, activate, logout, refresh]);
   return <PortalAuthContext.Provider value={value}>{children}</PortalAuthContext.Provider>;
 }
 

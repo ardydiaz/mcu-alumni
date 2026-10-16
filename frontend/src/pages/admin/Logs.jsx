@@ -3,8 +3,8 @@ import Badge from '../../components/admin/Badge.jsx';
 import { TitleCell } from '../../components/admin/cells.jsx';
 import { formatDateTime, fullName, humanize, toOptions } from '../../components/admin/format.js';
 
-const ACTIONS = ['login', 'login_failed', 'logout', 'create', 'update', 'delete', 'password_change'];
-const ENTITIES = ['Campaign', 'Donation', 'Scholar', 'Network', 'Partner', 'Project', 'Report', 'Alumni record', 'Tracer response', 'Volunteer', 'Message', 'User'];
+const ACTIONS = ['login', 'login_failed', 'logout', 'create', 'update', 'delete', 'password_change', 'export'];
+const ENTITIES = ['Campaign', 'Donation', 'Scholar', 'Network', 'Partner', 'Project', 'Report', 'Alumni record', 'Alumni profile', 'Alumni import', 'Alumni account', 'Tracer response', 'Volunteer', 'Message', 'User'];
 
 export default function Logs() {
   return (
