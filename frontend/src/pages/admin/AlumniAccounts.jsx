@@ -80,6 +80,28 @@ function RecordMatch({ accountId }) {
   );
 }
 
+// Emails the alumnus a password reset link (or the activation link). Staff never see or set passwords.
+function SendResetLink({ account }) {
+  const notify = useToast();
+  const [busy, setBusy] = useState(false);
+  const send = async () => {
+    setBusy(true);
+    try {
+      notify((await adminApi.send(`/portal/accounts/${account.id}/send-reset`, 'POST')).message);
+    } catch (err) {
+      notify(err.message, 'error');
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="send-reset">
+      <button type="button" className="btn btn-sm admin-btn-ghost" onClick={send} disabled={busy}><Icon name="mail" size={14} /> {busy ? 'Sending…' : 'Send password reset link'}</button>
+      <small className="muted">Goes to {account.email}. If the alumnus lost access to it, update their email first.</small>
+    </div>
+  );
+}
+
 // Registrations whose email is confirmed and that wait for the Alumni Office.
 function PendingReview({ onChange }) {
   const notify = useToast();
@@ -196,6 +218,7 @@ export default function AlumniAccounts() {
         { key: 'reviewedAt', label: 'Reviewed', render: (r) => formatDateTime(r.reviewedAt) },
         { key: 'reviewNote', label: 'Rejection reason', wide: true },
         { key: 'lastLoginAt', label: 'Last login', render: (r) => formatDateTime(r.lastLoginAt) },
+        { key: 'password', label: 'Password', wide: true, render: (r) => (r.status === 'rejected' ? <span className="muted">Not available for rejected registrations</span> : <SendResetLink account={r} />) },
         { key: 'consentAt', label: 'Consent given', render: (r) => formatDateTime(r.consentAt) },
         { key: 'record', label: 'Registrar record', wide: true, render: (r) => <RecordMatch accountId={r.id} /> },
         { key: 'tracer', label: 'Graduate Tracer history', wide: true, render: (r) => <TracerHistory accountId={r.id} /> },

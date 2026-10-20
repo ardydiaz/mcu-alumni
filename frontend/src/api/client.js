@@ -25,8 +25,6 @@ const CONTENT_ENDPOINTS = {
 const FORM_ENDPOINTS = {
   contact: '/messages',
   donation: '/donations',
-  'alumni-update': '/alumni',
-  tracer: '/tracer',
   volunteer: '/volunteers',
   'portal-register': '/portal/register',
 };

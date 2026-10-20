@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import PublicLayout from '../layouts/PublicLayout.jsx';
 import ProtectedRoute, { FullPageLoader } from './ProtectedRoute.jsx';
 
@@ -25,11 +25,12 @@ const PortalHome = lazy(() => import('../pages/portal/PortalHome.jsx'));
 const PortalRegister = lazy(() => import('../pages/portal/Register.jsx'));
 const PortalLogin = lazy(() => import('../pages/portal/PortalLogin.jsx'));
 const PortalVerify = lazy(() => import('../pages/portal/VerifyEmail.jsx'));
+const PortalForgotPassword = lazy(() => import('../pages/portal/ForgotPassword.jsx'));
+const PortalResetPassword = lazy(() => import('../pages/portal/ResetPassword.jsx'));
 const PortalActivate = lazy(() => import('../pages/portal/Activate.jsx'));
 const PortalAccount = lazy(() => import('../pages/portal/Account.jsx'));
 const PortalLayout = lazy(() => import('../pages/portal/PortalLayout.jsx'));
 const portalPage = (name) => lazy(() => import('../pages/portal/PortalServices.jsx').then((m) => ({ default: m[name] })));
-const PortalUpdateInfo = portalPage('PortalUpdateInfo');
 const PortalTracer = lazy(() => import('../pages/portal/PortalTracer.jsx'));
 const PortalProfile = lazy(() => import('../pages/portal/PortalProfile.jsx'));
 const PortalAlumniId = portalPage('PortalAlumniId');
@@ -53,6 +54,7 @@ const Reports = lazy(() => import('../pages/admin/Reports.jsx'));
 const Alumni = lazy(() => import('../pages/admin/Alumni.jsx'));
 const AlumniAccounts = lazy(() => import('../pages/admin/AlumniAccounts.jsx'));
 const AdminEvents = lazy(() => import('../pages/admin/Events.jsx'));
+const AdminEventRegistrants = lazy(() => import('../pages/admin/EventRegistrants.jsx'));
 const AlumniProfiles = lazy(() => import('../pages/admin/AlumniProfiles.jsx'));
 const AlumniProfileEdit = lazy(() => import('../pages/admin/AlumniProfileEdit.jsx'));
 const AlumniImport = lazy(() => import('../pages/admin/AlumniImport.jsx'));
@@ -90,12 +92,14 @@ export default function AppRoutes() {
           <Route path="portal/register" element={<PortalRegister />} />
           <Route path="portal/login" element={<PortalLogin />} />
           <Route path="portal/verify" element={<PortalVerify />} />
+          <Route path="portal/forgot-password" element={<PortalForgotPassword />} />
+          <Route path="portal/reset-password" element={<PortalResetPassword />} />
           <Route path="portal/activate" element={<PortalActivate />} />
           {/* Signed-in portal pages open inside the portal (sidebar layout) */}
           <Route element={<PortalLayout />}>
             <Route path="portal/account" element={<PortalAccount />} />
             <Route path="portal/profile" element={<PortalProfile />} />
-            <Route path="portal/update-info" element={<PortalUpdateInfo />} />
+            <Route path="portal/update-info" element={<Navigate to="/portal/profile" replace />} />
             <Route path="portal/graduate-tracer" element={<PortalTracer />} />
             <Route path="portal/alumni-id" element={<PortalAlumniId />} />
             <Route path="portal/perks" element={<PortalPerks />} />
@@ -115,6 +119,7 @@ export default function AppRoutes() {
           <Route index element={<Dashboard />} />
           <Route path="slides" element={<Slides />} />
           <Route path="events" element={<AdminEvents />} />
+          <Route path="events/:id/registrants" element={<AdminEventRegistrants />} />
           <Route path="categories" element={<Categories />} />
           <Route path="donations" element={<Donations />} />
           <Route path="scholars" element={<Scholars />} />

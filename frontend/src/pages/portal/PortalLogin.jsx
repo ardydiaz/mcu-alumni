@@ -10,7 +10,7 @@ export default function PortalLogin() {
   const { status, login } = usePortalAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const [values, setValues] = useState({ email: '', password: '' });
+  const [values, setValues] = useState({ email: params.get('email') || '', password: '' });
   const [state, setState] = useState({ busy: false, error: '', fields: {}, reason: null });
 
   // ?next=/events/... returns the alumnus to the page they came from (only paths on this site).
@@ -53,7 +53,7 @@ export default function PortalLogin() {
                 {state.busy ? <span className="spinner" aria-hidden="true" /> : <Icon name="users" size={18} />} Log in
               </button>
               <p className="portal-form__alt">
-                Forgot your password? Email <a href="mailto:alumni@mcu.edu.ph?subject=Alumni%20Portal%20password">alumni@mcu.edu.ph</a>
+                <Link to={`/portal/forgot-password${values.email ? `?email=${encodeURIComponent(values.email)}` : ''}`}>Forgot your password?</Link>
               </p>
             </form>
             <div className="portal-card__foot">

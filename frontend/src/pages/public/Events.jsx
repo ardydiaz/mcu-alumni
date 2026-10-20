@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHero from '../../components/ui/PageHero.jsx';
 import Icon from '../../components/ui/Icon.jsx';
-import EventCard from '../../components/events/EventCard.jsx';
+import EventCard, { modalClick } from '../../components/events/EventCard.jsx';
+import EventModal, { useEventModal } from '../../components/events/EventModal.jsx';
 import { getEvents } from '../../api/client.js';
 import { CATEGORIES, categoryOf, eventDays, monthGrid, monthTitle, todayKey, longDate, timeRange } from '../../components/events/eventUtils.js';
 import '../../styles/events.css';
@@ -53,7 +54,7 @@ function EmptyState({ text }) {
   );
 }
 
-function MonthCalendar({ category }) {
+function MonthCalendar({ category, onOpen }) {
   const today = todayKey();
   const [cursor, setCursor] = useState(() => ({ y: Number(today.slice(0, 4)), m: Number(today.slice(5, 7)) - 1 }));
   const [selected, setSelected] = useState(today);
@@ -140,7 +141,7 @@ function MonthCalendar({ category }) {
           <span className="ev-side__eyebrow">{selectedInMonth || selectedEvents.length ? 'Selected day' : 'This month'}</span>
           <h3>{longDate(`${selected}T12:00:00+08:00`)}</h3>
           {selectedEvents.length ? (
-            <div className="ev-side__list">{selectedEvents.map((e) => <EventCard key={e.id} event={e} compact />)}</div>
+            <div className="ev-side__list">{selectedEvents.map((e) => <EventCard key={e.id} event={e} compact onOpen={onOpen} />)}</div>
           ) : (
             <p className="muted ev-side__none">No events on this day.</p>
           )}
@@ -151,7 +152,7 @@ function MonthCalendar({ category }) {
             <ul className="ev-side__month">
               {inMonth.map((e) => (
                 <li key={e.id}>
-                  <Link to={`/events/${e.slug}`} style={{ '--cat': categoryOf(e.category).color }}>
+                  <Link to={`/events/${e.slug}`} onClick={modalClick(onOpen, e)} aria-haspopup="dialog" style={{ '--cat': categoryOf(e.category).color }}>
                     <span className="ev-dot" aria-hidden="true" />
                     <span>
                       <strong>{e.title}</strong>
@@ -170,7 +171,7 @@ function MonthCalendar({ category }) {
   );
 }
 
-function UpcomingList({ category }) {
+function UpcomingList({ category, onOpen }) {
   const { data, loading, error } = useEvents({ upcoming: true, category, limit: 50 });
   if (loading) return <div className="ev-list">{[1, 2, 3].map((i) => <div key={i} className="skeleton ev-skel" />)}</div>;
   if (error) return <p className="ev-error">We couldn't load events right now. Please try again later.</p>;
@@ -188,7 +189,7 @@ function UpcomingList({ category }) {
       {Object.entries(groups).map(([month, events]) => (
         <section key={month} className="ev-list__group">
           <h3>{month}</h3>
-          {events.map((e) => <EventCard key={e.id} event={e} />)}
+          {events.map((e) => <EventCard key={e.id} event={e} onOpen={onOpen} />)}
         </section>
       ))}
     </div>
@@ -198,6 +199,7 @@ function UpcomingList({ category }) {
 export default function Events() {
   const [view, setView] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 760 ? 'list' : 'calendar'));
   const [category, setCategory] = useState('');
+  const modal = useEventModal(); // event details open in a modal (?event=slug)
 
   return (
     <div className="ev">
@@ -219,9 +221,10 @@ export default function Events() {
               </button>
             </div>
           </div>
-          {view === 'calendar' ? <MonthCalendar category={category} /> : <UpcomingList category={category} />}
+          {view === 'calendar' ? <MonthCalendar category={category} onOpen={modal.open} /> : <UpcomingList category={category} onOpen={modal.open} />}
         </div>
       </section>
+      <EventModal slug={modal.slug} preview={modal.preview} onClose={modal.close} />
     </div>
   );
 }

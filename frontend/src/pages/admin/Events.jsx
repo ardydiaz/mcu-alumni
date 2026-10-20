@@ -1,7 +1,9 @@
 import ResourcePage from '../../components/admin/ResourcePage.jsx';
 import Badge from '../../components/admin/Badge.jsx';
 import { TitleCell } from '../../components/admin/cells.jsx';
-import EventRegistrants from '../../components/admin/EventRegistrants.jsx';
+import { Link } from 'react-router-dom';
+import Icon from '../../components/ui/Icon.jsx';
+import RegistrationSummary from '../../components/admin/RegistrationSummary.jsx';
 import { useContent } from '../../hooks/useContent.js';
 import { CATEGORIES, categoryOf, longDate, timeRange, shortDate, time } from '../../components/events/eventUtils.js';
 
@@ -38,7 +40,15 @@ export default function AdminEvents() {
           key: 'registeredCount',
           label: 'Registered',
           className: 'num',
-          render: (r) => (r.portalRegistration ? `${(r.registeredCount || 0).toLocaleString()}${r.capacity ? ` / ${r.capacity.toLocaleString()}` : ''}` : <span className="muted">—</span>),
+          // Opens the Registrants page directly (without opening the event details).
+          render: (r) =>
+            r.portalRegistration ? (
+              <Link to={`/admin/events/${r.id}/registrants`} className="ev-reg-link" onClick={(ev) => ev.stopPropagation()} title="Manage registrants">
+                {(r.registeredCount || 0).toLocaleString()}{r.capacity ? ` / ${r.capacity.toLocaleString()}` : ''} <Icon name="users" size={13} />
+              </Link>
+            ) : (
+              <span className="muted">—</span>
+            ),
         },
         { key: 'status', label: 'Status', render: (r) => <StatusBadge value={r.status} /> },
       ]}
@@ -76,7 +86,7 @@ export default function AdminEvents() {
         { key: 'registrationDeadline', label: 'Registration deadline', render: (r) => (r.registrationDeadline ? `${longDate(r.registrationDeadline)}, ${time(r.registrationDeadline)}` : '—') },
         { key: 'capacity', label: 'Slots' },
         { key: 'link', label: 'Public page', wide: true, render: (r) => (r.status === 'draft' ? 'Not public (draft)' : <a href={`/events/${r.slug}`} target="_blank" rel="noreferrer">/events/{r.slug}</a>) },
-        { key: 'registrants', label: 'Registrants', wide: true, render: (r) => <EventRegistrants event={r} /> },
+        { key: 'registrants', label: 'Registrants', wide: true, render: (r) => <RegistrationSummary event={r} /> },
         { key: 'summary', label: 'Summary', wide: true },
         { key: 'description', label: 'Description', wide: true },
       ]}

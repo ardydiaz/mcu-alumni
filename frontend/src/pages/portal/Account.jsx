@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { Link, useLocation, useOutletContext } from 'react-router-dom';
+import Field from '../../components/forms/Field.jsx';
+import { portalApi, portalSession } from '../../api/portal.js';
 import Icon from '../../components/ui/Icon.jsx';
 import { StatusBadge, Journey, firstName } from './portalShared.jsx';
 import { displayName } from './PortalLayout.jsx';
 import EventCard from '../../components/events/EventCard.jsx';
+import EventModal, { useEventModal } from '../../components/events/EventModal.jsx';
 import { useUpcomingEvents } from '../../components/events/useUpcomingEvents.js';
 import '../../styles/events.css';
 
@@ -20,6 +24,7 @@ export default function Account() {
   const { account } = useOutletContext();
   const welcome = useLocation().state?.welcome; // just activated from an invitation
   const events = useUpcomingEvents(3);
+  const modal = useEventModal(); // event details open in a modal (?event=slug)
   const verified = account.status === 'verified';
   const details = [
     { icon: 'users', label: 'Full name', value: account.fullName },
@@ -111,8 +116,9 @@ export default function Account() {
             <Link to="/events" className="portal-card__link">View calendar <Icon name="arrowRight" size={14} /></Link>
           </div>
           <div className="portal-events">
-            {events.data.map((e) => <EventCard key={e.id} event={e} compact />)}
+            {events.data.map((e) => <EventCard key={e.id} event={e} compact onOpen={modal.open} />)}
           </div>
+          <EventModal slug={modal.slug} preview={modal.preview} onClose={modal.close} />
         </section>
       ) : (
         <section className="portal-soon">
@@ -127,6 +133,55 @@ export default function Account() {
           </div>
         </section>
       )}
+
+      <ChangePassword />
     </>
+  );
+}
+
+// Account security: change the password (current one required). Other devices are signed out.
+function ChangePassword() {
+  const [open, setOpen] = useState(false);
+  const [values, setValues] = useState({ currentPassword: '', password: '', confirmPassword: '' });
+  const [state, setState] = useState({ busy: false, fields: {}, message: null });
+  const field = (name) => ({ name, value: values[name], error: state.fields[name], onChange: (e) => setValues((v) => ({ ...v, [name]: e.target.value })) });
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setState({ busy: true, fields: {}, message: null });
+    try {
+      const res = await portalApi.changePassword(values);
+      portalSession.set(res.data.token); // this device stays signed in
+      setValues({ currentPassword: '', password: '', confirmPassword: '' });
+      setState({ busy: false, fields: {}, message: { ok: true, text: res.message } });
+      setOpen(false);
+    } catch (err) {
+      setState({ busy: false, fields: err.fields || {}, message: err.fields ? null : { ok: false, text: err.message } });
+    }
+  };
+
+  return (
+    <section className="portal-card portal-security">
+      <div className="portal-security__head">
+        <div>
+          <h2 className="portal-card__title" style={{ margin: 0 }}>Password and security</h2>
+          <p>Change your password anytime. Forgot it? Use “Forgot your password?” on the log-in page.</p>
+        </div>
+        {!open && <button type="button" className="btn btn-outline btn-sm" onClick={() => { setOpen(true); setState({ busy: false, fields: {}, message: null }); }}><Icon name="shield" size={14} /> Change password</button>}
+      </div>
+      {state.message && !open && <p className={`portal-security__msg ${state.message.ok ? 'is-ok' : 'is-error'}`} role="status">{state.message.text}</p>}
+      {open && (
+        <form onSubmit={onSubmit} className="form" noValidate>
+          <Field label="Current password" type="password" autoComplete="current-password" required {...field('currentPassword')} />
+          <Field label="New password" type="password" autoComplete="new-password" hint="At least 8 characters, with a letter and a number." required {...field('password')} />
+          <Field label="Confirm new password" type="password" autoComplete="new-password" required {...field('confirmPassword')} />
+          <div className="portal-security__actions">
+            <button type="submit" className="btn btn-primary btn-sm" disabled={state.busy}>{state.busy ? 'Saving…' : 'Save new password'}</button>
+            <button type="button" className="btn btn-outline btn-sm" onClick={() => setOpen(false)} disabled={state.busy}>Cancel</button>
+            {state.message && <p className={`portal-security__msg ${state.message.ok ? 'is-ok' : 'is-error'}`} role="status">{state.message.text}</p>}
+          </div>
+        </form>
+      )}
+    </section>
   );
 }

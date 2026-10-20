@@ -16,7 +16,19 @@ export const navigation = [
   { label: 'Transparency Reports', to: '/transparency-reports' },
 ];
 
-export const updateInfo = [
-  { label: 'Alumni Contact Update', to: '/alumni-contact-update', description: 'Keep your details current and get your Alumni ID' },
-  { label: 'Graduate Tracer', to: '/graduate-tracer', description: 'Tell us where your MCU journey has taken you' },
+// The header account menu (one "Alumni Portal" button). Updating information and the Graduate Tracer need a
+// portal account, so they live here instead of a separate "Update Your Info" menu.
+export const portalMenu = [
+  { label: 'Dashboard', to: '/portal/account', icon: 'compass', description: 'Your account at a glance' },
+  { label: 'My profile', to: '/portal/profile', icon: 'users', description: 'Update your information' },
+  { label: 'Graduate Tracer', to: '/portal/graduate-tracer', icon: 'file', description: 'Tell us where your journey has taken you' },
+  { label: 'Alumni ID', to: '/portal/alumni-id', icon: 'id', description: 'Request your MCU Alumni ID' },
+];
+
+// Footer "Alumni Portal" column. The update / tracer links ask visitors to log in first.
+export const portalFooter = [
+  { label: 'Log in', to: '/portal/login' },
+  { label: 'Create an account', to: '/portal/register' },
+  { label: 'Update your information', to: '/alumni-contact-update' },
+  { label: 'Graduate Tracer', to: '/graduate-tracer' },
 ];

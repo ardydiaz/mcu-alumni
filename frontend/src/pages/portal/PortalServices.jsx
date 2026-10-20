@@ -1,8 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import AsyncContent from '../../components/ui/AsyncContent.jsx';
 import Icon from '../../components/ui/Icon.jsx';
 import { useContent } from '../../hooks/useContent.js';
-import { UpdateForm } from '../public/ContactUpdate.jsx';
+import { portalApi } from '../../api/portal.js';
 import { DonationForm, BankDetails } from '../public/Give.jsx';
 import { PartnerGrid } from '../public/MerchantPartners.jsx';
 import { PortalPageHead } from './PortalLayout.jsx';
@@ -18,45 +19,16 @@ function nameParts(fullName = '') {
   return { lastName, firstName: words.join(' '), middleName: middle };
 }
 
-const contactPrefill = (a) => ({
-  ...nameParts(a.fullName),
-  email: a.email,
-  phone: a.phone,
-  studentNumber: a.studentNumber,
-  yearGraduated: String(a.yearGraduated),
-});
-
 const usePortalAccount = () => useOutletContext().account;
 
-export function PortalUpdateInfo() {
-  const account = usePortalAccount();
-  const courses = useContent('courses');
-  return (
-    <>
-      <PortalPageHead
-        icon="users"
-        eyebrow="Alumni information"
-        title="Update my information"
-        text="Keep your address, work and contact details current so you never miss a reunion or alumni benefit."
-      />
-      <section className="portal-card">
-        <AsyncContent state={courses} skeleton={1}>
-          {(data) => <UpdateForm courses={data} initial={contactPrefill(account)} />}
-        </AsyncContent>
-      </section>
-    </>
-  );
-}
-
 const ID_STEPS = [
-  { title: 'Request', text: 'Confirm your details below and tick "request an MCU Alumni ID".' },
+  { title: 'Request', text: 'Check your details in My profile, then click "Request my Alumni ID".' },
   { title: 'We contact you', text: 'The Alumni Relations Office tells you the requirements and release schedule.' },
   { title: 'Enjoy perks', text: 'Present your Alumni ID at our merchant partners for discounts.' },
 ];
 
 export function PortalAlumniId() {
   const account = usePortalAccount();
-  const courses = useContent('courses');
   const site = useContent('site');
   return (
     <>
@@ -75,12 +47,69 @@ export function PortalAlumniId() {
           ))}
         </ol>
       </section>
-      <section className="portal-card">
-        <AsyncContent state={courses} skeleton={1}>
-          {(data) => <UpdateForm courses={data} initial={{ ...contactPrefill(account), requestAlumniId: true }} />}
-        </AsyncContent>
-      </section>
+      <AlumniIdRequest verified={account.status === 'verified'} />
     </>
+  );
+}
+
+const ID_STATUS = {
+  requested: { label: 'Requested', text: 'The Alumni Relations Office has your request and will contact you about the requirements.' },
+  processing: { label: 'Being processed', text: 'Your Alumni ID is being prepared. We will tell you when and where to claim it.' },
+  released: { label: 'Released', text: 'Your Alumni ID has been released. Present it at our merchant partners for discounts.' },
+};
+
+// One click: the request uses the details in the alumnus's profile (one request per graduate).
+function AlumniIdRequest({ verified }) {
+  const [state, setState] = useState({ loading: verified, request: null, busy: false, message: null });
+
+  useEffect(() => {
+    if (!verified) return;
+    portalApi.alumniId().then((d) => setState((s) => ({ ...s, loading: false, request: d.request }))).catch(() => setState((s) => ({ ...s, loading: false })));
+  }, [verified]);
+
+  const request = async () => {
+    setState((s) => ({ ...s, busy: true, message: null }));
+    try {
+      const res = await portalApi.requestAlumniId();
+      setState((s) => ({ ...s, busy: false, request: res.data.request, message: { ok: true, text: res.message } }));
+    } catch (err) {
+      setState((s) => ({ ...s, busy: false, message: { ok: false, text: err.message, profile: err.fields?.reason === 'incomplete_profile' } }));
+    }
+  };
+
+  if (!verified) {
+    return (
+      <section className="portal-card portal-idreq">
+        <p className="muted">You can request your Alumni ID once the Alumni Relations Office verifies your account.</p>
+      </section>
+    );
+  }
+  if (state.loading) return <section className="portal-card portal-idreq"><span className="spinner spinner--dark" aria-hidden="true" /></section>;
+
+  const current = state.request && ID_STATUS[state.request.status];
+  return (
+    <section className="portal-card portal-idreq">
+      {current ? (
+        <div className="portal-idreq__status">
+          <span className={`portal-idreq__badge is-${state.request.status}`}><Icon name={state.request.status === 'released' ? 'check' : 'clock'} size={14} /> {current.label}</span>
+          <p>{current.text}</p>
+        </div>
+      ) : (
+        <div className="portal-idreq__status">
+          <strong>Ready to request your Alumni ID?</strong>
+          <p>We use the details in your alumni profile: your name, program, batch, contact number and address. Please check that they're current.</p>
+        </div>
+      )}
+      <div className="portal-idreq__actions">
+        {!current && (
+          <button type="button" className="btn btn-gold btn-lg" onClick={request} disabled={state.busy}>
+            {state.busy ? <span className="spinner" aria-hidden="true" /> : <Icon name="id" size={18} />} Request my Alumni ID
+          </button>
+        )}
+        <Link to="/portal/profile" className="btn btn-outline">Review my profile</Link>
+      </div>
+      {state.message && <p className={`portal-idreq__msg ${state.message.ok ? 'is-ok' : 'is-error'}`} role="status">{state.message.text}</p>}
+    </section>
   );
 }
 

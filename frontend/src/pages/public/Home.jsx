@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/ui/Icon.jsx';
 import AsyncContent from '../../components/ui/AsyncContent.jsx';
@@ -7,7 +8,9 @@ import { useReveal } from '../../hooks/useReveal.js';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import { assetUrl } from '../../api/client.js';
 import { campaignIcons } from '../../components/ui/campaignIcons.js';
-import EventCard from '../../components/events/EventCard.jsx';
+import EventSpotlight from '../../components/events/EventSpotlight.jsx';
+import { portalApi } from '../../api/portal.js';
+import EventModal, { useEventModal } from '../../components/events/EventModal.jsx';
 import { useUpcomingEvents } from '../../components/events/useUpcomingEvents.js';
 import '../../styles/home.css';
 import '../../styles/events.css';
@@ -239,8 +242,17 @@ function Networks({ items }) {
   );
 }
 
-// Next three events; the section only appears when there are upcoming events.
+// Next events: a featured card + a compact list (or a friendly empty state). Logged-in alumni also see
+// which events they registered for. Events open in the event modal.
 function UpcomingEvents({ events }) {
+  const modal = useEventModal(); // event details open in a modal (?event=slug)
+  const { status } = usePortalAuth();
+  const [registered, setRegistered] = useState(() => new Set());
+  useEffect(() => {
+    if (status !== 'authenticated' || modal.slug) return; // refresh after the modal closes (they may have registered)
+    portalApi.myEvents().then((rows) => setRegistered(new Set(rows.map((r) => r.eventId)))).catch(() => {});
+  }, [status, modal.slug]);
+
   return (
     <section className="home-section home-events">
       <div className="container">
@@ -249,16 +261,13 @@ function UpcomingEvents({ events }) {
           eyebrow="Events and activities"
           title="Upcoming alumni events"
           text="Reunions, homecoming activities, chapter gatherings and alumni programs."
-          action={<Link to="/events" className="btn btn-outline">View calendar <Icon name="calendar" size={16} /></Link>}
+          action={<Link to="/events" className="home-events__all">View all events <Icon name="arrowRight" size={16} /></Link>}
         />
-        <div className="home-events__grid">
-          {events.map((e, i) => (
-            <div key={e.id} data-reveal style={{ '--delay': `${i * 80}ms` }}>
-              <EventCard event={e} />
-            </div>
-          ))}
+        <div data-reveal>
+          <EventSpotlight events={events} registeredIds={registered} onOpen={modal.open} />
         </div>
       </div>
+      <EventModal slug={modal.slug} preview={modal.preview} onClose={modal.close} />
     </section>
   );
 }
@@ -324,7 +333,7 @@ export default function Home() {
   const campaigns = useContent('campaigns');
   const networks = useContent('networks');
   const site = useContent('site');
-  const events = useUpcomingEvents(3);
+  const events = useUpcomingEvents(4); // 1 featured + up to 3 in the list
 
   // Re-scan for [data-reveal] once each section's data has arrived.
   useReveal([home.data, campaigns.data, networks.data, site.data, events.data]);
@@ -340,7 +349,7 @@ export default function Home() {
 
       <PortalBand image={site.data?.alumniIdImage} />
 
-      {events.data?.length > 0 && <UpcomingEvents events={events.data} />}
+      {events.data && !events.error && <UpcomingEvents events={events.data} />}
 
       <AsyncContent state={campaigns} skeleton={6}>{(items) => <Campaigns items={items} />}</AsyncContent>
 

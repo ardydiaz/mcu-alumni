@@ -170,15 +170,6 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
 .topbar span, .topbar a { display: inline-flex; align-items: center; gap: 7px; color: inherit; }
 .topbar__contact svg { color: var(--gold-500); }
 .topbar a:hover { color: var(--gold-400); }
-.topbar .topbar__portal {
-  flex: none; padding: 5px 14px; border-radius: 999px; color: #fff; font-weight: 700;
-  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 183, 54, 0.55);
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-.topbar .topbar__portal svg { color: var(--gold-400); }
-.topbar .topbar__portal:hover { background: var(--gold-500); border-color: var(--gold-500); color: var(--ink); }
-.topbar .topbar__portal:hover svg { color: var(--ink); }
-.drawer__portal { margin-bottom: 4px; }
 
 /* ---- Main row: logo | centered links | search + Update Your Info ---- */
 .navbar {
@@ -203,12 +194,6 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
 .nav-link.active { color: var(--purple-700); background: var(--purple-50); }
 
 .navbar__actions { flex: none; display: flex; align-items: center; gap: 12px; }
-.navbar__search {
-  display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%;
-  background: var(--surface-2); color: var(--ink-2); cursor: pointer; transition: background 0.2s, color 0.2s;
-}
-.navbar__search:hover { background: var(--purple-50); color: var(--purple-700); }
-.navbar__search:focus-visible { outline: 3px solid var(--gold-500); outline-offset: 2px; }
 
 .navbar__update {
   display: inline-flex; align-items: center; gap: 8px; padding: 7px 18px 7px 7px; border: 0; border-radius: 999px; cursor: pointer;
@@ -218,28 +203,6 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
 }
 .navbar__update:hover { transform: translateY(-1px); box-shadow: 0 14px 26px -10px rgba(92, 41, 124, 0.85); }
 .navbar__update-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--gold-500); color: var(--ink); }
-
-/* Header search (SiteSearch) */
-.site-search {
-  width: min(620px, calc(100vw - 32px)); margin: 12vh auto auto; padding: 0; border: 0; border-radius: 22px;
-  background: var(--surface); box-shadow: 0 40px 100px -20px rgba(20, 0, 40, 0.5); overflow: hidden;
-}
-.site-search::backdrop { background: rgba(20, 0, 32, 0.55); backdrop-filter: blur(4px); }
-.site-search[open] { animation: site-search-in 0.2s var(--ease); }
-@keyframes site-search-in { from { opacity: 0; transform: translateY(-8px) scale(0.98); } }
-.site-search__field { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--line); color: var(--purple-700); }
-.site-search__field input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 1.05rem; color: var(--ink); background: transparent; }
-.site-search__field kbd { padding: 2px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface-2); color: var(--muted); font-size: 0.75rem; font-family: inherit; }
-.site-search__label { margin: 14px 20px 6px; color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
-.site-search__results { list-style: none; margin: 0; padding: 0 10px 12px; max-height: 50vh; overflow-y: auto; }
-.site-search__results button {
-  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; border: 0; border-radius: 12px;
-  background: transparent; text-align: left; font: inherit; cursor: pointer; color: var(--muted);
-}
-.site-search__results button.is-active { background: var(--purple-50); color: var(--purple-700); }
-.site-search__results strong { display: block; color: var(--ink); font-size: 0.95rem; }
-.site-search__results small { display: block; color: var(--muted); font-size: 0.82rem; }
-.site-search__empty { margin: 8px 20px 22px; color: var(--muted); }
 
 .nav-dropdown { position: relative; }
 .nav-dropdown__menu {
@@ -255,6 +218,45 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
 .nav-dropdown__item strong { display: block; font-size: 0.92rem; }
 .nav-dropdown__item span { font-size: 0.8rem; color: var(--muted); }
 .nav-dropdown__item:hover, .nav-dropdown__item.active { background: var(--purple-50); color: var(--purple-700); }
+
+/* Header account menu ("Alumni Portal" / "Hi, Ardy") */
+.navbar__update-icon b { font-size: 0.74rem; font-weight: 900; letter-spacing: 0.02em; }
+.nav-account__menu { width: 320px; padding: 10px; }
+.nav-account__intro { display: grid; gap: 4px; padding: 8px 8px 12px; }
+.nav-account__intro strong { color: var(--ink); font-size: 0.95rem; }
+.nav-account__intro span { color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+.nav-account__menu .btn + .btn { margin-top: 8px; }
+.nav-account__hint { margin: 10px 8px 4px; color: var(--muted); font-size: 0.78rem; line-height: 1.45; }
+.nav-account__head { display: grid; gap: 4px; margin-bottom: 6px; padding: 8px 10px 12px; border-bottom: 1px solid var(--line); }
+.nav-account__head strong { color: var(--ink); font-size: 0.95rem; }
+.nav-account__status { justify-self: start; padding: 2px 9px; border-radius: 999px; background: #e6f6ec; color: #17693a; font-size: 0.72rem; font-weight: 800; }
+.nav-account__status.is-pending { background: var(--gold-100); color: var(--gold-800); }
+.nav-account__item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); color: var(--ink); text-decoration: none; }
+.nav-account__item svg { flex: none; margin-top: 2px; color: var(--purple-700); }
+.nav-account__item strong { display: block; font-size: 0.9rem; }
+.nav-account__item small { display: block; color: var(--muted); font-size: 0.78rem; }
+.nav-account__item:hover, .nav-account__item.active { background: var(--purple-50); color: var(--purple-700); }
+.nav-account__logout {
+  display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 6px; padding: 10px; border: 0; border-top: 1px solid var(--line);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm); background: none; color: var(--muted); font: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+}
+.nav-account__logout:hover { color: var(--danger); }
+
+/* Phone menu: account block */
+.drawer__account { display: grid; gap: 10px; margin-bottom: 8px; padding: 14px; border-radius: 16px; background: var(--purple-50); }
+.drawer__account-text { margin: 0; color: var(--ink-2); font-size: 0.9rem; line-height: 1.5; }
+.drawer__account-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.drawer__account-actions .btn { padding-left: 8px; padding-right: 8px; font-size: 0.9rem; }
+.drawer__me { display: flex; align-items: center; gap: 10px; }
+.drawer__me strong { display: block; color: var(--ink); }
+.drawer__me small { color: var(--muted); font-size: 0.8rem; }
+.drawer__avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--gold-500); color: var(--ink); font-size: 0.8rem; font-weight: 900; }
+.drawer__portal-links { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.drawer__portal-link { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 10px; background: var(--surface); color: var(--ink); font-size: 0.86rem; font-weight: 700; text-decoration: none; }
+.drawer__portal-link svg { color: var(--purple-700); }
+.drawer__portal-link.active { background: var(--purple-700); color: #fff; }
+.drawer__portal-link.active svg { color: var(--gold-400); }
+.drawer__logout { justify-self: start; padding: 4px 2px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 0.86rem; font-weight: 700; cursor: pointer; }
 
 .navbar__cta { flex: none; }
 .navbar__toggle { display: none; border: 0; background: none; color: var(--ink); padding: 8px; }
@@ -738,7 +740,6 @@ a.card:hover, .card.pillar:hover, .card.scholar:hover, .card.perk:hover, .card.n
   .navbar__links { gap: 0; }
   .nav-link { padding: 8px 7px; font-size: 0.86rem; }
   .navbar__actions { gap: 8px; }
-  .navbar__search { width: 40px; height: 40px; }
   .navbar__update { padding: 6px 14px 6px 6px; font-size: 0.9rem; }
   .navbar__update-icon { width: 28px; height: 28px; }
 }

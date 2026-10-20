@@ -87,6 +87,20 @@
 .portal-card__head h1 { font-size: 1.8rem; margin: 0 0 6px; }
 .portal-card__head p { margin: 0; color: var(--muted); }
 .portal-card__icon { display: inline-grid; place-items: center; width: 56px; height: 56px; margin-bottom: 14px; border-radius: 16px; background: linear-gradient(135deg, var(--purple-600), var(--purple-900)); color: var(--gold-400); }
+.portal-notfound { display: grid; justify-items: start; gap: 6px; padding: 12px 14px; border-radius: 12px; background: var(--danger-bg); color: var(--danger); font-size: 0.9rem; }
+.portal-notfound span { color: var(--ink-2); }
+
+/* Change password (dashboard) */
+.portal-security { display: grid; gap: 12px; }
+.portal-security__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.portal-security__head p { margin: 2px 0 0; color: var(--muted); font-size: 0.9rem; }
+.portal-security form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.portal-security__actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.portal-security__msg { margin: 0; font-weight: 700; }
+.portal-security__msg.is-ok { color: #17693a; }
+.portal-security__msg.is-error { color: var(--danger); }
+@media (max-width: 760px) { .portal-security form { grid-template-columns: minmax(0, 1fr); } }
+
 .portal-activate__record { display: grid; gap: 8px; margin: 0 0 22px; padding: 16px 18px; border-radius: 16px; background: var(--purple-50); border: 1px solid var(--purple-100); }
 .portal-activate__record > div { display: flex; justify-content: space-between; gap: 12px; }
 .portal-activate__record dt { color: var(--muted); font-size: 0.84rem; }
@@ -264,6 +278,18 @@
 .portal-id__steps li > span { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--gold-500); color: var(--ink); font-weight: 800; font-size: 0.86rem; }
 .portal-id__steps strong { display: block; color: #fff; }
 .portal-id__steps small { display: block; color: rgba(255, 255, 255, 0.78); font-size: 0.86rem; }
+
+/* Alumni ID request (one click, from the profile) */
+.portal-idreq { display: grid; gap: 16px; }
+.portal-idreq__status strong { display: block; font-size: 1.1rem; color: var(--ink); }
+.portal-idreq__status p { margin: 6px 0 0; color: var(--ink-2); line-height: 1.6; }
+.portal-idreq__badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: 0.82rem; font-weight: 800; background: var(--purple-50); color: var(--purple-700); }
+.portal-idreq__badge.is-processing { background: var(--gold-100); color: var(--gold-800); }
+.portal-idreq__badge.is-released { background: #e6f6ec; color: #17693a; }
+.portal-idreq__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.portal-idreq__msg { margin: 0; font-weight: 700; }
+.portal-idreq__msg.is-ok { color: #17693a; }
+.portal-idreq__msg.is-error { color: var(--danger); }
 
 .portal-perks .mp-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
 .portal-hint { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--muted); }

@@ -31,9 +31,18 @@ export const portalApi = {
   invitePreview: async (token) => (await send(`/portal/invite?token=${encodeURIComponent(token)}`)).data,
   activate: (data) => send('/portal/activate', { method: 'POST', body: data }),
   me: () => send('/portal/me', { token: portalSession.get() }),
+  // Password: forgot / reset (from the emailed link) / change (logged in)
+  forgotPassword: (email) => send('/portal/forgot-password', { method: 'POST', body: { email } }),
+  checkResetToken: async (token) => (await send(`/portal/reset-password?token=${encodeURIComponent(token)}`)).data,
+  resetPassword: (data) => send('/portal/reset-password', { method: 'POST', body: data }),
+  changePassword: (data) => send('/portal/change-password', { method: 'POST', body: data, token: portalSession.get() }),
   // Graduate Tracer: pre-filled answers (account + latest submission), and submit (linked to the account)
   tracer: () => send('/portal/tracer', { token: portalSession.get() }),
   submitTracer: (data) => send('/portal/tracer', { method: 'POST', body: data, token: portalSession.get() }),
+
+  // Alumni ID request (details come from the verified profile)
+  alumniId: async () => (await send('/portal/alumni-id', { token: portalSession.get() })).data,
+  requestAlumniId: () => send('/portal/alumni-id', { method: 'POST', token: portalSession.get() }),
 
   // Event registrations (Step 11)
   myEvents: async () => (await send('/portal/events', { token: portalSession.get() })).data,

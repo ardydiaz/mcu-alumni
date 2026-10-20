@@ -3,6 +3,7 @@ import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import MicrosoftButton, { MicrosoftLogo } from '../../components/admin/MicrosoftButton.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { getAuthProviders, m365LoginUrl } from '../../api/client.js';
+import Icon from '../../components/ui/Icon.jsx';
 
 // Error codes sent back by the backend after a failed Microsoft 365 sign-in.
 export const M365_ERRORS = {
@@ -42,8 +43,9 @@ export default function Login() {
 
   return (
     <>
-      <h1 className="auth-card__title">Sign in</h1>
-      <p className="muted">Use your MCU Microsoft 365 account.</p>
+      <span className="auth-card__badge"><Icon name="shield" size={14} /> Authorized staff only</span>
+      <h1 className="auth-card__title">Welcome back</h1>
+      <p className="auth-card__lead">Sign in with your MCU Microsoft 365 account to manage the alumni portal.</p>
 
       {message && (
         <div className={`alert mt-md ${errorCode === 'pending_approval' ? 'alert--warning' : 'alert--error'}`} role={errorCode === 'pending_approval' ? 'status' : 'alert'}>
@@ -71,8 +73,15 @@ export default function Login() {
         )}
       </div>
 
-      <p className="auth-card__note muted">
-        Access is limited to authorized MCU Alumni Relations staff. Having trouble? Contact the ICT office.
+      <ul className="auth-card__trust">
+        <li><Icon name="check" size={14} /> Single sign-on with your @mcu.edu.ph account</li>
+        <li><Icon name="check" size={14} /> No separate password to remember</li>
+        <li><Icon name="check" size={14} /> Every sign-in and change is recorded in the activity log</li>
+      </ul>
+
+      <p className="auth-card__note">
+        New staff? Sign in once to request access; a Super Admin approves it. Having trouble? Contact the{' '}
+        <a href="mailto:ict@mcu.edu.ph">ICT office</a>.
       </p>
     </>
   );

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Icon from '../ui/Icon.jsx';
 import ContactForm from '../forms/ContactForm.jsx';
 import { useContent } from '../../hooks/useContent.js';
-import { navigation, updateInfo } from './navigation.js';
+import { navigation, portalFooter } from './navigation.js';
 
 export default function Footer() {
   const { data: site } = useContent('site');
@@ -63,9 +63,9 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h3>Update Your Info</h3>
+          <h3>Alumni Portal</h3>
           <ul>
-            {updateInfo.map((l) => (
+            {portalFooter.map((l) => (
               <li key={l.to}><Link to={l.to}>{l.label}</Link></li>
             ))}
           </ul>

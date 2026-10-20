@@ -1,0 +1,24 @@
+/* "Log in to continue" pages for alumni-only features (Alumni Contact Update, Graduate Tracer). Prefix "gate". */
+.gate { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.gate-card {
+  position: relative; display: grid; justify-items: start; gap: 12px; padding: 36px; border-radius: 28px;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.gate-card::before { content: ''; position: absolute; inset: 0 36px auto; height: 4px; border-radius: 0 0 6px 6px; background: linear-gradient(90deg, var(--purple-700), var(--gold-500)); }
+.gate-card--loading { place-items: center; min-height: 240px; }
+.gate-card__icon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 18px; background: linear-gradient(135deg, var(--purple-700), var(--purple-900)); color: var(--gold-400); }
+.gate-card h2 { margin: 6px 0 0; font-size: clamp(1.5rem, 2.6vw, 2rem); }
+.gate-card > p { margin: 0; max-width: 560px; color: var(--ink-2); font-size: 1.04rem; line-height: 1.65; }
+.gate-card__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.gate-card__note { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--purple-50); color: var(--ink-2); font-size: 0.9rem; line-height: 1.5; }
+.gate-card__note svg { flex: none; margin-top: 2px; color: var(--purple-700); }
+.gate-why { padding: 28px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); }
+.gate-why h3 { margin: 0 0 14px; font-size: 1.1rem; }
+.gate-why .checklist { margin-bottom: 14px; }
+.gate-why p { margin: 0; font-size: 0.9rem; }
+.gate-why a { color: var(--purple-700); font-weight: 700; }
+@media (max-width: 860px) {
+  .gate { grid-template-columns: minmax(0, 1fr); }
+  .gate-card { padding: 26px 20px; }
+  .gate-card__actions .btn { flex: 1 1 100%; }
+}
