@@ -3,6 +3,7 @@ import Icon from '../../components/ui/Icon.jsx';
 import ProfileEditor from '../../components/profile/ProfileEditor.jsx';
 import { useContent } from '../../hooks/useContent.js';
 import { portalApi } from '../../api/portal.js';
+import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import { PortalPageHead } from './PortalLayout.jsx';
 import '../../styles/profile.css';
 
@@ -10,6 +11,7 @@ import '../../styles/profile.css';
 export default function PortalProfile() {
   const [state, setState] = useState({ profile: null, loading: true, error: null });
   const options = useContent('form-options');
+  const { refresh } = usePortalAuth();
 
   useEffect(() => {
     let active = true;
@@ -56,7 +58,11 @@ export default function PortalProfile() {
         profile={state.profile}
         mode="alumni"
         api={portalApi}
-        onChange={(profile) => setState((s) => ({ ...s, profile }))}
+        onChange={(profile) => {
+          // A new photo: refresh the account so the sidebar and header avatar update right away.
+          if (profile.photo !== state.profile?.photo) refresh();
+          setState((s) => ({ ...s, profile }));
+        }}
         choices={{ jobCategories: options.data?.jobCategories || [] }}
       />
     </>

@@ -221,6 +221,9 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
 
 /* Header account menu ("Alumni Portal" / "Hi, Ardy") */
 .navbar__update-icon b { font-size: 0.74rem; font-weight: 900; letter-spacing: 0.02em; }
+.navbar__update-icon.has-photo, .drawer__avatar.has-photo { overflow: hidden; background: #fff; }
+.navbar__update-icon img, .drawer__avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.drawer__avatar b { font: inherit; }
 .nav-account__menu { width: 320px; padding: 10px; }
 .nav-account__intro { display: grid; gap: 4px; padding: 8px 8px 12px; }
 .nav-account__intro strong { color: var(--ink); font-size: 0.95rem; }

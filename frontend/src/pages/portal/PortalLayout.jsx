@@ -4,6 +4,7 @@ import Icon from '../../components/ui/Icon.jsx';
 import { FullPageLoader } from '../../routes/ProtectedRoute.jsx';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import { StatusBadge } from './portalShared.jsx';
+import PortalAvatar from '../../components/portal/PortalAvatar.jsx';
 import '../../styles/portal.css';
 
 // Pages that open inside the portal (sidebar stays on the left).
@@ -50,7 +51,7 @@ export default function PortalLayout() {
       <div className="container portal-dash">
         <aside className="portal-side">
           <div className="portal-side__profile">
-            <span className="portal-avatar" aria-hidden="true">{initials(account.fullName)}</span>
+            <PortalAvatar account={account} className="portal-avatar" />
             <div className="portal-side__who">
               <strong>{displayName(account.fullName)}</strong>
               <small>{account.email}</small>

@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../ui/Icon.jsx';
 import { navigation, portalMenu } from './navigation.js';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
+import PortalAvatar from '../portal/PortalAvatar.jsx';
 
 const LOGO = 'https://alumni.mcu.edu.ph/wp-content/uploads/2023/11/header-logo.png';
 
@@ -46,7 +47,7 @@ function AccountMenu({ portal, onLogout }) {
   return (
     <div className="nav-dropdown nav-dropdown--right nav-account">
       <button type="button" className={`navbar__update${signedIn ? ' is-signed-in' : ''}`} aria-haspopup="true">
-        <span className="navbar__update-icon" aria-hidden="true">{signedIn ? <b>{me.initials}</b> : <Icon name="users" size={16} />}</span>
+        {signedIn ? <PortalAvatar account={portal.account} className="navbar__update-icon" /> : <span className="navbar__update-icon" aria-hidden="true"><Icon name="users" size={16} /></span>}
         {signedIn ? `Hi, ${me.first}` : 'Alumni Portal'} <Icon name="chevronDown" size={16} />
       </button>
       <div className="nav-dropdown__menu nav-account__menu" role="menu">
@@ -161,7 +162,7 @@ export default function Navbar() {
           {signedIn ? (
             <div className="drawer__account">
               <div className="drawer__me">
-                <span className="drawer__avatar" aria-hidden="true">{me.initials}</span>
+                <PortalAvatar account={portal.account} className="drawer__avatar" />
                 <div>
                   <strong>Hi, {me.first}</strong>
                   <small>{portal.account?.status === 'verified' ? 'Verified alumni' : 'Waiting for verification'}</small>
