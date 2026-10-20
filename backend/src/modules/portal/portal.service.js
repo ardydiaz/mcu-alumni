@@ -36,6 +36,12 @@ export const toPortalProfile = (a) => ({
   createdAt: a.createdAt,
 });
 
+// The same, plus the profile photo (uploaded in My profile) for the sidebar and header avatar.
+export async function toPortalProfileWithPhoto(a) {
+  const profile = await profileService.forAccount(a.id);
+  return { ...toPortalProfile(a), photo: profile?.photo || null };
+}
+
 function sendVerificationEmail(account, token) {
   const link = `${env.frontendUrl}/portal/verify?token=${encodeURIComponent(token)}`;
   return sendMail({
@@ -123,7 +129,7 @@ export const portalService = {
     }
 
     await account.update({ failedLogins: 0, lockedUntil: null, lastLoginAt: new Date() });
-    return { token: signAlumniToken(account), account: toPortalProfile(account) };
+    return { token: signAlumniToken(account), account: await toPortalProfileWithPhoto(account) };
   },
 
   // ---- Staff review ----

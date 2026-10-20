@@ -1,4 +1,4 @@
-import { portalService, toPortalProfile } from './portal.service.js';
+import { portalService, toPortalProfile, toPortalProfileWithPhoto } from './portal.service.js';
 import { portalTracer } from './portal.tracer.js';
 import { portalInvite } from './portal.invite.js';
 import { portalAlumniId } from './portal.alumniId.js';
@@ -41,7 +41,7 @@ export const portalController = {
   }),
 
   me: asyncHandler(async (req, res) => {
-    sendSuccess(res, { data: toPortalProfile(req.alumni) });
+    sendSuccess(res, { data: await toPortalProfileWithPhoto(req.alumni) });
   }),
 
   // Graduate Tracer: pre-filled answers (account + latest submission)
