@@ -24,6 +24,13 @@ export const eventController = {
     sendSuccess(res, { data: r, message: r.status === 'attended' ? 'Marked as attended' : r.status === 'cancelled' ? 'Registration cancelled' : 'Marked as registered' });
   }),
 
+  setRegistrationStatusMany: asyncHandler(async (req, res) => {
+    const n = await eventRegistrations.setStatusMany(req.params.id, req.body.ids, req.body.status);
+    const label = { attended: 'marked as attended', registered: 'marked as registered', cancelled: 'cancelled' }[req.body.status];
+    await logService.record(req, { action: 'update', entity: 'Event', entityId: req.params.id, description: `${n} registration${n === 1 ? '' : 's'} ${label}` });
+    sendSuccess(res, { data: { updated: n }, message: `${n} registrant${n === 1 ? '' : 's'} ${label}` });
+  }),
+
   exportRegistrations: asyncHandler(async (req, res) => {
     const { event, csv } = await eventRegistrations.exportCsv(req.params.id);
     await logService.record(req, { action: 'export', entity: 'Event', entityId: event.id, description: `Exported the registrants of ${event.title}` });

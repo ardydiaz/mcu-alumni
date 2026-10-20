@@ -126,7 +126,12 @@ export const eventRegistrations = {
       .filter((r) => !term || `${r.fullName} ${r.email} ${r.studentNumber} ${r.program}`.toLowerCase().includes(term));
     const counts = { registered: 0, attended: 0, cancelled: 0 };
     for (const r of registrations) counts[r.status] = (counts[r.status] || 0) + 1;
-    return { event: { id: event.id, title: event.title, capacity: event.capacity, startAt: event.startAt }, counts, rows };
+    const e = event;
+    return {
+      event: { id: e.id, title: e.title, slug: e.slug, capacity: e.capacity, startAt: e.startAt, endAt: e.endAt, allDay: e.allDay, venue: e.venue, status: e.status, portalRegistration: e.portalRegistration, registrationDeadline: e.registrationDeadline },
+      counts,
+      rows,
+    };
   },
 
   async setStatus(eventId, registrationId, status) {
@@ -138,6 +143,20 @@ export const eventRegistrations = {
       cancelledAt: status === 'cancelled' ? registration.cancelledAt || new Date() : null,
     });
     return registration;
+  },
+
+  // Many at once (e.g. mark everyone selected as attended). Only this event's registrations are touched.
+  async setStatusMany(eventId, ids, status) {
+    const rows = await EventRegistration.findAll({ where: { id: ids, eventId } });
+    for (const r of rows) {
+      if (r.status === status) continue;
+      await r.update({
+        status,
+        attendedAt: status === 'attended' ? r.attendedAt || new Date() : null,
+        cancelledAt: status === 'cancelled' ? r.cancelledAt || new Date() : null,
+      });
+    }
+    return rows.length;
   },
 
   async exportCsv(eventId) {

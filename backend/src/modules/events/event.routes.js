@@ -8,6 +8,7 @@ import {
   registrationParamSchema,
   registrationListQuerySchema,
   registrationStatusSchema,
+  registrationBulkSchema,
 } from './event.validation.js';
 import { authenticateAlumni } from '../portal/portal.middleware.js';
 import { createRateLimiter } from '../../utils/helpers.js';
@@ -32,6 +33,7 @@ router.delete('/:id', authenticate, adminPanelOnly, validate(idParamSchema, 'par
 const staff = [authenticate, adminPanelOnly];
 router.get('/:id/registrations', ...staff, validate(registrationParamSchema, 'params'), validate(registrationListQuerySchema, 'query'), eventController.registrations);
 router.get('/:id/registrations/export', ...staff, validate(registrationParamSchema, 'params'), eventController.exportRegistrations);
+router.patch('/:id/registrations', ...staff, validate(registrationParamSchema, 'params'), validate(registrationBulkSchema), eventController.setRegistrationStatusMany);
 router.patch('/:id/registrations/:registrationId', ...staff, validate(registrationParamSchema, 'params'), validate(registrationStatusSchema), eventController.setRegistrationStatus);
 
 export default router;

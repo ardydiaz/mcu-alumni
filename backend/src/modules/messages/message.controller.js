@@ -7,6 +7,6 @@ export const messageController = {
 
   create: asyncHandler(async (req, res) => {
     const data = await messageService.create(req.body);
-    sendCreated(res, data, 'Thank you! Your message has been sent.');
+    sendCreated(res, data, 'Thank you! Your message has been sent. We emailed you a confirmation and will reply within 2–3 working days.');
   }),
 };

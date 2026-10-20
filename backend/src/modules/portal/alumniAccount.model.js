@@ -33,6 +33,11 @@ AlumniAccount.init(
     reviewedAt: { type: DataTypes.DATE },
     reviewNote: { type: DataTypes.STRING(500) }, // reason shown to the alumnus when rejected
     consentAt: { type: DataTypes.DATE, allowNull: false },
+    // Password reset (migration 14): SHA-256 of the emailed one-time link, and when the password last changed
+    // (sessions started before that are signed out).
+    passwordResetHash: { type: DataTypes.STRING(64) },
+    passwordResetExpiresAt: { type: DataTypes.DATE },
+    passwordChangedAt: { type: DataTypes.DATE },
   },
   {
     sequelize,
@@ -40,7 +45,7 @@ AlumniAccount.init(
     tableName: 'alumni_accounts',
     indexes: [{ fields: ['status'] }, { fields: ['email_token_hash'] }],
     // Secrets never leave the model unless asked for with .scope('withSecrets')
-    defaultScope: { attributes: { exclude: ['passwordHash', 'emailTokenHash', 'emailTokenExpiresAt'] } },
+    defaultScope: { attributes: { exclude: ['passwordHash', 'emailTokenHash', 'emailTokenExpiresAt', 'passwordResetHash', 'passwordResetExpiresAt'] } },
     scopes: { withSecrets: {} }, // replaces the default scope, so every column is loaded
   }
 );

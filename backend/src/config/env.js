@@ -67,6 +67,8 @@ export const env = {
   mail: {
     from: (process.env.MAIL_FROM || '').trim(), // mailbox that sends, e.g. alumni@mcu.edu.ph
     fromName: process.env.MAIL_FROM_NAME || 'MCU Alumni Relations',
+    // Who is told about new "Leave us a message" messages (comma-separated).
+    messageNotify: (process.env.MESSAGE_NOTIFY_TO || 'alumni@mcu.edu.ph').split(',').map((s) => s.trim()).filter(Boolean),
   },
 
   seedAdmin: {

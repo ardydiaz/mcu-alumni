@@ -1,15 +1,17 @@
 import { Router } from 'express';
 import { tracerController } from './tracer.controller.js';
-import { createTracerSchema, listTracerQuerySchema, tracerSummaryQuerySchema } from './tracer.validation.js';
+import { listTracerQuerySchema, tracerSummaryQuerySchema } from './tracer.validation.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { adminPanelOnly } from '../../middleware/role.middleware.js';
 import { validate, idParamSchema } from '../../middleware/validation.middleware.js';
-import { createRateLimiter } from '../../utils/helpers.js';
 
 const router = Router();
 
-// Public: Graduate Tracer form.
-router.post('/', createRateLimiter(), validate(createTracerSchema), tracerController.create);
+// The public Graduate Tracer form is closed: alumni answer it in the Alumni Portal (POST /portal/tracer),
+// pre-filled from their verified profile, so every answer belongs to a known graduate and updates their record.
+router.post('/', (req, res) =>
+  res.status(410).json({ success: false, message: 'Please log in to the MCU Alumni Portal to answer the Graduate Tracer. New here? Create your account at /portal/register.' })
+);
 
 // Staff: responses and statistics.
 router.get('/summary', authenticate, adminPanelOnly, validate(tracerSummaryQuerySchema, 'query'), tracerController.summary);

@@ -1,6 +1,8 @@
 import { portalService, toPortalProfile } from './portal.service.js';
 import { portalTracer } from './portal.tracer.js';
 import { portalInvite } from './portal.invite.js';
+import { portalAlumniId } from './portal.alumniId.js';
+import { portalPassword } from './portal.password.js';
 import { logService } from '../logs/log.service.js';
 import { asyncHandler, createCrudController } from '../../utils/helpers.js';
 import { sendCreated, sendSuccess } from '../../utils/response.js';
@@ -59,6 +61,50 @@ export const portalController = {
   tracerHistory: asyncHandler(async (req, res) => {
     await portalService.getById(req.params.id, { internal: true }); // 404 if the account does not exist
     sendSuccess(res, { data: await portalTracer.history(req.params.id) });
+  }),
+
+  // ---- Password: forgot / reset / change ----
+  forgotPassword: asyncHandler(async (req, res) => {
+    const data = await portalPassword.request(req.body.email);
+    const message = data.status === 'invited'
+      ? `Your account isn't activated yet, so we sent your activation link to ${data.email}. Use it to set your password.`
+      : `We sent a password reset link to ${data.email}. It expires in 1 hour; check your Spam folder too.`;
+    sendSuccess(res, { data, message });
+  }),
+
+  checkResetToken: asyncHandler(async (req, res) => {
+    sendSuccess(res, { data: await portalPassword.check(req.query.token) });
+  }),
+
+  resetPassword: asyncHandler(async (req, res) => {
+    const data = await portalPassword.reset(req.body.token, req.body.password);
+    sendSuccess(res, { data, message: 'Your password was changed. You can now log in with your new password.' });
+  }),
+
+  changePassword: asyncHandler(async (req, res) => {
+    const data = await portalPassword.change(req.alumni, req.body);
+    sendSuccess(res, { data, message: 'Your password was changed. Other devices were signed out.' });
+  }),
+
+  // Staff: send the reset link (e.g. after correcting the alumnus's email)
+  sendPasswordReset: asyncHandler(async (req, res) => {
+    const data = await portalPassword.sendForStaff(req.params.id);
+    await logService.record(req, { action: 'update', entity: 'Alumni account', entityId: req.params.id, description: `Sent a password reset link to ${data.email}` });
+    sendSuccess(res, { data, message: data.status === 'invited' ? `Activation link sent to ${data.email}` : `Password reset link sent to ${data.email}` });
+  }),
+
+  // Alumni ID request (from the verified profile; one request per graduate)
+  alumniIdStatus: asyncHandler(async (req, res) => {
+    sendSuccess(res, { data: await portalAlumniId.status(req.alumni) });
+  }),
+
+  requestAlumniId: asyncHandler(async (req, res) => {
+    const data = await portalAlumniId.request(req.alumni);
+    const message =
+      data.already === 'released' ? 'Your Alumni ID has already been released.'
+        : data.already === 'open' ? 'Your Alumni ID request is already being processed.'
+          : 'Alumni ID requested! The Alumni Relations Office will contact you about the requirements and release.';
+    sendSuccess(res, { data, message });
   }),
 
   // Staff: the Registrar/EAO record this registration matches (null if none)

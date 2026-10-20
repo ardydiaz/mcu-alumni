@@ -32,12 +32,20 @@ export function createEmailToken(hours = 24) {
 
 export const hashToken = (token) => crypto.createHash('sha256').update(String(token)).digest('hex');
 
+// When a password changes: the next whole second, so the value is stored exactly whatever the database's
+// time precision, and every session started before the change (even earlier in the same second) is older.
+export const passwordChangeStamp = () => new Date(Math.ceil((Date.now() + 1) / 1000) * 1000);
+
 // ---- Alumni session tokens ----
 // A different `type` and `aud` from staff tokens: the staff auth middleware only accepts
 // type "access", and the alumni middleware only accepts type "alumni", so neither can be
 // used in place of the other.
 export function signAlumniToken(account) {
-  return jwt.sign({ sub: String(account.id), type: ALUMNI_TOKEN_TYPE }, env.jwt.accessSecret, {
+  // ims: when the session started, in milliseconds (JWT "iat" is whole seconds), so a password change signs out
+  // every earlier session exactly (see portalPassword.sessionRevoked). A new session never counts as older than
+  // the last password change (which is stamped at the next whole second, see passwordChangeStamp).
+  const changed = account.passwordChangedAt ? new Date(account.passwordChangedAt).getTime() : 0;
+  return jwt.sign({ sub: String(account.id), type: ALUMNI_TOKEN_TYPE, ims: Math.max(Date.now(), changed) }, env.jwt.accessSecret, {
     expiresIn: process.env.ALUMNI_TOKEN_EXPIRES_IN || '8h',
     issuer: ISSUER,
     audience: AUDIENCE,

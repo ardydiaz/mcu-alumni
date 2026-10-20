@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { portalController } from './portal.controller.js';
-import { registerSchema, verifyEmailSchema, resendSchema, loginSchema, listAccountsQuerySchema, rejectSchema, activateSchema, inviteTokenQuerySchema } from './portal.validation.js';
+import { registerSchema, verifyEmailSchema, resendSchema, loginSchema, listAccountsQuerySchema, rejectSchema, activateSchema, inviteTokenQuerySchema, forgotPasswordSchema, resetPasswordSchema, changePasswordSchema } from './portal.validation.js';
 import { authenticateAlumni } from './portal.middleware.js';
 import { lockIdentity } from './portal.tracer.js';
 import { createTracerSchema } from '../tracer/tracer.validation.js';
@@ -19,7 +19,14 @@ router.post('/resend-verification', createRateLimiter({ max: 5 }), validate(rese
 router.post('/login', createRateLimiter({ max: 20 }), validate(loginSchema), portalController.login);
 router.get('/invite', createRateLimiter({ max: 30 }), validate(inviteTokenQuerySchema, 'query'), portalController.invitePreview);
 router.post('/activate', createRateLimiter({ max: 10 }), validate(activateSchema), portalController.activate);
+// Password: "Forgot password?" (rate-limited: the page says whether an email is registered), reset, change
+router.post('/forgot-password', createRateLimiter({ max: 5, message: 'Too many reset requests. Please try again in 15 minutes.' }), validate(forgotPasswordSchema), portalController.forgotPassword);
+router.get('/reset-password', createRateLimiter({ max: 30 }), validate(inviteTokenQuerySchema, 'query'), portalController.checkResetToken);
+router.post('/reset-password', createRateLimiter({ max: 10 }), validate(resetPasswordSchema), portalController.resetPassword);
+router.post('/change-password', createRateLimiter({ max: 10 }), authenticateAlumni, validate(changePasswordSchema), portalController.changePassword);
 router.get('/me', authenticateAlumni, portalController.me);
+router.get('/alumni-id', authenticateAlumni, portalController.alumniIdStatus);
+router.post('/alumni-id', createRateLimiter({ max: 10 }), authenticateAlumni, portalController.requestAlumniId);
 router.get('/tracer', authenticateAlumni, portalController.tracerPrefill);
 // lockIdentity runs before validation: name, email, degree and year always come from the verified account.
 router.post('/tracer', createRateLimiter({ max: 20 }), authenticateAlumni, lockIdentity, validate(createTracerSchema), portalController.tracerSubmit);
@@ -31,6 +38,7 @@ router.post('/accounts/:id/approve', ...staff, validate(idParamSchema, 'params')
 router.post('/accounts/:id/reject', ...staff, validate(idParamSchema, 'params'), validate(rejectSchema), portalController.reject);
 router.get('/accounts/:id/tracer', ...staff, validate(idParamSchema, 'params'), portalController.tracerHistory);
 router.get('/accounts/:id/record', ...staff, validate(idParamSchema, 'params'), portalController.recordMatch);
+router.post('/accounts/:id/send-reset', ...staff, validate(idParamSchema, 'params'), portalController.sendPasswordReset);
 router.delete('/accounts/:id', ...staff, validate(idParamSchema, 'params'), portalController.remove);
 
 export default router;

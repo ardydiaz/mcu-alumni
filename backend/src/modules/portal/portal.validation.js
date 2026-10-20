@@ -33,6 +33,19 @@ export const activateSchema = Joi.object({
 });
 export const inviteTokenQuerySchema = Joi.object({ token: Joi.string().trim().max(200).required() });
 
+// Password reset / change
+export const forgotPasswordSchema = Joi.object({ email: email().required() });
+export const resetPasswordSchema = Joi.object({
+  token: Joi.string().trim().max(200).required(),
+  password: registerSchema.extract('password'),
+  confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({ 'any.only': 'Passwords do not match' }),
+});
+export const changePasswordSchema = Joi.object({
+  currentPassword: Joi.string().max(128).required(),
+  password: registerSchema.extract('password').invalid(Joi.ref('currentPassword')).messages({ 'any.invalid': 'Choose a password different from your current one' }),
+  confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({ 'any.only': 'Passwords do not match' }),
+});
+
 export const resendSchema = Joi.object({ email: email().required() });
 
 export const loginSchema = Joi.object({

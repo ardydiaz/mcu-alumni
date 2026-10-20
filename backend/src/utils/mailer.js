@@ -46,7 +46,7 @@ export function toHtml(text) {
 </table></td></tr></table></body></html>`;
 }
 
-async function sendWithGraph({ to, subject, text }) {
+async function sendWithGraph({ to, subject, text, replyTo }) {
   const res = await fetch(`${GRAPH}/users/${encodeURIComponent(env.mail.from)}/sendMail`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${await graphToken()}`, 'Content-Type': 'application/json' },
@@ -56,6 +56,7 @@ async function sendWithGraph({ to, subject, text }) {
         body: { contentType: 'HTML', content: toHtml(text) },
         from: { emailAddress: { address: env.mail.from, name: env.mail.fromName } },
         toRecipients: [{ emailAddress: { address: to } }],
+        ...(replyTo && { replyTo: [{ emailAddress: { address: replyTo.address, name: replyTo.name } }] }),
       },
       saveToSentItems: false,
     }),
@@ -67,8 +68,9 @@ async function sendWithGraph({ to, subject, text }) {
 }
 
 // Never throws: a failed email must not undo the action that triggered it (the alumnus can ask for it again).
-export async function sendMail({ to, subject, text }) {
-  if (!env.isProduction) logger.info(`[mail] To: ${to} | ${subject}\n${text}`);
+// replyTo: { address, name } — where "Reply" in the recipient's mail app goes (e.g. the person who wrote in).
+export async function sendMail({ to, subject, text, replyTo }) {
+  if (!env.isProduction) logger.info(`[mail] To: ${to}${replyTo ? ` (reply-to ${replyTo.address})` : ''} | ${subject}\n${text}`);
 
   if (!env.mail.enabled) {
     if (env.isProduction) logger.warn(`[mail] MAIL_FROM is not set; "${subject}" to ${to} was not sent.`);
@@ -76,7 +78,7 @@ export async function sendMail({ to, subject, text }) {
   }
 
   try {
-    await sendWithGraph({ to, subject, text });
+    await sendWithGraph({ to, subject, text, replyTo });
     logger.info(`[mail] Sent "${subject}" to ${to} via Microsoft 365`);
     return { delivered: true };
   } catch (err) {

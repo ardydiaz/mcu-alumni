@@ -58,6 +58,10 @@ export const listEventsQuerySchema = listQuerySchema.keys({
 export const registrationParamSchema = Joi.object({ id: Joi.number().integer().min(1).required(), registrationId: Joi.number().integer().min(1) });
 export const registrationListQuerySchema = Joi.object({ status: Joi.string().valid(...REGISTRATION_STATUS), search: Joi.string().trim().max(100).allow('') });
 export const registrationStatusSchema = Joi.object({ status: Joi.string().valid(...REGISTRATION_STATUS).required() });
+export const registrationBulkSchema = Joi.object({
+  ids: Joi.array().items(Joi.number().integer().min(1)).min(1).max(5000).required(),
+  status: Joi.string().valid(...REGISTRATION_STATUS).required(),
+});
 
 // Public URLs use the slug; the admin panel uses the numeric id.
 export const eventKeySchema = Joi.object({ key: Joi.string().trim().max(220).pattern(/^[a-z0-9-]+$/).required() });
