@@ -53,7 +53,7 @@
 .admin-user__meta strong { font-size: 0.9rem; }
 .admin-user__meta small { color: var(--muted); font-size: 0.76rem; }
 
-.admin-content { flex: 1; padding: 28px; max-width: 1400px; width: 100%; }
+.admin-content { flex: 1; padding: 28px; width: 100%; }
 
 /* ---- Page furniture ------------------------------------------------------ */
 .admin-page-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
