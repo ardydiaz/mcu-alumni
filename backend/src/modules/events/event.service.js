@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { Event } from './event.model.js';
 import { eventRegistrations } from './event.registration.js';
+import { eventAlertService } from '../eventAlerts/eventAlert.service.js';
 import { ApiError, createCrudService, isStaff } from '../../utils/helpers.js';
 import { getPagination, buildMeta, getSort } from '../../utils/pagination.js';
 
@@ -66,13 +67,18 @@ export const eventService = {
   },
 
   async create(data) {
-    const event = await Event.create({ ...clean(data), slug: await uniqueSlug(data.title) });
-    return crud.getById(event.id, { internal: true });
+    const { alertsSentAt, ...rest } = clean(data);
+    const event = await Event.create({ ...rest, slug: await uniqueSlug(data.title) });
+    const saved = await crud.getById(event.id, { internal: true });
+    await eventAlertService.announce(saved); // published Homecoming -> "Notify me" subscribers, once
+    return saved;
   },
 
   async update(id, data) {
-    const { slug, ...rest } = clean(data); // slug is fixed once created
+    const { slug, alertsSentAt, ...rest } = clean(data); // slug is fixed once created; alertsSentAt is system-set
     await crud.update(id, rest);
-    return crud.getById(id, { internal: true });
+    const saved = await crud.getById(id, { internal: true });
+    await eventAlertService.announce(saved);
+    return saved;
   },
 };

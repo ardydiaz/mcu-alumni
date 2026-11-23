@@ -34,6 +34,7 @@ export const adminNav = [
       { label: 'Graduate tracer', to: '/admin/tracer', icon: 'rocket' },
       { label: 'Volunteers', to: '/admin/volunteers', icon: 'mic' },
       { label: 'Messages', to: '/admin/messages', icon: 'mail' },
+      { label: 'Event alerts', to: '/admin/event-alerts', icon: 'bell' },
     ],
   },
   {

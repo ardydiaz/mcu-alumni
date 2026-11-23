@@ -24,6 +24,7 @@ const CONTENT_ENDPOINTS = {
 // Public form names -> backend endpoints.
 const FORM_ENDPOINTS = {
   contact: '/messages',
+  'event-alert': '/event-alerts', // homepage "Notify me" box
   donation: '/donations',
   volunteer: '/volunteers',
   'portal-register': '/portal/register',
@@ -149,6 +150,7 @@ export async function getContent(name) {
 }
 
 export const submitForm = (type, data) => send(FORM_ENDPOINTS[type], { method: 'POST', body: data });
+export const unsubscribeEventAlerts = (token) => send('/event-alerts/unsubscribe', { method: 'POST', body: { token } });
 
 // Which sign-in methods are enabled: { password: boolean, microsoft: boolean }
 export const getAuthProviders = async () => (await send('/auth/providers')).data;

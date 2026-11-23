@@ -17,7 +17,13 @@ import '../../styles/events.css';
 
 const pillarIcons = { connect: 'users', engage: 'calendar', empower: 'rocket', give: 'heart' };
 const statIcon = (label = '') =>
-  /graduate/i.test(label) ? 'users' : /found/i.test(label) ? 'flag' : /network/i.test(label) ? 'handshake' : 'building';
+  /graduate/i.test(label) ? 'users' : /found/i.test(label) ? 'landmark' : /network/i.test(label) ? 'globe' : /partner/i.test(label) ? 'handshake' : 'building';
+
+// "50,000+" -> number + a gold "+" (any trailing symbol is styled as the accent).
+function StatValue({ value }) {
+  const [, main, suffix] = /^(.*?)([+%]*)$/.exec(String(value ?? ''));
+  return <strong>{main}{suffix && <em>{suffix}</em>}</strong>;
+}
 
 // Left-aligned section header with an optional action on the right.
 function HomeHeading({ eyebrow, title, text, action, light, solid }) {
@@ -57,11 +63,11 @@ function Stats({ stats }) {
   return (
     <div className="container">
       <div className="home-stats">
-        {stats.map((s) => (
+        {stats.map((s, i) => (
           <div key={s.label} className="home-stat">
-            <span className="home-stat__icon" aria-hidden="true"><Icon name={statIcon(s.label)} size={22} /></span>
+            <span className={`home-stat__icon home-stat__icon--${i % 2 ? 'gold' : 'purple'}`} aria-hidden="true"><Icon name={statIcon(s.label)} size={22} /></span>
             <div>
-              <strong>{s.value}</strong>
+              <StatValue value={s.value} />
               <span>{s.label}</span>
             </div>
           </div>
@@ -260,7 +266,7 @@ function UpcomingEvents({ events }) {
           solid
           eyebrow="Events and activities"
           title="Upcoming alumni events"
-          text="Reunions, homecoming activities, chapter gatherings and alumni programs."
+          text="Reunions, homecoming activities, chapter gatherings, and alumni programs."
           action={<Link to="/events" className="home-events__all">View all events <Icon name="arrowRight" size={16} /></Link>}
         />
         <div data-reveal>

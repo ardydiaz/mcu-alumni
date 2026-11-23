@@ -101,9 +101,9 @@ export const sections = {
     },
     stats: [
       { value: '50,000+', label: 'Centralino graduates' },
-      { value: '1904', label: 'Founded' },
+      { value: '1904', label: 'Founded legacy' },
       { value: '7', label: 'Alumni networks' },
-      { value: '40+', label: 'Partners' },
+      { value: '40+', label: 'Merchant partners' },
     ],
     pillars: [
       { key: 'connect', title: 'Connect', text: 'Reconnect with former classmates, professors, and acquaintances.' },

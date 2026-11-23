@@ -30,6 +30,7 @@ Event.init(
     portalRegistration: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false }, // alumni register in the portal (migration 13)
     networkId: { type: DataTypes.INTEGER.UNSIGNED }, // chapter hosting the event
     status: { type: DataTypes.ENUM(...EVENT_STATUS), allowNull: false, defaultValue: 'draft' },
+    alertsSentAt: { type: DataTypes.DATE }, // when "Notify me" subscribers were emailed about it (migration 15)
   },
   {
     sequelize,

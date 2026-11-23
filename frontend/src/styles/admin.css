@@ -575,3 +575,8 @@
 .slide-thumb__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
 .slide-thumb__text strong { color: var(--ink); font-weight: 600; }
 .slide-thumb__text small { color: var(--muted); font-size: 0.8rem; }
+
+/* Event alerts page: how alerts are sent + export */
+.admin-note { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; margin: 16px 0 20px; }
+.admin-note > svg { flex: none; color: var(--purple-700); }
+.admin-note p { flex: 1 1 320px; margin: 0; color: var(--ink-2); font-size: 0.9rem; line-height: 1.5; }

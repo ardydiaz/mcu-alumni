@@ -19,6 +19,7 @@ import NotFound from '../pages/public/NotFound.jsx';
 // Alumni events calendar
 const Events = lazy(() => import('../pages/public/Events.jsx'));
 const EventDetail = lazy(() => import('../pages/public/EventDetail.jsx'));
+const EventAlertsUnsubscribe = lazy(() => import('../pages/public/EventAlertsUnsubscribe.jsx'));
 
 // Alumni Portal
 const PortalHome = lazy(() => import('../pages/portal/PortalHome.jsx'));
@@ -62,6 +63,7 @@ const AlumniReports = lazy(() => import('../pages/admin/AlumniReports.jsx'));
 const Tracer = lazy(() => import('../pages/admin/Tracer.jsx'));
 const Volunteers = lazy(() => import('../pages/admin/Volunteers.jsx'));
 const Messages = lazy(() => import('../pages/admin/Messages.jsx'));
+const EventAlerts = lazy(() => import('../pages/admin/EventAlerts.jsx'));
 const Users = lazy(() => import('../pages/admin/Users.jsx'));
 const Roles = lazy(() => import('../pages/admin/Roles.jsx'));
 const Logs = lazy(() => import('../pages/admin/Logs.jsx'));
@@ -88,6 +90,7 @@ export default function AppRoutes() {
           <Route path="graduate-tracer" element={<GraduateTracer />} />
           <Route path="events" element={<Events />} />
           <Route path="events/:slug" element={<EventDetail />} />
+          <Route path="event-alerts/unsubscribe" element={<EventAlertsUnsubscribe />} />
           <Route path="portal" element={<PortalHome />} />
           <Route path="portal/register" element={<PortalRegister />} />
           <Route path="portal/login" element={<PortalLogin />} />
@@ -136,6 +139,7 @@ export default function AppRoutes() {
           <Route path="tracer" element={<Tracer />} />
           <Route path="volunteers" element={<Volunteers />} />
           <Route path="messages" element={<Messages />} />
+          <Route path="event-alerts" element={<EventAlerts />} />
           <Route path="profile" element={<Profile />} />
           <Route path="users" element={superAdminOnly(<Users />)} />
           <Route path="roles" element={superAdminOnly(<Roles />)} />

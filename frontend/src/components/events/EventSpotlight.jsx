@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import Icon from '../ui/Icon.jsx';
+import FormStatus from '../forms/FormStatus.jsx';
+import { useForm } from '../../hooks/useForm.js';
 import { assetUrl } from '../../api/client.js';
 import { modalClick } from './EventCard.jsx';
 import { categoryOf, dayKey, todayKey, deadlineInfo, timeRange, monthShort, dayNumber, weekdayShort } from './eventUtils.js';
@@ -114,6 +116,40 @@ function Row({ event: e, registered, onOpen }) {
   );
 }
 
+// "Get notified" row under the empty state: saves the email; subscribers are emailed when a Homecoming event is published.
+function NotifyForm() {
+  const { field, status, onSubmit } = useForm('event-alert', { email: '' });
+  const email = field('email');
+  const busy = status.state === 'submitting';
+  return (
+    <form className="esp-notify" onSubmit={onSubmit} noValidate>
+      <label htmlFor="esp-notify-email" className="esp-notify__label">
+        <Icon name="bell" size={17} /> Get notified when Grand Alumni Homecoming registration opens:
+      </label>
+      <span className="esp-notify__control">
+        <input
+          id="esp-notify-email"
+          type="email"
+          autoComplete="email"
+          placeholder="Enter your alumni email..."
+          required
+          aria-invalid={Boolean(email.error)}
+          aria-describedby={email.error ? 'esp-notify-error' : undefined}
+          name={email.name}
+          value={email.value}
+          onChange={email.onChange}
+        />
+        <button type="submit" className="btn esp-notify__btn" disabled={busy}>
+          {busy ? <span className="spinner spinner--ink" aria-hidden="true" /> : null}
+          {busy ? 'Saving...' : 'Notify Me'}
+        </button>
+      </span>
+      {email.error && <small id="esp-notify-error" className="esp-notify__error">{email.error}</small>}
+      <FormStatus status={status} />
+    </form>
+  );
+}
+
 /**
  * events: upcoming events (soonest first). registeredIds: Set of event ids the logged-in alumnus registered for.
  * onOpen(event): opens the event modal.
@@ -122,15 +158,18 @@ export default function EventSpotlight({ events, registeredIds = new Set(), onOp
   if (!events.length) {
     return (
       <div className="esp-empty">
-        <span className="esp-empty__icon" aria-hidden="true"><Icon name="calendar" size={24} /></span>
-        <div>
-          <strong>New events are coming soon</strong>
-          <p>Reunions, homecoming activities and chapter gatherings will appear here. Meanwhile, join a chapter or volunteer.</p>
+        <div className="esp-empty__main">
+          <span className="esp-empty__icon" aria-hidden="true"><Icon name="calendar" size={24} /><i><Icon name="clock" size={12} /></i></span>
+          <div className="esp-empty__text">
+            <h3>New events are coming soon <span className="esp-empty__tag">{new Date().getFullYear()} Calendar</span></h3>
+            <p>Reunions, homecoming activities, and chapter gatherings will appear here. Meanwhile, join a chapter, volunteer, or subscribe for instant event alerts.</p>
+          </div>
+          <span className="esp-empty__actions">
+            <Link to="/networks" className="btn esp-empty__btn esp-empty__btn--outline">Find your chapter</Link>
+            <Link to="/volunteer" className="btn esp-empty__btn esp-empty__btn--solid">Volunteer</Link>
+          </span>
         </div>
-        <span className="esp-empty__actions">
-          <Link to="/networks" className="btn btn-outline">Find your chapter</Link>
-          <Link to="/volunteer" className="btn btn-primary">Volunteer</Link>
-        </span>
+        <NotifyForm />
       </div>
     );
   }

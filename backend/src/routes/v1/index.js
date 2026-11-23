@@ -22,6 +22,7 @@ import { staffProfileRoutes, portalProfileRoutes } from '../../modules/profiles/
 import psgcRoutes from '../../modules/psgc/psgc.routes.js';
 import importRoutes from '../../modules/imports/import.routes.js';
 import alumniReportRoutes from '../../modules/alumniReports/alumniReport.routes.js';
+import eventAlertRoutes from '../../modules/eventAlerts/eventAlert.routes.js';
 
 const router = Router();
 
@@ -51,6 +52,7 @@ router.use('/profiles', staffProfileRoutes); // Alumni profiles / data entry (EA
 router.use('/imports', importRoutes); // Alumni database migration: CSV import / export (Step 5)
 router.use('/alumni-reports', alumniReportRoutes); // Report generation (Step 13)
 router.use('/psgc', psgcRoutes); // Philippine address lists
+router.use('/event-alerts', eventAlertRoutes); // homepage "Notify me" subscribers
 router.use('/events', eventRoutes); // Alumni Events and Activities calendar
 
 export default router;
