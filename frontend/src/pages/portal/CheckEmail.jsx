@@ -4,7 +4,8 @@ import Icon from '../../components/ui/Icon.jsx';
 import { portalApi } from '../../api/portal.js';
 
 // "Check your email" panel, with a button to send the verification link again.
-export default function CheckEmail({ email, title = 'Check your email' }) {
+// onLogin: in the login modal, switch to the login view instead of opening the login page.
+export default function CheckEmail({ email, title = 'Check your email', onLogin }) {
   const [state, setState] = useState({ busy: false, message: '' });
 
   const resend = async () => {
@@ -29,7 +30,11 @@ export default function CheckEmail({ email, title = 'Check your email' }) {
         <button type="button" className="btn btn-outline" onClick={resend} disabled={state.busy}>
           {state.busy ? 'Sending...' : 'Resend verification link'}
         </button>
-        <Link to="/portal/login" className="btn btn-primary">Go to login</Link>
+        {onLogin ? (
+          <button type="button" className="btn btn-primary" onClick={onLogin}>Go to login</button>
+        ) : (
+          <Link to="/portal/login" className="btn btn-primary">Go to login</Link>
+        )}
       </div>
       {state.message && <p className="portal-notice__msg" role="status"><Icon name="check" size={15} /> {state.message}</p>}
     </div>

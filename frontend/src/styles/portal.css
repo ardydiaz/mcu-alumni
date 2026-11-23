@@ -111,6 +111,55 @@
 
 .portal-form fieldset + fieldset { padding-top: 22px; border-top: 1px dashed var(--line); }
 .portal-form__alt { margin: 0; text-align: center; color: var(--muted); font-size: 0.9rem; }
+.portal-form__alt .link-btn { border: 0; background: none; padding: 0; color: var(--purple-700); font: inherit; font-weight: 700; cursor: pointer; }
+.portal-form__alt .link-btn:hover { text-decoration: underline; }
+.portal-form__forgot { margin: -8px 0 0; text-align: right; font-size: 0.84rem; }
+.portal-form__forgot a { color: var(--purple-700); font-weight: 600; }
+
+/* ---- Login / register modal from the header ("pam") ------------------------- */
+.pam {
+  width: min(448px, calc(100vw - 24px)); max-width: none; max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px);
+  margin: auto; padding: 0; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 26px; overflow: hidden;
+  background: #fff; color: var(--ink); box-shadow: 0 40px 80px -30px rgba(27, 16, 36, 0.6);
+}
+.pam--wide { width: min(720px, calc(100vw - 24px)); }
+.pam::backdrop { background: rgba(46, 0, 70, 0.45); backdrop-filter: blur(6px); }
+.pam[open] { animation: pam-in 0.28s var(--ease); }
+.pam[open]::backdrop { animation: pam-fade 0.28s ease; }
+@keyframes pam-in { from { opacity: 0; transform: translateY(18px) scale(0.98); } }
+@keyframes pam-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pam[open], .pam[open]::backdrop { animation: none; } }
+html.evm-lock { overflow: hidden; }
+.pam__panel { display: flex; flex-direction: column; max-height: inherit; }
+.pam__head {
+  flex: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 28px 24px 22px;
+  background: linear-gradient(120deg, #2e0d4c 0%, #3d1263 55%, #2a0b45 100%); color: #fff;
+}
+.pam__eyebrow { display: block; margin-bottom: 6px; color: var(--gold-500); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.pam__head h2 { margin: 0; color: #fff; font-size: 1.35rem; letter-spacing: -0.02em; }
+.pam__head p { margin: 8px 0 0; max-width: 520px; color: rgba(255, 255, 255, 0.78); font-size: 0.9rem; line-height: 1.5; }
+.pam__close {
+  flex: none; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(255, 255, 255, 0.14); color: #fff; transition: background 0.2s, transform 0.2s;
+}
+.pam__close:hover { background: rgba(255, 255, 255, 0.26); transform: rotate(90deg); }
+.pam__close:focus-visible { outline: 3px solid var(--gold-500); outline-offset: 2px; }
+.pam__body { overflow-y: auto; overscroll-behavior: contain; padding: 24px; scrollbar-width: thin; scrollbar-color: rgba(92, 41, 124, 0.35) transparent; }
+.pam .portal-form { gap: 16px; }
+.pam .portal-form .field label { font-size: 0.84rem; font-weight: 700; color: var(--ink); }
+.pam .portal-form .field input, .pam .portal-form .field select { background: #f7f8fa; border: 1px solid #e3e5ea; border-radius: 12px; }
+.pam .portal-form .field input:focus, .pam .portal-form .field select:focus { background: #fff; }
+.pam .portal-form .field input::placeholder { color: #9a9ea8; }
+.pam .portal-form__submit { margin-top: 4px; border-radius: 999px; background: linear-gradient(90deg, #3d1263, #4a1772); }
+.pam .portal-form__submit:hover { background: linear-gradient(90deg, #4a1772, #5c297c); }
+.pam .portal-form fieldset { margin: 0; }
+.pam .alert--warning { display: block; background: var(--gold-100); color: var(--gold-800); font-weight: 600; line-height: 1.5; }
+.pam .portal-notice { padding: 8px 0; }
+@media (max-width: 600px) {
+  .pam__head { padding: 22px 18px 18px; }
+  .pam__body { padding: 20px 18px; }
+  .pam .form-grid { grid-template-columns: minmax(0, 1fr); }
+}
 .portal .alert--warning { display: block; background: var(--gold-100); color: var(--gold-800); font-weight: 600; line-height: 1.5; }
 
 /* Registration steps */

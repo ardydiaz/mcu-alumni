@@ -224,17 +224,25 @@ a:hover .link-arrow svg, .link-arrow:hover svg { transform: translateX(3px); }
 .navbar__update-icon.has-photo, .drawer__avatar.has-photo { overflow: hidden; background: #fff; }
 .navbar__update-icon img, .drawer__avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .drawer__avatar b { font: inherit; }
-.nav-account__menu { width: 320px; padding: 10px; }
-.nav-account__intro { display: grid; gap: 4px; padding: 8px 8px 12px; }
-.nav-account__intro strong { color: var(--ink); font-size: 0.95rem; }
-.nav-account__intro span { color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
-.nav-account__menu .btn + .btn { margin-top: 8px; }
-.nav-account__hint { margin: 10px 8px 4px; color: var(--muted); font-size: 0.78rem; line-height: 1.45; }
+.nav-account__menu { width: 300px; padding: 10px; border-color: #eeeaf2; border-radius: 22px; box-shadow: 0 24px 48px -18px rgba(46, 0, 70, 0.3); }
+.nav-account__chevron { transition: transform 0.2s var(--ease); }
+.nav-account:hover .nav-account__chevron, .nav-account:focus-within .nav-account__chevron { transform: rotate(180deg); }
+.nav-account__intro { display: grid; gap: 2px; margin-bottom: 6px; padding: 10px 12px 14px; border-bottom: 1px solid #efedf2; }
+.nav-account__intro strong { color: var(--purple-800); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.nav-account__intro span { color: var(--muted); font-size: 0.86rem; }
+.nav-account__action { display: flex; align-items: center; gap: 14px; padding: 10px 12px; border-radius: 14px; color: var(--ink); text-decoration: none; transition: background 0.2s; }
+.nav-account__action:hover, .nav-account__action:focus-visible { background: var(--purple-50); color: var(--ink); }
+.nav-account__action strong { display: block; font-size: 0.95rem; font-weight: 600; }
+.nav-account__action small { display: block; color: var(--muted); font-size: 0.78rem; }
+.nav-account__tile { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: #efe8f4; color: var(--purple-800); transition: transform 0.2s var(--ease); }
+.nav-account__tile--gold { background: var(--gold-100); color: #c47a00; }
+.nav-account__action:hover .nav-account__tile { transform: scale(1.06); }
+.nav-account__hint { margin: 6px 12px 4px; padding-top: 10px; border-top: 1px solid #efedf2; color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
 .nav-account__head { display: grid; gap: 4px; margin-bottom: 6px; padding: 8px 10px 12px; border-bottom: 1px solid var(--line); }
 .nav-account__head strong { color: var(--ink); font-size: 0.95rem; }
 .nav-account__status { justify-self: start; padding: 2px 9px; border-radius: 999px; background: #e6f6ec; color: #17693a; font-size: 0.72rem; font-weight: 800; }
 .nav-account__status.is-pending { background: var(--gold-100); color: var(--gold-800); }
-.nav-account__item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); color: var(--ink); text-decoration: none; }
+.nav-account__item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 10px; border-radius: 12px; color: var(--ink); text-decoration: none; }
 .nav-account__item svg { flex: none; margin-top: 2px; color: var(--purple-700); }
 .nav-account__item strong { display: block; font-size: 0.9rem; }
 .nav-account__item small { display: block; color: var(--muted); font-size: 0.78rem; }

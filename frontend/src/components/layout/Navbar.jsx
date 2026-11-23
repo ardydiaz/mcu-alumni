@@ -4,6 +4,7 @@ import Icon from '../ui/Icon.jsx';
 import { navigation, portalMenu } from './navigation.js';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import PortalAvatar from '../portal/PortalAvatar.jsx';
+import { usePortalAuthModal } from '../portal/usePortalAuthModal.js';
 
 const LOGO = 'https://alumni.mcu.edu.ph/wp-content/uploads/2023/11/header-logo.png';
 
@@ -38,7 +39,15 @@ function who(fullName = '') {
 // One account button for everything alumni do on the site.
 //   Logged out: "Alumni Portal" -> what you can do + Log in / Create an account.
 //   Logged in:  "Hi, Ardy" -> portal pages + Log out.
-function AccountMenu({ portal, onLogout }) {
+// Plain click opens the modal; Ctrl/Cmd/middle-click still opens the full page in a new tab.
+const modalLink = (openModal) => (e) => {
+  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  e.currentTarget.blur(); // closes the hover/focus dropdown behind the modal
+  openModal();
+};
+
+function AccountMenu({ portal, onLogout, onOpenModal }) {
   const { pathname } = useLocation();
   const signedIn = portal.status === 'authenticated';
   const me = signedIn ? who(portal.account?.fullName) : null;
@@ -47,8 +56,8 @@ function AccountMenu({ portal, onLogout }) {
   return (
     <div className="nav-dropdown nav-dropdown--right nav-account">
       <button type="button" className={`navbar__update${signedIn ? ' is-signed-in' : ''}`} aria-haspopup="true">
-        {signedIn ? <PortalAvatar account={portal.account} className="navbar__update-icon" /> : <span className="navbar__update-icon" aria-hidden="true"><Icon name="users" size={16} /></span>}
-        {signedIn ? `Hi, ${me.first}` : 'Alumni Portal'} <Icon name="chevronDown" size={16} />
+        {signedIn ? <PortalAvatar account={portal.account} className="navbar__update-icon" /> : <span className="navbar__update-icon" aria-hidden="true"><Icon name="userCheck" size={16} /></span>}
+        {signedIn ? `Hi, ${me.first}` : 'Alumni Portal'} <Icon name="chevronDown" size={16} className="nav-account__chevron" />
       </button>
       <div className="nav-dropdown__menu nav-account__menu" role="menu">
         {signedIn ? (
@@ -70,11 +79,17 @@ function AccountMenu({ portal, onLogout }) {
         ) : (
           <>
             <div className="nav-account__intro">
-              <strong>For MCU graduates</strong>
-              <span>Update your information, answer the Graduate Tracer, request your Alumni ID and register for events.</span>
+              <strong>Centralino access</strong>
+              <span>Manage your alumni credentials</span>
             </div>
-            <Link to="/portal/login" className="btn btn-primary btn-block" role="menuitem">Log in</Link>
-            <Link to="/portal/register" className="btn btn-outline btn-block" role="menuitem">Create an account</Link>
+            <Link to="/portal/login" onClick={modalLink(() => onOpenModal('login'))} className="nav-account__action" role="menuitem" aria-haspopup="dialog">
+              <span className="nav-account__tile" aria-hidden="true"><Icon name="login" size={18} /></span>
+              <span><strong>Alumni Login</strong><small>Access dashboard &amp; perks</small></span>
+            </Link>
+            <Link to="/portal/register" onClick={modalLink(() => onOpenModal('register'))} className="nav-account__action" role="menuitem" aria-haspopup="dialog">
+              <span className="nav-account__tile nav-account__tile--gold" aria-hidden="true"><Icon name="userPlus" size={18} /></span>
+              <span><strong>Create Account</strong><small>New graduate registration</small></span>
+            </Link>
             <p className="nav-account__hint">Got an activation email from the Alumni Office? Use the link in it.</p>
           </>
         )}
@@ -89,6 +104,7 @@ export default function Navbar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const portal = usePortalAuth();
+  const authModal = usePortalAuthModal();
   const signedIn = portal.status === 'authenticated';
   const me = signedIn ? who(portal.account?.fullName) : null;
   const logout = () => {
@@ -142,7 +158,7 @@ export default function Navbar() {
 
         <div className="navbar__actions">
           <div className="navbar__cta">
-            <AccountMenu portal={portal} onLogout={logout} />
+            <AccountMenu portal={portal} onLogout={logout} onOpenModal={authModal.open} />
           </div>
           <button type="button" className="navbar__toggle" onClick={() => setOpen(true)} aria-label="Open menu" aria-expanded={open}>
             <Icon name="menu" size={24} />
@@ -181,8 +197,8 @@ export default function Navbar() {
             <div className="drawer__account">
               <p className="drawer__account-text"><strong>MCU graduate?</strong> Log in to update your information, answer the Graduate Tracer and register for events.</p>
               <div className="drawer__account-actions">
-                <Link to="/portal/login" className="btn btn-gold">Log in</Link>
-                <Link to="/portal/register" className="btn btn-outline">Create an account</Link>
+                <Link to="/portal/login" onClick={modalLink(() => { setOpen(false); authModal.open('login'); })} className="btn btn-gold" aria-haspopup="dialog">Log in</Link>
+                <Link to="/portal/register" onClick={modalLink(() => { setOpen(false); authModal.open('register'); })} className="btn btn-outline" aria-haspopup="dialog">Create an account</Link>
               </div>
             </div>
           )}

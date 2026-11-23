@@ -1,7 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
+import { usePortalAuthModal } from '../components/portal/usePortalAuthModal.js';
+
+// Login / register modal: its code loads the first time someone opens it.
+const PortalAuthModal = lazy(() => import('../components/portal/PortalAuthModal.jsx'));
 
 // Every new page starts at the top; with a #hash, it then scrolls to that section once it has rendered
 // (targets inside forms appear only after their content loads). A #hash the page doesn't have just stays at
@@ -28,6 +32,11 @@ function useScrollOnNavigate() {
 
 export default function PublicLayout() {
   useScrollOnNavigate();
+  const { mode } = usePortalAuthModal();
+  const [modalUsed, setModalUsed] = useState(false);
+  useEffect(() => {
+    if (mode) setModalUsed(true); // keep it mounted afterwards so it can close and reopen smoothly
+  }, [mode]);
 
   return (
     <>
@@ -37,6 +46,11 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <Footer />
+      {(mode || modalUsed) && (
+        <Suspense fallback={null}>
+          <PortalAuthModal />
+        </Suspense>
+      )}
     </>
   );
 }
