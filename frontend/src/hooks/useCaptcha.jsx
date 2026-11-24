@@ -22,9 +22,14 @@ export function useCaptcha() {
   const inputRef = useRef(null);
   const inputId = useId();
 
+  // A server without the security check (older version, or the request failed twice) is treated as "off":
+  // the form is sent without a code and the server decides. If the server does want one, it answers with a
+  // "captcha" error and fail() below loads a code again.
   const load = useCallback(() => {
     setLoadError('');
-    const p = getCaptcha()
+    const attempt = () => getCaptcha().then((c) => (c && typeof c.enabled === 'boolean' ? c : { enabled: false }));
+    return attempt()
+      .catch(() => new Promise((r) => setTimeout(r, 800)).then(attempt))
       .then((c) => {
         setChallenge(c);
         setAnswer('');
@@ -32,9 +37,9 @@ export function useCaptcha() {
       })
       .catch(() => {
         setLoadError("The security code couldn't load.");
-        return null;
+        setChallenge({ enabled: false, unavailable: true });
+        return { enabled: false, unavailable: true };
       });
-    return p;
   }, []);
 
   useEffect(() => {
@@ -43,12 +48,7 @@ export function useCaptcha() {
 
   const payload = useCallback(async () => {
     const c = challenge || (await first.current);
-    if (!c) {
-      const msg = "The security code couldn't load. Click the refresh button, then try again.";
-      setError(msg);
-      throw new Error(msg);
-    }
-    if (!c.enabled) return {};
+    if (!c?.enabled) return {}; // off, or couldn't load: let the server decide
     const digits = answer.replace(/\D/g, '');
     if (digits.length < (c.length || 5)) {
       const msg = 'Please type the numbers shown in the security check.';
@@ -62,15 +62,17 @@ export function useCaptcha() {
 
   const reset = useCallback(() => {
     setError('');
-    if (challenge?.enabled !== false) load();
+    if (challenge?.enabled) load();
   }, [challenge, load]);
 
   const fail = useCallback(
     (err) => {
       // 422 = a form field was wrong: the code wasn't checked yet, so keep it and what was typed.
       if (err?.status === 422 && err?.fields?.reason !== 'captcha') return;
-      if (err?.fields?.reason === 'captcha') setError(err.fields.captcha || err.message);
-      if (challenge?.enabled !== false) load();
+      if (err?.fields?.reason === 'captcha') {
+        setError(err.fields.captcha || err.message);
+        load(); // the server wants a code: (re)load one even if the first load failed
+      } else if (challenge?.enabled) load();
     },
     [challenge, load]
   );
