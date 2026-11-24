@@ -5,6 +5,16 @@
 
 .pf { display: grid; gap: 18px; min-width: 0; }
 
+/* First-time review banner (Alumni Portal, Step 3) */
+.pf-review { align-items: center; margin-bottom: 18px; }
+.pf-review__body { flex: 1; min-width: 0; }
+.pf-review__btn { flex: none; white-space: nowrap; }
+.pf-review__error { color: #b42318; font-weight: 600; }
+@media (max-width: 720px) {
+  .pf-review { flex-wrap: wrap; }
+  .pf-review__btn { width: 100%; justify-content: center; }
+}
+
 /* Header */
 .pf-head {
   display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(220px, 300px); align-items: center; gap: 20px;

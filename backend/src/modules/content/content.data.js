@@ -68,7 +68,27 @@ export const JOB_CATEGORIES = [
   'Academic / Educator',
   'Other',
 ];
-export const TIME_AFTER_GRADUATION = ['Within 6 months', '7 months to 1 year', '1 to 2 years', 'More than 2 years'];
+// Industry of a job (Work section; EAO search, Step 12). Broad groups based on the PSA industry classification,
+// weighted toward where MCU graduates work. To be finalized with EAO.
+export const INDUSTRIES = [
+  'Hospital / Healthcare',
+  'Pharmaceutical / Drug distribution',
+  'Clinic / Laboratory / Diagnostics',
+  'Education / Training',
+  'Government / Public service',
+  'Banking / Finance / Insurance',
+  'Business process outsourcing (BPO)',
+  'Information technology',
+  'Manufacturing',
+  'Wholesale / Retail trade',
+  'Hotel / Restaurant / Tourism',
+  'Engineering / Construction',
+  'Research / Science',
+  'Non-profit / NGO / Church',
+  'Own business / Self-employed',
+  'Other',
+];
+export const TIME_AFTER_GRADUATION =['Within 6 months', '7 months to 1 year', '1 to 2 years', 'More than 2 years'];
 // "If No, choose N/A"
 export const FURTHER_STUDIES_TIMING = [...TIME_AFTER_GRADUATION, 'N/A'];
 
@@ -202,6 +222,7 @@ export const sections = {
     sexes: SEXES,
     degreeGroups: DEGREE_GROUPS,
     jobCategories: JOB_CATEGORIES,
+    industries: INDUSTRIES,
     timeToFirstJob: TIME_AFTER_GRADUATION,
     furtherStudiesTiming: FURTHER_STUDIES_TIMING,
   },

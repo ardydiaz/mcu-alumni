@@ -153,6 +153,10 @@ export const profileService = {
       const like = esc(`%${query.employer}%`);
       and.push({ id: { [Op.in]: literal(`(SELECT profile_id FROM profile_work WHERE is_current = 1 AND (company LIKE ${like} OR position LIKE ${like} OR job_category LIKE ${like}))`) } });
     }
+    // Industry and job level of the current job (a Graduate Tracer answer may list several job levels).
+    if (query.industry) and.push({ id: { [Op.in]: literal(`(SELECT profile_id FROM profile_work WHERE is_current = 1 AND industry = ${esc(query.industry)})`) } });
+    if (query.jobLevel) and.push({ id: { [Op.in]: literal(`(SELECT profile_id FROM profile_work WHERE is_current = 1 AND job_category LIKE ${esc(`%${query.jobLevel}%`)})`) } });
+    if (query.sex) and.push({ sex: query.sex });
     // Updated by the alumnus in the last 12 months (My Profile or Graduate Tracer), not since, or never.
     const yearAgo = new Date(Date.now() - UPDATED_WITHIN_DAYS * 86400000);
     if (query.updated === 'recent') and.push({ alumniUpdatedAt: { [Op.gte]: yearAgo } });
@@ -296,6 +300,11 @@ export const profileService = {
   },
 
   // ---- C. Sections ----
+  // The alumnus checked their profile and confirmed it is correct (counts as "updated" for EAO monitoring).
+  async confirmReviewed(profile, actor) {
+    await log(profile.id, actor, 'profile', 'review', { title: 'Reviewed and confirmed their information' });
+  },
+
   async addItem(profile, section, data, actor) {
     const item = await SectionModels[section].create({ ...blankToNull(data), profileId: profile.id, ...(section === 'work' && { source: actor.type === 'staff' ? 'staff' : 'portal' }) });
     await log(profile.id, actor, section, 'add', { title: SECTIONS[section].title(item) });

@@ -12,6 +12,7 @@ import { useToast } from '../../components/admin/Toast.jsx';
 import Icon from '../../components/ui/Icon.jsx';
 import { adminApi } from '../../api/admin.js';
 import { authDownload, saveBlob, getPsgc } from '../../api/client.js';
+import { useContent } from '../../hooks/useContent.js';
 
 // Step 4: alumni master records. Portal accounts get a profile when verified; EAO encodes walk-ins here.
 const NEW_FIELDS = [
@@ -51,7 +52,7 @@ const SourceBadge = ({ row }) => {
 };
 
 // EAO search filters (Step 11). Text filters are debounced together with the rest.
-const NO_FILTERS = { search: '', program: '', yearGraduated: '', regionCode: '', location: '', employment: '', employer: '', updated: '', invite: '', source: '' };
+const NO_FILTERS = { search: '', program: '', yearGraduated: '', regionCode: '', location: '', employment: '', industry: '', jobLevel: '', sex: '', employer: '', updated: '', invite: '', source: '' };
 const UPDATED = {
   recent: { label: 'Updated in the last 12 months', tone: 'success' },
   stale: { label: 'Not updated in 12+ months', tone: 'warning' },
@@ -110,7 +111,8 @@ export default function AlumniProfiles() {
   const f = useDebounced(filters);
   const set = (k) => (e) => setFilters((s) => ({ ...s, [k]: e.target.value }));
   const activeCount = Object.entries(filters).filter(([k, v]) => k !== 'search' && v !== '').length;
-  const moreCount = ['regionCode', 'location', 'employment', 'employer', 'updated', 'invite', 'source'].filter((k) => filters[k] !== '').length;
+  const moreCount = ['regionCode', 'location', 'employment', 'industry', 'jobLevel', 'sex', 'employer', 'updated', 'invite', 'source'].filter((k) => filters[k] !== '').length;
+  const options = useContent('form-options'); // industries, job levels, sexes
 
   useEffect(() => {
     adminApi.fetch('/profiles/overview').then(setOverview).catch(() => {});
@@ -234,6 +236,27 @@ export default function AlumniProfiles() {
                 <option value="">Any</option>
                 <option value="employed">Has a current job</option>
                 <option value="none">No current job on record</option>
+              </select>
+            </label>
+            <label className="admin-filter">
+              <span>Industry</span>
+              <select value={filters.industry} onChange={set('industry')}>
+                <option value="">Any industry</option>
+                {(options.data?.industries || []).map((v) => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </label>
+            <label className="admin-filter">
+              <span>Job level</span>
+              <select value={filters.jobLevel} onChange={set('jobLevel')}>
+                <option value="">Any level</option>
+                {(options.data?.jobCategories || []).map((v) => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </label>
+            <label className="admin-filter">
+              <span>Gender</span>
+              <select value={filters.sex} onChange={set('sex')}>
+                <option value="">Any</option>
+                {(options.data?.sexes || []).map((v) => <option key={v} value={v}>{v}</option>)}
               </select>
             </label>
             <label className="admin-filter">

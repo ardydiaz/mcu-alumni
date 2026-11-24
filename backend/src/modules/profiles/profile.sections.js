@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { Joi } from '../../middleware/validation.middleware.js';
-import { JOB_CATEGORIES } from '../content/content.data.js';
+import { JOB_CATEGORIES, INDUSTRIES } from '../content/content.data.js';
 
 // Section C of the alumni profile: repeatable lists. One definition drives the model, the validation
 // and the activity history, so a new field only needs to be added here (plus a migration column).
@@ -19,6 +19,7 @@ export const OPTIONS = {
   skillLevel: ['Basic', 'Intermediate', 'Advanced'],
   trainingType: ['Training', 'Seminar', 'Certification', 'Licensure exam'],
   jobCategory: JOB_CATEGORIES,
+  industry: INDUSTRIES,
 };
 
 export const SECTIONS = {
@@ -97,6 +98,7 @@ export const SECTIONS = {
       company: { type: DataTypes.STRING(200), allowNull: false },
       position: { type: DataTypes.STRING(120), allowNull: false },
       jobCategory: { type: DataTypes.STRING(200) },
+      industry: { type: DataTypes.STRING(60) }, // migration 16
       startDate: { type: DataTypes.DATEONLY },
       endDate: { type: DataTypes.DATEONLY },
       isCurrent: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
@@ -107,6 +109,7 @@ export const SECTIONS = {
       company: Joi.string().trim().max(200).required(),
       position: Joi.string().trim().max(120).required(),
       jobCategory: text(200),
+      industry: oneOf(OPTIONS.industry),
       startDate: date(),
       endDate: date(),
       isCurrent: Joi.boolean(),

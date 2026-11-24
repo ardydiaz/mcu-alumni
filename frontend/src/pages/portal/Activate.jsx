@@ -37,7 +37,8 @@ export default function Activate() {
     setState({ busy: true, error: '', fields: {} });
     try {
       await activate({ token, ...values, phone: invite.phone ? undefined : values.phone });
-      navigate('/portal/account', { replace: true, state: { welcome: true } });
+      // Step 3: the profile is already filled in from their records; open it so they review it first.
+      navigate('/portal/profile', { replace: true, state: { review: true, welcome: true } });
     } catch (err) {
       setState({ busy: false, error: err.fields?.reason === 'exists' || !err.fields ? err.message : '', fields: err.fields || {} });
     }

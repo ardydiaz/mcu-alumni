@@ -52,6 +52,7 @@ export const portalApi = {
   // My Profile (Step 4). Every call returns the full profile.
   profile: async () => (await send('/portal/profile', { token: portalSession.get() })).data,
   saveProfile: async (data, photo) => (await send('/portal/profile', { method: 'PATCH', body: withFile(data, photo), token: portalSession.get() })).data,
+  confirmProfile: async () => send('/portal/profile/confirm', { method: 'POST', token: portalSession.get() }),
   addItem: async (section, data) => (await send(`/portal/profile/${section}`, { method: 'POST', body: data, token: portalSession.get() })).data,
   editItem: async (section, id, data) => (await send(`/portal/profile/${section}/${id}`, { method: 'PATCH', body: data, token: portalSession.get() })).data,
   removeItem: async (section, id) => (await send(`/portal/profile/${section}/${id}`, { method: 'DELETE', token: portalSession.get() })).data,

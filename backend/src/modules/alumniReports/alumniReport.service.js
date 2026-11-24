@@ -29,12 +29,16 @@ function describe(q) {
   else parts.push('All batches');
   if (q.regionCode) parts.push(psgc.regions().find((r) => r.code === q.regionCode)?.name || 'Selected region');
   if (q.location) parts.push(`Location: "${q.location}"`);
+  if (q.sex) parts.push(q.sex);
+  if (q.employment) parts.push(q.employment === 'employed' ? 'Employed' : 'No current job on record');
+  if (q.industry) parts.push(`Industry: ${q.industry}`);
+  if (q.jobLevel) parts.push(`Job level: ${q.jobLevel}`);
   return parts.join(' · ');
 }
 
 // Profiles for the graduate-based reports (same filters as the Alumni profiles list).
 const profileWhere = (q) => {
-  const where = profileService.where({ program: q.program, regionCode: q.regionCode, location: q.location });
+  const where = profileService.where({ program: q.program, regionCode: q.regionCode, location: q.location, sex: q.sex, employment: q.employment, industry: q.industry, jobLevel: q.jobLevel });
   const year = yearWhere(q);
   return year ? { [Op.and]: [where, { yearGraduated: year }] } : where;
 };
@@ -71,6 +75,7 @@ export const GRADUATE_COLUMNS = {
   address: 'Address',
   employer: 'Current employer',
   position: 'Position',
+  industry: 'Industry',
   portal: 'Portal account',
 };
 const DEFAULT_GRADUATE_COLUMNS = ['studentNumber', 'name', 'program', 'yearGraduated', 'email', 'phone'];
@@ -85,7 +90,7 @@ const REPORTS = {
       const profiles = await AlumniProfile.findAll({ where: profileWhere(q), order: [['program', 'ASC'], ['yearGraduated', 'ASC'], ['surname', 'ASC'], ['firstName', 'ASC']], limit: MAX_ROWS + 1 });
       if (profiles.length > MAX_ROWS) throw ApiError.unprocessable(`More than ${MAX_ROWS.toLocaleString()} graduates match; narrow the filters.`);
       const jobs = new Map();
-      if (keys.includes('employer') || keys.includes('position')) {
+      if (keys.includes('employer') || keys.includes('position') || keys.includes('industry')) {
         const ids = profiles.map((p) => p.id);
         for (let i = 0; i < ids.length; i += 1000) {
           const work = await SectionModels.work.findAll({ where: { profileId: ids.slice(i, i + 1000), isCurrent: true }, order: [['updatedAt', 'DESC']] });
@@ -97,6 +102,7 @@ const REPORTS = {
         if (k === 'address') return oneLineAddress(p);
         if (k === 'employer') return jobs.get(p.id)?.company || '';
         if (k === 'position') return jobs.get(p.id)?.position || '';
+        if (k === 'industry') return jobs.get(p.id)?.industry || '';
         if (k === 'portal') return p.alumniAccountId ? 'Yes' : 'No';
         return p[k] ?? '';
       };

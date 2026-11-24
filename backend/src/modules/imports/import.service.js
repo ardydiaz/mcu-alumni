@@ -299,13 +299,13 @@ export const importService = {
       for (const w of work) if (!jobs.has(w.profileId)) jobs.set(w.profileId, w);
     }
     const mdy = (d) => (d ? `${String(d).slice(5, 7)}/${String(d).slice(8, 10)}/${String(d).slice(0, 4)}` : '');
-    const header = ['Alumni No.', 'Student No.', 'Year', 'Course', 'Surname', 'Given Name', 'Middle Name', 'Suffix', 'Maiden Name', 'Contact No.', 'Email Address', 'Home Address', 'Barangay', 'City', 'Province', 'Region', 'Country', 'Birthdate', 'Gender', 'Civil Status', 'Nationality', 'Company Name', 'Position', 'Portal Account', 'Source', 'Last Updated by Alumnus'];
+    const header = ['Alumni No.', 'Student No.', 'Year', 'Course', 'Surname', 'Given Name', 'Middle Name', 'Suffix', 'Maiden Name', 'Contact No.', 'Email Address', 'Home Address', 'Barangay', 'City', 'Province', 'Region', 'Country', 'Birthdate', 'Gender', 'Civil Status', 'Nationality', 'Company Name', 'Position', 'Industry', 'Portal Account', 'Source', 'Last Updated by Alumnus'];
     const lines = profiles.map((p) => {
       const job = jobs.get(p.id);
       return [
         p.alumniNumber, p.studentNumber, p.yearGraduated, p.program, p.surname, p.firstName, p.middleName, p.suffix, p.maidenName, p.phone, p.email,
         p.houseStreet, p.barangay, p.city, p.province, p.region, p.country, mdy(p.birthDate), p.sex, p.civilStatus, p.nationality,
-        job?.company, job?.position, p.alumniAccountId ? 'Yes' : 'No', p.source, p.alumniUpdatedAt ? mdy(new Date(p.alumniUpdatedAt).toISOString()) : '',
+        job?.company, job?.position, job?.industry, p.alumniAccountId ? 'Yes' : 'No', p.source, p.alumniUpdatedAt ? mdy(new Date(p.alumniUpdatedAt).toISOString()) : '',
       ];
     });
     const cell = (v) => {

@@ -60,7 +60,12 @@ export default function PortalAuthModal() {
 
   const afterLogin = (account) => {
     loggedInHere.current = true;
-    const go = stay ? close : () => navigate(next || '/portal/account', { replace: true });
+    // Step 3: a verified alumnus who hasn't reviewed their profile yet goes to My Profile first, so the
+    // record found for them (or the new one) is checked and completed before anything else.
+    const review = account?.status === 'verified' && account.profileReviewed === false && (!next || next === '/portal/account');
+    const go = stay
+      ? close
+      : () => (review ? navigate('/portal/profile', { replace: true, state: { review: true } }) : navigate(next || '/portal/account', { replace: true }));
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const ms = reduced ? LOADER_MS_REDUCED : LOADER_MS;
     setWelcome({ account, stay, leaving: false, ms });

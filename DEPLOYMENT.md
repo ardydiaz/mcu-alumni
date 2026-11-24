@@ -63,7 +63,7 @@ Never commit `backend/.env`, and never paste its secrets into chats or tickets.
 ### 2.4 Migrations and seeder
 
 ```bash
-npm run migrate -w backend          # applies the 15 migrations: "Applied 15 migration(s)"
+npm run migrate -w backend          # applies the 16 migrations: "Applied 16 migration(s)"
 npm run seed -w backend             # base tables, first Super Admin, starting content: "Seeding complete"
 npm run migrate:status -w backend   # every migration should show "applied"
 ```
@@ -88,6 +88,7 @@ npm run migrate:status -w backend   # every migration should show "applied"
 | 13 | `20261016-13-eao-monitoring-event-registrations` | Profile update monitoring, event registrations |
 | 14 | `20261020-14-portal-password-reset` | Alumni password reset |
 | 15 | `20261123-15-event-alerts` | Homepage "Notify me" event alert subscribers |
+| 16 | `20261124-16-work-industry` | Industry of each job (Work section), for EAO search by industry |
 
 **The seeder** (`backend/scripts/seed.js`) is safe to re-run: existing records are never overwritten. It creates:
 

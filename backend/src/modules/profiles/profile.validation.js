@@ -1,5 +1,5 @@
 import { Joi, listQuerySchema, phone, year, validate } from '../../middleware/validation.middleware.js';
-import { SEXES } from '../content/content.data.js';
+import { SEXES, INDUSTRIES, JOB_CATEGORIES } from '../content/content.data.js';
 import { CIVIL_STATUS } from './profile.model.js';
 import { SECTIONS, SECTION_KEYS } from './profile.sections.js';
 import { canonicalStudentNumber } from '../../utils/studentNumber.js';
@@ -67,6 +67,9 @@ export const listProfilesQuerySchema = listQuerySchema.keys({
   location: Joi.string().trim().max(100),
   employment: Joi.string().valid('employed', 'none'),
   employer: Joi.string().trim().max(100), // current company, position or job category
+  industry: Joi.string().valid(...INDUSTRIES),
+  jobLevel: Joi.string().valid(...JOB_CATEGORIES),
+  sex: Joi.string().valid(...SEXES),
   updated: Joi.string().valid('recent', 'stale', 'never'),
 });
 

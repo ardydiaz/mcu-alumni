@@ -12,20 +12,20 @@ import '../../styles/reports.css';
 
 const GRADUATE_COLUMNS = [
   ['studentNumber', 'Student No.'], ['alumniNumber', 'Alumni No.'], ['name', 'Name'], ['program', 'Program'], ['yearGraduated', 'Year'],
-  ['sex', 'Sex'], ['email', 'Email'], ['phone', 'Contact No.'], ['address', 'Address'], ['employer', 'Current employer'], ['position', 'Position'], ['portal', 'Portal account'],
+  ['sex', 'Sex'], ['email', 'Email'], ['phone', 'Contact No.'], ['address', 'Address'], ['employer', 'Current employer'], ['position', 'Position'], ['industry', 'Industry'], ['portal', 'Portal account'],
 ];
 const DEFAULT_COLUMNS = ['studentNumber', 'name', 'program', 'yearGraduated', 'email', 'phone'];
 
 const REPORTS = [
-  { key: 'graduates', icon: 'id', title: 'List of graduates', tag: 'Accreditation', text: 'Graduates of a program and batch, with the columns you choose.', filters: ['program', 'years', 'region', 'location', 'columns'] },
+  { key: 'graduates', icon: 'id', title: 'List of graduates', tag: 'Accreditation', text: 'Graduates of a program and batch, with the columns you choose.', filters: ['program', 'years', 'region', 'location', 'sex', 'work', 'columns'] },
   { key: 'employment', icon: 'building', title: 'Employment by program', tag: 'Tracer study', text: 'Employment status of graduates per program from the Graduate Tracer.', filters: ['program', 'years'] },
   { key: 'tracer', icon: 'rocket', title: 'Tracer study results', tag: 'Tracer study', text: 'Time to first job, job level, related to degree, further studies.', filters: ['program', 'years'] },
   { key: 'engagement', icon: 'users', title: 'Alumni engagement', text: 'Portal use and profile updates per program or batch.', filters: ['program', 'years', 'groupBy:program,year'] },
   { key: 'attendance', icon: 'calendar', title: 'Event attendance', text: 'Registered vs attended per event, or the attendee list of one event.', filters: ['event', 'dates'] },
-  { key: 'location', icon: 'pin', title: 'Graduates by location', text: 'Where graduates live, by region, province or city.', filters: ['program', 'years', 'groupBy:region,province,city'] },
+  { key: 'location', icon: 'pin', title: 'Graduates by location', text: 'Where graduates live, by region, province or city.', filters: ['program', 'years', 'sex', 'work', 'groupBy:region,province,city'] },
 ];
 const GROUP_LABELS = { program: 'Program', year: 'Batch', region: 'Region', province: 'Province', city: 'City / municipality' };
-const EMPTY = { program: '', yearFrom: '', yearTo: '', regionCode: '', location: '', groupBy: '', eventId: '', dateFrom: '', dateTo: '' };
+const EMPTY = { program: '', yearFrom: '', yearTo: '', regionCode: '', location: '', sex: '', employment: '', industry: '', jobLevel: '', groupBy: '', eventId: '', dateFrom: '', dateTo: '' };
 
 const fmt = (v, type) => (v === null || v === undefined || v === '' ? '—' : type === 'percent' ? `${v}%` : typeof v === 'number' ? v.toLocaleString() : v);
 const query = (def, f, columns) => {
@@ -130,6 +130,7 @@ function Paper({ report, logo }) {
 export default function AlumniReports() {
   const notify = useToast();
   const site = useContent('site');
+  const formOptions = useContent('form-options'); // sexes, industries, job levels
   const [type, setType] = useState('graduates');
   const [filters, setFilters] = useState(EMPTY);
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
@@ -158,6 +159,8 @@ export default function AlumniReports() {
       ...(keep.years && { yearFrom: filters.yearFrom, yearTo: filters.yearTo }),
       ...(keep.region && { regionCode: filters.regionCode }),
       ...(keep.location && { location: filters.location }),
+      ...(def.filters.includes('sex') && { sex: filters.sex }),
+      ...(def.filters.includes('work') && { employment: filters.employment, industry: filters.industry, jobLevel: filters.jobLevel }),
       ...(groupBy && { groupBy: filters.groupBy || groupBy[0] }),
       ...(def.filters.includes('event') && { eventId: filters.eventId }),
       ...(def.filters.includes('dates') && !filters.eventId && { dateFrom: filters.dateFrom, dateTo: filters.dateTo }),
@@ -262,6 +265,41 @@ export default function AlumniReports() {
               <span>Location contains</span>
               <input type="search" placeholder="City, province…" value={filters.location} onChange={set('location')} />
             </label>
+          )}
+          {def.filters.includes('sex') && (
+            <label className="admin-filter">
+              <span>Gender</span>
+              <select value={filters.sex} onChange={set('sex')}>
+                <option value="">Any</option>
+                {(formOptions.data?.sexes || []).map((v) => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </label>
+          )}
+          {def.filters.includes('work') && (
+            <>
+              <label className="admin-filter">
+                <span>Employment status</span>
+                <select value={filters.employment} onChange={set('employment')}>
+                  <option value="">Any</option>
+                  <option value="employed">Employed (has a current job)</option>
+                  <option value="none">No current job on record</option>
+                </select>
+              </label>
+              <label className="admin-filter">
+                <span>Industry</span>
+                <select value={filters.industry} onChange={set('industry')}>
+                  <option value="">Any industry</option>
+                  {(formOptions.data?.industries || []).map((v) => <option key={v} value={v}>{v}</option>)}
+                </select>
+              </label>
+              <label className="admin-filter">
+                <span>Job level</span>
+                <select value={filters.jobLevel} onChange={set('jobLevel')}>
+                  <option value="">Any level</option>
+                  {(formOptions.data?.jobCategories || []).map((v) => <option key={v} value={v}>{v}</option>)}
+                </select>
+              </label>
+            </>
           )}
           {groupBy && (
             <label className="admin-filter">

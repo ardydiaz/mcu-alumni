@@ -12,7 +12,7 @@ import { formatDate } from '../../components/admin/format.js';
 import '../../styles/profile.css';
 
 const SECTION_LABEL = { profile: 'Profile', ...Object.fromEntries(SECTIONS.map((s) => [s.key, s.label])) };
-const ACTION_LABEL = { create: 'Created profile', import: 'Imported', invite: 'Invited to the portal', verify: 'Verified and linked to portal account', update: 'Updated', add: 'Added', edit: 'Edited', remove: 'Removed' };
+const ACTION_LABEL = { create: 'Created profile', import: 'Imported', invite: 'Invited to the portal', verify: 'Verified and linked to portal account', review: 'Reviewed',update: 'Updated', add: 'Added', edit: 'Edited', remove: 'Removed' };
 const ACTOR_LABEL = { alumni: 'Alumnus', staff: 'EAO staff', system: 'System' };
 const dateTime = (d) => new Date(d).toLocaleString('en-PH', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 const val = (v) => (v === null || v === '' || v === undefined ? 'empty' : String(v));
@@ -165,7 +165,7 @@ export default function AlumniProfileEdit() {
           </>
         }
       />
-      <ProfileEditor profile={profile} mode="staff" api={api} onChange={onChange} choices={{ jobCategories: options.data?.jobCategories || [] }} extraTabs={extraTabs} />
+      <ProfileEditor profile={profile} mode="staff" api={api} onChange={onChange} choices={{ jobCategories: options.data?.jobCategories || [], industries: options.data?.industries || [] }} extraTabs={extraTabs} />
     </>
   );
 }

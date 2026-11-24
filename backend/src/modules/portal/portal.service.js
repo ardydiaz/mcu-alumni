@@ -37,9 +37,11 @@ export const toPortalProfile = (a) => ({
 });
 
 // The same, plus the profile photo (uploaded in My profile) for the sidebar and header avatar.
+// profileReviewed: false while a verified alumnus has never reviewed their profile (edited it, confirmed it or
+// answered the Graduate Tracer); the portal then opens My Profile after login (Step 3) instead of the dashboard.
 export async function toPortalProfileWithPhoto(a) {
   const profile = await profileService.forAccount(a.id);
-  return { ...toPortalProfile(a), photo: profile?.photo || null };
+  return { ...toPortalProfile(a), photo: profile?.photo || null, profileReviewed: profile ? Boolean(profile.alumniUpdatedAt) : null };
 }
 
 function sendVerificationEmail(account, token) {

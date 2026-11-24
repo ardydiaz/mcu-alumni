@@ -5,6 +5,7 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import { adminPanelOnly } from '../../middleware/role.middleware.js';
 import { validate, Joi, year } from '../../middleware/validation.middleware.js';
 import { asyncHandler } from '../../utils/helpers.js';
+import { SEXES, INDUSTRIES, JOB_CATEGORIES } from '../content/content.data.js';
 import { sendSuccess } from '../../utils/response.js';
 
 // Staff (EAO): /api/v1/alumni-reports — Step 13: Report Generation.
@@ -19,6 +20,11 @@ const querySchema = Joi.object({
   yearTo: year(),
   regionCode: Joi.string().trim().pattern(/^R?\d{9,10}$/).allow(''),
   location: Joi.string().trim().max(100).allow(''),
+  // Step 14: e.g. Program = Medicine + Batch 2015 + Employment status = Employed
+  employment: Joi.string().valid('employed', 'none').allow(''),
+  sex: Joi.string().valid(...SEXES).allow(''),
+  industry: Joi.string().valid(...INDUSTRIES).allow(''),
+  jobLevel: Joi.string().valid(...JOB_CATEGORIES).allow(''),
   groupBy: Joi.string().valid('program', 'year', 'region', 'province', 'city'),
   columns: Joi.string().trim().max(300).pattern(new RegExp(`^(${Object.keys(GRADUATE_COLUMNS).join('|')})(,(${Object.keys(GRADUATE_COLUMNS).join('|')}))*$`)),
   eventId: Joi.number().integer().min(1),

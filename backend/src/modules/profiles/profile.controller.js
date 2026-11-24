@@ -92,6 +92,12 @@ export const profileController = {
     sendSuccess(res, { data: await profileService.update(req.profile, req.body, alumniActor(req.alumni)), message: 'Your profile was saved' });
   }),
 
+  // "My information is correct": the alumnus reviewed their profile without needing to change anything (Step 3).
+  confirmMine: asyncHandler(async (req, res) => {
+    await profileService.confirmReviewed(req.profile, alumniActor(req.alumni));
+    sendSuccess(res, { data: await profileService.full(req.profile), message: 'Thank you for reviewing your profile!' });
+  }),
+
   addMine: asyncHandler(async (req, res) => {
     await profileService.addItem(req.profile, req.params.section, req.body, alumniActor(req.alumni));
     sendCreated(res, await profileService.full(req.profile), 'Added to your profile');

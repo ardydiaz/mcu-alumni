@@ -37,6 +37,7 @@ export const portalProfileRoutes = Router();
 portalProfileRoutes.use(authenticateAlumni, loadOwnProfile);
 portalProfileRoutes.get('/', profileController.mine);
 portalProfileRoutes.patch('/', uploadImage('photo', 'profiles'), validate(alumniProfileSchema), profileController.updateMine);
-portalProfileRoutes.post('/:section', validate(sectionParamSchema, 'params'), validateSectionBody, profileController.addMine);
+portalProfileRoutes.post('/confirm', profileController.confirmMine);
+portalProfileRoutes.post('/:section',validate(sectionParamSchema, 'params'), validateSectionBody, profileController.addMine);
 portalProfileRoutes.patch('/:section/:itemId', validate(sectionParamSchema, 'params'), validateSectionBody, profileController.editMine);
 portalProfileRoutes.delete('/:section/:itemId', validate(sectionParamSchema, 'params'), profileController.removeMine);

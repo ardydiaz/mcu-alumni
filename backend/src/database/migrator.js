@@ -15,6 +15,7 @@ import * as profileInvitations from './migrations/20261016-12-profile-invitation
 import * as eaoMonitoring from './migrations/20261016-13-eao-monitoring-event-registrations.js';
 import * as passwordReset from './migrations/20261020-14-portal-password-reset.js';
 import * as eventAlerts from './migrations/20261123-15-event-alerts.js';
+import * as workIndustry from './migrations/20261124-16-work-industry.js';
 
 // Versioned schema migrations, applied in order and recorded in `schema_migrations`.
 // Add new migrations to the end of this list; never rename or reorder applied ones.
@@ -34,6 +35,7 @@ const MIGRATIONS = [
   ['20261016-13-eao-monitoring-event-registrations', eaoMonitoring],
   ['20261020-14-portal-password-reset', passwordReset],
   ['20261123-15-event-alerts', eventAlerts],
+  ['20261124-16-work-industry', workIndustry],
 ];
 
 export function createMigrator(sequelize) {

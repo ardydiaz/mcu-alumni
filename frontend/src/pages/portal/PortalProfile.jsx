@@ -7,6 +7,43 @@ import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import { PortalPageHead } from './PortalLayout.jsx';
 import '../../styles/profile.css';
 
+// Step 3: shown until the alumnus reviews their profile for the first time (any change, the Graduate Tracer,
+// or "My information is correct"). The text depends on whether a record was found for them.
+function ReviewBanner({ profile, onConfirmed }) {
+  const [state, setState] = useState({ busy: false, error: '' });
+  const found = profile.source !== 'portal'; // imported from the Registrar or encoded by EAO
+  const { percent } = profile.completeness || {};
+
+  const confirm = async () => {
+    setState({ busy: true, error: '' });
+    try {
+      const res = await portalApi.confirmProfile();
+      onConfirmed(res.data);
+    } catch (err) {
+      setState({ busy: false, error: err.message || 'Something went wrong. Please try again.' });
+    }
+  };
+
+  return (
+    <section className="portal-review pf-review" aria-labelledby="pf-review-title">
+      <span className="portal-review__icon" aria-hidden="true"><Icon name={found ? 'check' : 'users'} size={22} /></span>
+      <div className="pf-review__body">
+        <strong id="pf-review-title">{found ? 'We found your alumni record' : 'Welcome! Let’s complete your alumni profile'}</strong>
+        <p>
+          {found
+            ? 'Your information from the MCU alumni records is shown below. Please review it, update anything missing or outdated, then confirm.'
+            : 'We created your alumni profile from your registration. Please fill in the rest of your information below, then confirm.'}
+          {percent != null && percent < 100 && ` Your profile is ${percent}% complete.`}
+        </p>
+        {state.error && <p className="pf-review__error" role="alert">{state.error}</p>}
+      </div>
+      <button type="button" className="btn btn-primary btn-sm pf-review__btn" onClick={confirm} disabled={state.busy}>
+        <Icon name="check" size={14} /> {state.busy ? 'Saving…' : 'My information is correct'}
+      </button>
+    </section>
+  );
+}
+
 // "My Profile" in the Alumni Portal (Step 4): the alumnus's master record, sections A, B and C.
 export default function PortalProfile() {
   const [state, setState] = useState({ profile: null, loading: true, error: null });
@@ -54,6 +91,15 @@ export default function PortalProfile() {
   return (
     <>
       {head}
+      {!state.profile.alumniUpdatedAt && (
+        <ReviewBanner
+          profile={state.profile}
+          onConfirmed={(profile) => {
+            setState((s) => ({ ...s, profile }));
+            refresh(); // account.profileReviewed -> true, so the next login opens the dashboard
+          }}
+        />
+      )}
       <ProfileEditor
         profile={state.profile}
         mode="alumni"
@@ -63,7 +109,7 @@ export default function PortalProfile() {
           if (profile.photo !== state.profile?.photo) refresh();
           setState((s) => ({ ...s, profile }));
         }}
-        choices={{ jobCategories: options.data?.jobCategories || [] }}
+        choices={{ jobCategories: options.data?.jobCategories || [], industries: options.data?.industries || [] }}
       />
     </>
   );
