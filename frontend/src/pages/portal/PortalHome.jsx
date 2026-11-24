@@ -4,7 +4,7 @@ import PageHero from '../../components/ui/PageHero.jsx';
 import Icon from '../../components/ui/Icon.jsx';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import { useReveal } from '../../hooks/useReveal.js';
-import { StatusBadge, firstName } from './portalShared.jsx';
+import { StatusBadge, firstName, JOURNEY } from './portalShared.jsx';
 import '../../styles/portal.css';
 
 // Entry points from the proposed Alumni User Journey (Step 1).
@@ -21,12 +21,12 @@ const ENTRY_POINTS = [
   {
     icon: 'calendar',
     title: 'Alumni Events and Activities',
-    text: 'Reunions, talks and outreach. Join a chapter or volunteer as a speaker or mentor.',
+    text: 'Homecoming, reunions, talks and outreach. See what is coming up, join a chapter or volunteer as a speaker or mentor.',
     links: [
-      { label: 'Volunteer', to: '/volunteer' },
+      { label: 'Events calendar', to: '/events' },
       { label: 'Alumni Networks', to: '/networks' },
+      { label: 'Volunteer', to: '/volunteer' },
     ],
-    note: 'Events calendar coming soon',
   },
   {
     icon: 'award',
@@ -40,6 +40,7 @@ const ENTRY_POINTS = [
   },
 ];
 
+// Only verified alumni can log in, so a signed-in visitor always has full access.
 function SignedInCard({ account }) {
   return (
     <div className="portal-welcome" data-reveal>
@@ -47,14 +48,38 @@ function SignedInCard({ account }) {
         <span className="portal-eyebrow">Welcome back</span>
         <h2>Hello, {firstName(account.fullName)}!</h2>
         <p>
-          <StatusBadge status={account.status} />{' '}
-          {account.status === 'verified'
-            ? 'Your account is verified. You have full access to the Alumni Portal.'
-            : 'Your registration is being reviewed by the Alumni Relations Office.'}
+          <StatusBadge status={account.status} /> Your profile, Alumni ID, Graduate Tracer and alumni perks are in your account.
         </p>
       </div>
       <Link to="/portal/account" className="btn btn-gold btn-lg">Go to my account <Icon name="arrowRight" size={18} /></Link>
     </div>
+  );
+}
+
+// "How it works": the same four steps as the registration journey, for first-time visitors.
+const STEP_ICONS = ['userPlus', 'mail', 'clock', 'userCheck'];
+
+function HowItWorks() {
+  return (
+    <section className="portal-steps" aria-labelledby="portal-steps-title" data-reveal>
+      <div className="portal-heading">
+        <span className="portal-eyebrow">How it works</span>
+        <h2 id="portal-steps-title">Your account in four steps</h2>
+      </div>
+      <ol className="portal-steps__list">
+        {JOURNEY.map((s, i) => (
+          <li key={s.title} className="portal-step" style={{ '--delay': `${i * 80}ms` }}>
+            <span className="portal-step__icon" aria-hidden="true"><Icon name={STEP_ICONS[i]} size={22} /></span>
+            <span className="portal-step__num">Step {i + 1}</span>
+            <strong>{s.title}</strong>
+            <span className="portal-step__text">{s.text}</span>
+          </li>
+        ))}
+      </ol>
+      <p className="portal-steps__note">
+        <Icon name="clock" size={15} /> Step 3 is done by the Alumni Relations Office. We email you as soon as your account is verified, and then you can log in.
+      </p>
+    </section>
   );
 }
 
@@ -103,6 +128,8 @@ export default function PortalHome() {
               </PortalAuthLink>
             </div>
           )}
+
+          {status !== 'authenticated' && <HowItWorks />}
 
           <div className="portal-heading" data-reveal>
             <span className="portal-eyebrow">Explore</span>

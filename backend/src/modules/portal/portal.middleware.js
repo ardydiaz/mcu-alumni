@@ -16,9 +16,10 @@ export const authenticateAlumni = asyncHandler(async (req, res, next) => {
   }
   if (payload.type !== ALUMNI_TOKEN_TYPE) throw ApiError.unauthorized('Invalid session');
 
-  // Re-read on every request so a rejection takes effect immediately.
+  // Re-read on every request so a rejection takes effect immediately. Only verified accounts use the portal
+  // (sessions from before pending logins were blocked end here too).
   const account = await AlumniAccount.findByPk(payload.sub);
-  if (!account || !['pending', 'verified'].includes(account.status)) throw ApiError.unauthorized('Account not found or not active');
+  if (!account || account.status !== 'verified') throw ApiError.unauthorized('Account not found or not active');
   // Password changed since this session started (e.g. reset after "Forgot password"): sign this device out.
   if (portalPassword.sessionRevoked(account, payload)) {
     throw ApiError.unauthorized('Your password was changed. Please log in again.');

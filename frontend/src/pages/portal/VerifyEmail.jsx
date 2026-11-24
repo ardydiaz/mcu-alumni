@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Icon from '../../components/ui/Icon.jsx';
 import { portalApi } from '../../api/portal.js';
 import { Journey } from './portalShared.jsx';
@@ -35,10 +35,10 @@ export default function VerifyEmail() {
           <div className="portal-notice">
             <span className="portal-notice__icon portal-notice__icon--ok" aria-hidden="true"><Icon name="check" size={28} /></span>
             <h2>Email verified!</h2>
-            <p>{state.message} We will email you once your account is verified.</p>
+            <p>{state.message} We will email you once your account is verified, and then you can log in to the Alumni Portal.</p>
             <Journey current={2} />
             <div className="portal-notice__actions">
-              <PortalAuthLink mode="login" className="btn btn-primary">Log in to check your status</PortalAuthLink>
+              <Link to="/" className="btn btn-primary">Back to the homepage</Link>
             </div>
           </div>
         )}

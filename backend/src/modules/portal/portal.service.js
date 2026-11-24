@@ -126,6 +126,10 @@ export const portalService = {
     if (account.status === 'email_unverified') {
       throw new ApiError(403, 'Please verify your email address first. Check your inbox for the verification link.', { reason: 'email_unverified' });
     }
+    // The portal opens only after the Alumni Relations Office verifies the account (the approval email says so).
+    if (account.status === 'pending') {
+      throw new ApiError(403, 'Your account is still being reviewed by the Alumni Relations Office. We will email you once it is verified, and then you can log in.', { reason: 'pending' });
+    }
     if (account.status === 'rejected') {
       throw new ApiError(403, 'Your registration was not approved. Please contact the Alumni Relations Office.', { reason: 'rejected' });
     }

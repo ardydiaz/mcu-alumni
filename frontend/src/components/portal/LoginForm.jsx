@@ -4,6 +4,27 @@ import Icon from '../ui/Icon.jsx';
 import Field from '../forms/Field.jsx';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import CheckEmail from '../../pages/portal/CheckEmail.jsx';
+import { Journey } from '../../pages/portal/portalShared.jsx';
+
+// Correct password, but the Alumni Relations Office hasn't verified the account yet: the portal stays closed
+// until then (the approval email tells them they can log in).
+function UnderReview({ onBack }) {
+  return (
+    <div className="portal-notice portal-notice--review">
+      <span className="portal-notice__icon portal-notice__icon--wait" aria-hidden="true"><Icon name="clock" size={28} /></span>
+      <h2>Your account is under review</h2>
+      <p>
+        Thank you for registering! The Alumni Relations Office is confirming your record as an MCU graduate.
+        We will email you once your account is verified, and then you can log in to the Alumni Portal.
+      </p>
+      <Journey current={2} />
+      <p className="muted">Questions? Email <a href="mailto:alumni@mcu.edu.ph">alumni@mcu.edu.ph</a>.</p>
+      <div className="portal-notice__actions">
+        <button type="button" className="btn btn-outline" onClick={onBack}>Back to log in</button>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Alumni Portal login form (in the login modal).
@@ -28,6 +49,7 @@ export default function LoginForm({ initialEmail = '', onSuccess, onRegister, on
   };
 
   if (state.reason === 'email_unverified') return <CheckEmail email={values.email} title="Verify your email first" onLogin={onLogin} />;
+  if (state.reason === 'pending') return <UnderReview onBack={() => setState({ busy: false, error: '', fields: {}, reason: null })} />;
 
   const forgot = `/portal/forgot-password${values.email ? `?email=${encodeURIComponent(values.email)}` : ''}`;
   return (
