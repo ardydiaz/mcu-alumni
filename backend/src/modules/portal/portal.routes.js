@@ -8,19 +8,20 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import { adminPanelOnly } from '../../middleware/role.middleware.js';
 import { validate, idParamSchema } from '../../middleware/validation.middleware.js';
 import { createRateLimiter } from '../../utils/helpers.js';
+import { withCaptcha } from '../../middleware/captcha.middleware.js'; // security code on register / resend / forgot password
 
 const router = Router();
 const staff = [authenticate, adminPanelOnly];
 
 // Alumni Portal (public + alumni session)
-router.post('/register', createRateLimiter({ max: 10 }), validate(registerSchema), portalController.register);
+router.post('/register', createRateLimiter({ max: 10 }), ...withCaptcha(validate(registerSchema)), portalController.register);
 router.post('/verify-email', createRateLimiter({ max: 20 }), validate(verifyEmailSchema), portalController.verifyEmail);
-router.post('/resend-verification', createRateLimiter({ max: 5 }), validate(resendSchema), portalController.resendVerification);
+router.post('/resend-verification', createRateLimiter({ max: 5 }), ...withCaptcha(validate(resendSchema)), portalController.resendVerification);
 router.post('/login', createRateLimiter({ max: 20 }), validate(loginSchema), portalController.login);
 router.get('/invite', createRateLimiter({ max: 30 }), validate(inviteTokenQuerySchema, 'query'), portalController.invitePreview);
 router.post('/activate', createRateLimiter({ max: 10 }), validate(activateSchema), portalController.activate);
 // Password: "Forgot password?" (rate-limited: the page says whether an email is registered), reset, change
-router.post('/forgot-password', createRateLimiter({ max: 5, message: 'Too many reset requests. Please try again in 15 minutes.' }), validate(forgotPasswordSchema), portalController.forgotPassword);
+router.post('/forgot-password', createRateLimiter({ max: 5, message: 'Too many reset requests. Please try again in 15 minutes.' }), ...withCaptcha(validate(forgotPasswordSchema)), portalController.forgotPassword);
 router.get('/reset-password', createRateLimiter({ max: 30 }), validate(inviteTokenQuerySchema, 'query'), portalController.checkResetToken);
 router.post('/reset-password', createRateLimiter({ max: 10 }), validate(resetPasswordSchema), portalController.resetPassword);
 router.post('/change-password', createRateLimiter({ max: 10 }), authenticateAlumni, validate(changePasswordSchema), portalController.changePassword);

@@ -486,6 +486,7 @@ html.evm-lock { overflow: hidden; scrollbar-gutter: stable; } /* keep the scroll
 .esp-notify__label { display: inline-flex; align-items: center; gap: 8px; flex: 1 1 320px; margin: 0; color: var(--ink-2); font-size: 0.88rem; font-weight: 500; }
 .esp-notify__label svg { flex: none; color: var(--gold-600); }
 .esp-notify__control { display: flex; gap: 8px; flex: 0 1 360px; min-width: 0; margin-left: auto; }
+.esp-notify .captcha { flex: 0 1 360px; max-width: 360px; margin-left: auto; } /* sits under the email box */
 .esp-notify__control input {
   flex: 1; min-width: 0; padding: 8px 16px; border-radius: 999px; border: 1px solid #e3e1e8; background: #fafafb;
   font: inherit; font-size: 0.86rem; color: var(--ink); transition: border-color 0.2s, box-shadow 0.2s;

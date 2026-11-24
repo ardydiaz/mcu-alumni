@@ -2,19 +2,29 @@ import { useState } from 'react';
 import PortalAuthLink from '../../components/portal/PortalAuthLink.jsx';
 import Icon from '../../components/ui/Icon.jsx';
 import { portalApi } from '../../api/portal.js';
+import { useCaptcha } from '../../hooks/useCaptcha.jsx';
 
 // "Check your email" panel, with a button to send the verification link again.
 // onLogin: in the login modal, switch to the login view instead of opening the login page.
 export default function CheckEmail({ email, title = 'Check your email', onLogin }) {
   const [state, setState] = useState({ busy: false, message: '' });
+  const captcha = useCaptcha();
 
   const resend = async () => {
     setState({ busy: true, message: '' });
+    let extra;
     try {
-      const res = await portalApi.resendVerification(email);
+      extra = await captcha.payload();
+    } catch {
+      return setState({ busy: false, message: '' }); // message shown under the check
+    }
+    try {
+      const res = await portalApi.resendVerification(email, extra);
       setState({ busy: false, message: res.message });
+      captcha.reset();
     } catch (err) {
-      setState({ busy: false, message: err.message });
+      setState({ busy: false, message: err.fields?.reason === 'captcha' ? '' : err.message });
+      captcha.fail(err);
     }
   };
 
@@ -26,6 +36,7 @@ export default function CheckEmail({ email, title = 'Check your email', onLogin 
         We sent a verification link to <strong>{email}</strong>. Click the link to confirm your email address. It expires in 24 hours.
       </p>
       <p className="muted">Didn't get it? Check your spam folder, or send the link again.</p>
+      {captcha.element}
       <div className="portal-notice__actions">
         <button type="button" className="btn btn-outline" onClick={resend} disabled={state.busy}>
           {state.busy ? 'Sending...' : 'Resend verification link'}

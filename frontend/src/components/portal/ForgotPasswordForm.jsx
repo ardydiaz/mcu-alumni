@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Icon from '../ui/Icon.jsx';
 import Field from '../forms/Field.jsx';
 import { portalApi } from '../../api/portal.js';
+import { useCaptcha } from '../../hooks/useCaptcha.jsx';
 
 /**
  * "Forgot your password?" in the Alumni Portal modal: enter the account email; if it's registered, a reset link
@@ -10,16 +11,26 @@ import { portalApi } from '../../api/portal.js';
 export default function ForgotPasswordForm({ initialEmail = '', onLogin, onRegister }) {
   const [email, setEmail] = useState(initialEmail);
   const [state, setState] = useState({ busy: false, error: '', notFound: false, sent: null, fieldError: undefined });
+  const captcha = useCaptcha();
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setState({ busy: true, error: '', notFound: false, sent: null });
+    let extra;
     try {
-      const res = await portalApi.forgotPassword(email.trim());
+      extra = await captcha.payload();
+    } catch {
+      return setState({ busy: false, error: '', notFound: false, sent: null }); // message shown under the check
+    }
+    try {
+      const res = await portalApi.forgotPassword(email.trim(), extra);
       setState({ busy: false, error: '', notFound: false, sent: { ...res.data, message: res.message } });
+      captcha.reset();
     } catch (err) {
       const notFound = err.status === 404;
-      setState({ busy: false, error: notFound ? '' : err.fields ? '' : err.message, notFound, sent: null, fieldError: notFound ? undefined : err.fields?.email });
+      const captchaError = err.fields?.reason === 'captcha';
+      setState({ busy: false, error: notFound || captchaError ? '' : err.fields ? '' : err.message, notFound, sent: null, fieldError: notFound ? undefined : err.fields?.email });
+      captcha.fail(err);
     }
   };
 
@@ -60,6 +71,7 @@ export default function ForgotPasswordForm({ initialEmail = '', onLogin, onRegis
           <button type="button" className="btn btn-outline btn-sm" onClick={onRegister}>Create an account</button>
         </div>
       )}
+      {captcha.element}
       <button type="submit" className="btn btn-primary btn-lg btn-block portal-form__submit" disabled={state.busy || !email.trim()}>
         {state.busy && <span className="spinner" aria-hidden="true" />} Send reset link
       </button>

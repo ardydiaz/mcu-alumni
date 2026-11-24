@@ -150,6 +150,9 @@ export async function getContent(name) {
 }
 
 export const submitForm = (type, data) => send(FORM_ENDPOINTS[type], { method: 'POST', body: data });
+
+// A new security code (self-hosted CAPTCHA) for the public forms: { enabled, id, image (SVG) }.
+export const getCaptcha = async () => (await send('/captcha')).data;
 export const unsubscribeEventAlerts = (token) => send('/event-alerts/unsubscribe', { method: 'POST', body: { token } });
 
 // Which sign-in methods are enabled: { password: boolean, microsoft: boolean }

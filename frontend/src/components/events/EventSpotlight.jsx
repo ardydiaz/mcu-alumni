@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Icon from '../ui/Icon.jsx';
 import FormStatus from '../forms/FormStatus.jsx';
 import { useForm } from '../../hooks/useForm.js';
+import { useCaptcha } from '../../hooks/useCaptcha.jsx';
 import { assetUrl } from '../../api/client.js';
 import { modalClick } from './EventCard.jsx';
 import { categoryOf, dayKey, todayKey, deadlineInfo, timeRange, monthShort, dayNumber, weekdayShort } from './eventUtils.js';
@@ -118,7 +119,8 @@ function Row({ event: e, registered, onOpen }) {
 
 // "Get notified" row under the empty state: saves the email; subscribers are emailed when a Homecoming event is published.
 function NotifyForm() {
-  const { field, status, onSubmit } = useForm('event-alert', { email: '' });
+  const captcha = useCaptcha();
+  const { field, status, onSubmit } = useForm('event-alert', { email: '' }, { captcha });
   const email = field('email');
   const busy = status.state === 'submitting';
   return (
@@ -145,6 +147,7 @@ function NotifyForm() {
         </button>
       </span>
       {email.error && <small id="esp-notify-error" className="esp-notify__error">{email.error}</small>}
+      {captcha.element}
       <FormStatus status={status} />
     </form>
   );

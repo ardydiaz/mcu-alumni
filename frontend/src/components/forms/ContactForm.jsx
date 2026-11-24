@@ -3,9 +3,11 @@ import Icon from '../ui/Icon.jsx';
 import FormStatus from './FormStatus.jsx';
 import SubmitButton from './SubmitButton.jsx';
 import { useForm } from '../../hooks/useForm.js';
+import { useCaptcha } from '../../hooks/useCaptcha.jsx';
 
 export default function ContactForm() {
-  const { field, status, onSubmit } = useForm('contact', { name: '', email: '', subject: '', message: '' });
+  const captcha = useCaptcha();
+  const { field, status, onSubmit } = useForm('contact', { name: '', email: '', subject: '', message: '' }, { captcha });
 
   return (
     <form onSubmit={onSubmit} className="form contact-form" noValidate>
@@ -15,6 +17,7 @@ export default function ContactForm() {
       </div>
       <Field label="Subject" placeholder="Alumni ID Inquiry / Batch Reunion / Giving" {...field('subject')} />
       <Field label="Message" as="textarea" placeholder="Write your message to the MCU Alumni Relations Office..." required {...field('message')} />
+      {captcha.element}
       <FormStatus status={status} />
       <SubmitButton status={status} className="btn-block contact-form__submit">
         Send message <Icon name="send" size={17} />

@@ -57,6 +57,7 @@ Copy `backend/.env.example` to `backend/.env`, then set:
 | `MAIL_FROM` `MAIL_FROM_NAME` | see section 5 | Leave `MAIL_FROM` empty to log emails instead of sending them |
 | `MESSAGE_NOTIFY_TO` | a test mailbox on staging | Receives "Leave us a message" notifications |
 | `UPLOAD_DIR` | `uploads` | Photos and cover images are stored in `backend/uploads/` |
+| `CAPTCHA_ENABLED` | `true` (default) | Built-in security check (distorted 5-digit code) on Register, Forgot password, Resend verification, "Leave us a message" and "Notify me". No outside service. Each code works once and expires after 10 minutes; used codes are remembered in memory, so run a single backend process. |
 
 Never commit `backend/.env`, and never paste its secrets into chats or tickets.
 

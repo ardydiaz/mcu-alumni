@@ -25,14 +25,15 @@ export function withFile(data, file, field = 'photo') {
 export const portalApi = {
   register: (data) => send('/portal/register', { method: 'POST', body: data }),
   verifyEmail: (token) => send('/portal/verify-email', { method: 'POST', body: { token } }),
-  resendVerification: (email) => send('/portal/resend-verification', { method: 'POST', body: { email } }),
+  // extra: { captchaToken } from the security check (see useCaptcha)
+  resendVerification: (email, extra = {}) => send('/portal/resend-verification', { method: 'POST', body: { email, ...extra } }),
   login: (credentials) => send('/portal/login', { method: 'POST', body: credentials }),
   // Portal invitation (record imported by the Alumni Office): who the link is for, then set a password.
   invitePreview: async (token) => (await send(`/portal/invite?token=${encodeURIComponent(token)}`)).data,
   activate: (data) => send('/portal/activate', { method: 'POST', body: data }),
   me: () => send('/portal/me', { token: portalSession.get() }),
   // Password: forgot / reset (from the emailed link) / change (logged in)
-  forgotPassword: (email) => send('/portal/forgot-password', { method: 'POST', body: { email } }),
+  forgotPassword: (email, extra = {}) => send('/portal/forgot-password', { method: 'POST', body: { email, ...extra } }),
   checkResetToken: async (token) => (await send(`/portal/reset-password?token=${encodeURIComponent(token)}`)).data,
   resetPassword: (data) => send('/portal/reset-password', { method: 'POST', body: data }),
   changePassword: (data) => send('/portal/change-password', { method: 'POST', body: data, token: portalSession.get() }),

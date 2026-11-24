@@ -23,10 +23,13 @@ import psgcRoutes from '../../modules/psgc/psgc.routes.js';
 import importRoutes from '../../modules/imports/import.routes.js';
 import alumniReportRoutes from '../../modules/alumniReports/alumniReport.routes.js';
 import eventAlertRoutes from '../../modules/eventAlerts/eventAlert.routes.js';
+import { captchaChallenge } from '../../middleware/captcha.middleware.js';
+import { createRateLimiter } from '../../utils/helpers.js';
 
 const router = Router();
 
 router.get('/', (req, res) => res.json({ success: true, message: 'MCU Alumni API v1', data: { version: 'v1' } }));
+router.get('/captcha', createRateLimiter({ windowMinutes: 15, max: 120 }), captchaChallenge); // new security code for the public forms
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);

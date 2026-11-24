@@ -5,11 +5,12 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import { adminPanelOnly } from '../../middleware/role.middleware.js';
 import { validate, idParamSchema } from '../../middleware/validation.middleware.js';
 import { createRateLimiter } from '../../utils/helpers.js';
+import { withCaptcha } from '../../middleware/captcha.middleware.js';
 
 const router = Router();
 
 // Public: "Leave us a message" form in the footer.
-router.post('/', createRateLimiter(), validate(createMessageSchema), messageController.create);
+router.post('/', createRateLimiter(), ...withCaptcha(validate(createMessageSchema)), messageController.create);
 
 // Staff: inbox.
 router.get('/', authenticate, adminPanelOnly, validate(listMessagesQuerySchema, 'query'), messageController.list);

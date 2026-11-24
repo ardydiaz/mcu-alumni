@@ -71,6 +71,12 @@ export const env = {
     messageNotify: (process.env.MESSAGE_NOTIFY_TO || 'alumni@mcu.edu.ph').split(',').map((s) => s.trim()).filter(Boolean),
   },
 
+  // Self-hosted CAPTCHA on the public forms (register, forgot password, resend verification,
+  // "Leave us a message", "Notify me"). On unless CAPTCHA_ENABLED=false.
+  captcha: {
+    enabled: process.env.CAPTCHA_ENABLED !== 'false',
+  },
+
   seedAdmin: {
     email: process.env.SEED_ADMIN_EMAIL || 'admin@mcu.edu.ph',
     fullname: process.env.SEED_ADMIN_FULLNAME || 'MCU Administrator',
@@ -79,7 +85,7 @@ export const env = {
   frontendDist: path.resolve(rootDir, '..', 'frontend', 'dist'),
 };
 
-env.mail.enabled = Boolean(env.mail.from && env.m365.tenantId && env.m365.clientId && env.m365.clientSecret);
+env.mail.enabled =Boolean(env.mail.from && env.m365.tenantId && env.m365.clientId && env.m365.clientSecret);
 
 env.m365.enabled =
   process.env.M365_ENABLED === 'true' && Boolean(env.m365.tenantId && env.m365.clientId && env.m365.clientSecret);

@@ -5,6 +5,7 @@ import FormStatus from '../forms/FormStatus.jsx';
 import SubmitButton from '../forms/SubmitButton.jsx';
 import DegreeField from '../forms/DegreeField.jsx';
 import { useForm } from '../../hooks/useForm.js';
+import { useCaptcha } from '../../hooks/useCaptcha.jsx';
 
 const initialValues = {
   fullName: '', studentNumber: '', program: '', yearGraduated: '', email: '', phone: '',
@@ -16,7 +17,8 @@ const initialValues = {
  * onRegistered(email): the verification link was sent. onLogin: switch to the login view in the modal (else a link).
  */
 export default function RegisterForm({ degreeGroups, onRegistered, onLogin }) {
-  const { values, errors, field, status, onSubmit } = useForm('portal-register', initialValues);
+  const captcha = useCaptcha();
+  const { values, errors, field, status, onSubmit } = useForm('portal-register', initialValues, { captcha });
   const submittedEmail = useRef('');
   const answer = (name, value) => field(name).onChange({ target: { name, value, type: 'text' } });
 
@@ -71,6 +73,7 @@ export default function RegisterForm({ degreeGroups, onRegistered, onLogin }) {
         {...field('consent')}
       />
 
+      {captcha.element}
       <FormStatus status={status} />
       <SubmitButton status={status} className="btn-lg btn-block portal-form__submit">Create my account</SubmitButton>
       <p className="portal-form__alt">

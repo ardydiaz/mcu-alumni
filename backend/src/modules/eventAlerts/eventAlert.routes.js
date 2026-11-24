@@ -5,6 +5,7 @@ import { adminPanelOnly } from '../../middleware/role.middleware.js';
 import { validate, idParamSchema, listQuerySchema, Joi } from '../../middleware/validation.middleware.js';
 import { asyncHandler, createRateLimiter, createCrudController } from '../../utils/helpers.js';
 import { sendSuccess } from '../../utils/response.js';
+import { withCaptcha } from '../../middleware/captcha.middleware.js';
 
 const subscribeSchema = Joi.object({ email: Joi.string().trim().lowercase().email().max(120).required() });
 const unsubscribeSchema = Joi.object({ token: Joi.string().hex().length(64).required() });
@@ -17,7 +18,7 @@ const router = Router();
 router.post(
   '/',
   createRateLimiter({ windowMinutes: 15, max: 10 }),
-  validate(subscribeSchema),
+  ...withCaptcha(validate(subscribeSchema)),
   asyncHandler(async (req, res) => {
     await eventAlertService.subscribe(req.body.email);
     sendSuccess(res, { message: "You're on the list! We'll email you when Grand Alumni Homecoming registration opens." });
