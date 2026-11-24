@@ -5,17 +5,31 @@ import AsyncContent from '../ui/AsyncContent.jsx';
 import LoginForm from './LoginForm.jsx';
 import RegisterForm from './RegisterForm.jsx';
 import CheckEmail from '../../pages/portal/CheckEmail.jsx';
+import { Journey } from '../../pages/portal/portalShared.jsx';
 import { useContent } from '../../hooks/useContent.js';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import { usePortalAuthModal } from './usePortalAuthModal.js';
 import '../../styles/portal.css';
 
+// Registration: the 4-step journey beside the form (on top on phones); step 2 lights up once the form is sent.
 function RegisterView({ onLogin }) {
   const options = useContent('form-options');
   const [registeredEmail, setRegisteredEmail] = useState(null);
-  if (registeredEmail) return <CheckEmail email={registeredEmail} onLogin={onLogin} />;
-  if (options.data?.degreeGroups) return <RegisterForm degreeGroups={options.data.degreeGroups} onRegistered={setRegisteredEmail} onLogin={onLogin} />;
-  return <AsyncContent state={options} skeleton={1}>{() => null}</AsyncContent>;
+
+  let content;
+  if (registeredEmail) content = <CheckEmail email={registeredEmail} onLogin={onLogin} />;
+  else if (options.data?.degreeGroups) content = <RegisterForm degreeGroups={options.data.degreeGroups} onRegistered={setRegisteredEmail} onLogin={onLogin} />;
+  else content = <AsyncContent state={options} skeleton={1}>{() => null}</AsyncContent>;
+
+  return (
+    <div className="pam__split">
+      <aside className="pam__journey" aria-label="How registration works">
+        <span className="pam__journey-label">How it works</span>
+        <Journey current={registeredEmail ? 1 : 0} />
+      </aside>
+      <div className="pam__main">{content}</div>
+    </div>
+  );
 }
 
 export default function PortalAuthModal() {
@@ -55,7 +69,9 @@ export default function PortalAuthModal() {
       onClick={(e) => e.target === ref.current && close()}
     >
       {show && (
-        <div className="pam__panel">
+        // autoFocus: the dialog starts on its content, not the close button; Tab still reaches every control.
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        <div className="pam__panel" tabIndex={-1} autoFocus>
           <header className="pam__head">
             <div>
               <span className="pam__eyebrow">Centralino access</span>
@@ -66,7 +82,7 @@ export default function PortalAuthModal() {
               <Icon name="close" size={18} />
             </button>
           </header>
-          <div className="pam__body">
+          <div className={`pam__body${register ? ' pam__body--split' : ''}`}>
             {register ? (
               <RegisterView key="register" onLogin={() => open('login')} />
             ) : (

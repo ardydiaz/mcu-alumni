@@ -4,6 +4,17 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 const MODES = ['login', 'register'];
 
 /**
+ * onClick for a <Link to="/portal/login"> (or register) that should open the modal instead.
+ * A plain click opens the modal; Ctrl/Cmd/Shift/middle-click still opens the full page (e.g. in a new tab).
+ */
+export const modalLink = (openModal) => (e) => {
+  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  e.currentTarget.blur(); // closes a hover/focus dropdown behind the modal
+  openModal();
+};
+
+/**
  * Header "Alumni Login" / "Create Account" open in a modal on the current page, kept in the address bar as
  * ?portal=login|register: Back closes it, and switching between login and register replaces the entry.
  */

@@ -133,7 +133,7 @@
 .ev-empty__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
 
 /* ---- Event modal (events page, homepage, portal) ----------------------------- */
-html.evm-lock { overflow: hidden; }
+html.evm-lock { overflow: hidden; scrollbar-gutter: stable; } /* keep the scrollbar's space so the page behind doesn't reflow */
 .evm {
   width: min(980px, calc(100vw - 32px)); max-width: none; max-height: calc(100vh - 48px); max-height: calc(100dvh - 48px);
   margin: auto; padding: 0; border: 0; border-radius: 28px; overflow: hidden;

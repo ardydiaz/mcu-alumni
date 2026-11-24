@@ -122,15 +122,45 @@
   margin: auto; padding: 0; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 26px; overflow: hidden;
   background: #fff; color: var(--ink); box-shadow: 0 40px 80px -30px rgba(27, 16, 36, 0.6);
 }
-.pam--wide { width: min(720px, calc(100vw - 24px)); }
+.pam--wide { width: min(980px, calc(100vw - 24px)); }
+/* Register: journey column + form. The whole body scrolls on phones; on desktop only the form scrolls. */
+.pam__body.pam__body--split { padding: 0; display: flex; flex-direction: column; min-height: 0; }
+.pam__split { display: grid; grid-template-columns: 270px minmax(0, 1fr); min-height: 0; flex: 1; }
+.pam__journey { padding: 26px 24px; background: #f8f5fb; border-right: 1px solid #efe9f4; }
+.pam__journey-label { display: block; margin-bottom: 18px; color: var(--purple-800); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.pam__journey .portal-journey strong { font-size: 0.92rem; }
+.pam__journey .portal-journey li > div span { font-size: 0.82rem; line-height: 1.45; }
+.pam__journey .portal-journey li { padding-bottom: 22px; }
+.pam__journey .portal-journey li:last-child { padding-bottom: 0; }
+.pam__main { padding: 24px 26px 26px; min-width: 0; }
+@media (min-width: 761px) {
+  .pam__body.pam__body--split { overflow: hidden; }
+  .pam__split { overflow: hidden; }
+  .pam__journey { position: relative; }
+  .pam__main { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(92, 41, 124, 0.35) transparent; }
+}
+@media (max-width: 760px) {
+  /* Compact row of numbered steps above the form; only the current step's title shows */
+  .pam__split { grid-template-columns: minmax(0, 1fr); }
+  .pam__journey { padding: 14px 18px; border-right: 0; border-bottom: 1px solid #efe9f4; }
+  .pam__journey-label { display: none; }
+  .pam__journey .portal-journey { display: flex; align-items: flex-start; }
+  .pam__journey .portal-journey li { flex: 1; flex-direction: column; align-items: center; gap: 6px; padding: 0; text-align: center; }
+  .pam__journey .portal-journey li:not(:last-child)::after { left: calc(50% + 20px); right: calc(-50% + 20px); top: 15px; bottom: auto; width: auto; height: 2px; }
+  .pam__journey .portal-journey li > div span { display: none; }
+  .pam__journey .portal-journey strong { font-size: 0.72rem; font-weight: 600; color: var(--muted); line-height: 1.25; }
+  .pam__journey .portal-journey li.is-current strong { color: var(--purple-700); font-weight: 800; }
+  .pam__main { padding: 20px 18px; }
+}
 .pam::backdrop { background: rgba(46, 0, 70, 0.45); backdrop-filter: blur(6px); }
 .pam[open] { animation: pam-in 0.28s var(--ease); }
 .pam[open]::backdrop { animation: pam-fade 0.28s ease; }
 @keyframes pam-in { from { opacity: 0; transform: translateY(18px) scale(0.98); } }
 @keyframes pam-fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .pam[open], .pam[open]::backdrop { animation: none; } }
-html.evm-lock { overflow: hidden; }
+html.evm-lock { overflow: hidden; scrollbar-gutter: stable; } /* keep the scrollbar's space so the page behind doesn't reflow */
 .pam__panel { display: flex; flex-direction: column; max-height: inherit; }
+.pam__panel:focus { outline: none; }
 .pam__head {
   flex: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 28px 24px 22px;
   background: linear-gradient(120deg, #2e0d4c 0%, #3d1263 55%, #2a0b45 100%); color: #fff;
@@ -144,7 +174,7 @@ html.evm-lock { overflow: hidden; }
 }
 .pam__close:hover { background: rgba(255, 255, 255, 0.26); transform: rotate(90deg); }
 .pam__close:focus-visible { outline: 3px solid var(--gold-500); outline-offset: 2px; }
-.pam__body { overflow-y: auto; overscroll-behavior: contain; padding: 24px; scrollbar-width: thin; scrollbar-color: rgba(92, 41, 124, 0.35) transparent; }
+.pam__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px; scrollbar-width: thin; scrollbar-color: rgba(92, 41, 124, 0.35) transparent; }
 .pam .portal-form { gap: 16px; }
 .pam .portal-form .field label { font-size: 0.84rem; font-weight: 700; color: var(--ink); }
 .pam .portal-form .field input, .pam .portal-form .field select { background: #f7f8fa; border: 1px solid #e3e5ea; border-radius: 12px; }

@@ -4,7 +4,7 @@ import Icon from '../ui/Icon.jsx';
 import { navigation, portalMenu } from './navigation.js';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import PortalAvatar from '../portal/PortalAvatar.jsx';
-import { usePortalAuthModal } from '../portal/usePortalAuthModal.js';
+import { usePortalAuthModal, modalLink } from '../portal/usePortalAuthModal.js';
 
 const LOGO = 'https://alumni.mcu.edu.ph/wp-content/uploads/2023/11/header-logo.png';
 
@@ -39,14 +39,6 @@ function who(fullName = '') {
 // One account button for everything alumni do on the site.
 //   Logged out: "Alumni Portal" -> what you can do + Log in / Create an account.
 //   Logged in:  "Hi, Ardy" -> portal pages + Log out.
-// Plain click opens the modal; Ctrl/Cmd/middle-click still opens the full page in a new tab.
-const modalLink = (openModal) => (e) => {
-  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-  e.preventDefault();
-  e.currentTarget.blur(); // closes the hover/focus dropdown behind the modal
-  openModal();
-};
-
 function AccountMenu({ portal, onLogout, onOpenModal }) {
   const { pathname } = useLocation();
   const signedIn = portal.status === 'authenticated';

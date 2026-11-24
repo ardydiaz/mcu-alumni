@@ -6,6 +6,7 @@ import HeroSlider from '../../components/ui/HeroSlider.jsx';
 import { useContent } from '../../hooks/useContent.js';
 import { useReveal } from '../../hooks/useReveal.js';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
+import { usePortalAuthModal, modalLink } from '../../components/portal/usePortalAuthModal.js';
 import { assetUrl } from '../../api/client.js';
 import { campaignIcons } from '../../components/ui/campaignIcons.js';
 import EventSpotlight from '../../components/events/EventSpotlight.jsx';
@@ -289,6 +290,7 @@ const PORTAL_ACTIONS = [
 function PortalBand({ image }) {
   const { status } = usePortalAuth();
   const signedIn = status === 'authenticated';
+  const authModal = usePortalAuthModal();
 
   return (
     <section className="home-section home-section--purple home-portal">
@@ -304,8 +306,12 @@ function PortalBand({ image }) {
               <Link to="/portal/account" className="btn btn-gold btn-lg">Go to my account <Icon name="arrowRight" size={18} /></Link>
             ) : (
               <>
-                <Link to="/portal/register" className="btn btn-gold btn-lg">Create an account <Icon name="arrowRight" size={18} /></Link>
-                <Link to="/portal/login" className="btn btn-outline-light btn-lg">Alumni Login</Link>
+                <Link to="/portal/register" onClick={modalLink(() => authModal.open('register'))} className="btn btn-gold btn-lg" aria-haspopup="dialog">
+                  Create an account <Icon name="arrowRight" size={18} />
+                </Link>
+                <Link to="/portal/login" onClick={modalLink(() => authModal.open('login'))} className="btn btn-outline-light btn-lg" aria-haspopup="dialog">
+                  Alumni Login
+                </Link>
               </>
             )}
           </div>
