@@ -27,8 +27,8 @@ export const portalMenu = [
 
 // Footer "Alumni Portal" column. The update / tracer links ask visitors to log in first.
 export const portalFooter = [
-  { label: 'Log in', to: '/portal/login' },
-  { label: 'Create an account', to: '/portal/register' },
+  { label: 'Log in', to: '/portal/login', modal: 'login' }, // opens the login modal on the current page
+  { label: 'Create an account', to: '/portal/register', modal: 'register' },
   { label: 'Update your information', to: '/alumni-contact-update' },
   { label: 'Graduate Tracer', to: '/graduate-tracer' },
 ];

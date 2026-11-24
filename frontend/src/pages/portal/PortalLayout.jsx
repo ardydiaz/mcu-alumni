@@ -31,7 +31,7 @@ export function displayName(fullName = '') {
 
 // Shell for signed-in portal pages: sidebar + the current page.
 export default function PortalLayout() {
-  const { status, account, logout, refresh } = usePortalAuth();
+  const { status, account, logout, refresh, loggedOut } = usePortalAuth();
   const { pathname } = useLocation();
 
   // Pick up a review that happened since login (pending -> verified).
@@ -44,7 +44,10 @@ export default function PortalLayout() {
   }, [pathname]);
 
   if (status === 'loading') return <FullPageLoader />;
-  if (status !== 'authenticated') return <Navigate to="/portal/login" replace />;
+  // Just logged out: the homepage (with a "logged out" message), not a login prompt.
+  if (status !== 'authenticated' && loggedOut) return <Navigate to="/" replace />;
+  // Not logged in (e.g. a bookmarked portal page): the login modal over the Alumni Portal page, then back here.
+  if (status !== 'authenticated') return <Navigate to={`/portal/login?next=${encodeURIComponent(pathname)}`} replace />;
 
   return (
     <div className="portal portal-page portal-dash-page">

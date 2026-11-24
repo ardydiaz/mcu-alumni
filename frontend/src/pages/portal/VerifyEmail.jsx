@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Icon from '../../components/ui/Icon.jsx';
 import { portalApi } from '../../api/portal.js';
 import { Journey } from './portalShared.jsx';
+import PortalAuthLink from '../../components/portal/PortalAuthLink.jsx';
 import '../../styles/portal.css';
 
 // Landing page for the link in the verification email: /portal/verify?token=...
@@ -37,7 +38,7 @@ export default function VerifyEmail() {
             <p>{state.message} We will email you once your account is verified.</p>
             <Journey current={2} />
             <div className="portal-notice__actions">
-              <Link to="/portal/login" className="btn btn-primary">Log in to check your status</Link>
+              <PortalAuthLink mode="login" className="btn btn-primary">Log in to check your status</PortalAuthLink>
             </div>
           </div>
         )}
@@ -48,7 +49,7 @@ export default function VerifyEmail() {
             <p>{state.message}</p>
             <p className="muted">If you already verified your email, you can log in. Otherwise, log in to request a new link.</p>
             <div className="portal-notice__actions">
-              <Link to="/portal/login" className="btn btn-primary">Go to login</Link>
+              <PortalAuthLink mode="login" className="btn btn-primary">Go to login</PortalAuthLink>
             </div>
           </div>
         )}

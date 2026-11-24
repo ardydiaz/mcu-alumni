@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Icon from '../../components/ui/Icon.jsx';
 import Field from '../../components/forms/Field.jsx';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import { portalApi } from '../../api/portal.js';
+import PortalAuthLink from '../../components/portal/PortalAuthLink.jsx';
 import '../../styles/portal.css';
 
 // Landing page for the portal invitation email: /portal/activate?token=...
@@ -51,8 +52,8 @@ export default function Activate() {
             <h2>This link can't be used</h2>
             <p>{loadError}</p>
             <div className="portal-notice__actions">
-              <Link to="/portal/login" className="btn btn-primary">Log in</Link>
-              <Link to="/portal/register" className="btn btn-outline">Register instead</Link>
+              <PortalAuthLink mode="login" className="btn btn-primary">Log in</PortalAuthLink>
+              <PortalAuthLink mode="register" className="btn btn-outline">Register instead</PortalAuthLink>
             </div>
           </div>
         )}

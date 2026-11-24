@@ -1,7 +1,9 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar.jsx';
 import Footer from '../components/layout/Footer.jsx';
+import FormStatus from '../components/forms/FormStatus.jsx';
+import { usePortalAuth } from '../context/PortalAuthContext.jsx';
 import { usePortalAuthModal } from '../components/portal/usePortalAuthModal.js';
 
 // Login / register modal: its code loads the first time someone opens it.
@@ -38,6 +40,13 @@ export default function PublicLayout() {
     if (mode) setModalUsed(true); // keep it mounted afterwards so it can close and reopen smoothly
   }, [mode]);
 
+  // "You've been logged out" toast, once per logout (from the header menu or the portal sidebar).
+  const { loggedOut } = usePortalAuth();
+  const logoutNotice = useMemo(
+    () => (loggedOut ? { state: 'success', message: "You've been logged out. See you again, Centralino!" } : { state: 'idle' }),
+    [loggedOut]
+  );
+
   return (
     <>
       <a href="#main" className="skip-link">Skip to content</a>
@@ -46,6 +55,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <Footer />
+      <FormStatus status={logoutNotice} />
       {(mode || modalUsed) && (
         <Suspense fallback={null}>
           <PortalAuthModal />

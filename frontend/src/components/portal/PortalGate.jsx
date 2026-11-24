@@ -1,4 +1,5 @@
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import PortalAuthLink from './PortalAuthLink.jsx';
 import PageHero from '../ui/PageHero.jsx';
 import Icon from '../ui/Icon.jsx';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
@@ -13,7 +14,6 @@ export default function PortalGate({ to, eyebrow, title, subtitle, heading, text
   const { status } = usePortalAuth();
   if (status === 'authenticated') return <Navigate to={to} replace />;
 
-  const next = encodeURIComponent(to);
   return (
     <>
       <PageHero eyebrow={eyebrow} title={title} subtitle={subtitle} />
@@ -28,10 +28,11 @@ export default function PortalGate({ to, eyebrow, title, subtitle, heading, text
                 <h2>{heading}</h2>
                 <p>{text}</p>
                 <div className="gate-card__actions">
-                  <Link to={`/portal/login?next=${next}`} className="btn btn-primary btn-lg">
+                  {/* After logging in they stay here, and this gate sends them on to the portal page */}
+                  <PortalAuthLink mode="login" stay className="btn btn-primary btn-lg">
                     <Icon name="users" size={18} /> Log in to continue
-                  </Link>
-                  <Link to="/portal/register" className="btn btn-outline btn-lg">Create my account</Link>
+                  </PortalAuthLink>
+                  <PortalAuthLink mode="register" className="btn btn-outline btn-lg">Create my account</PortalAuthLink>
                 </div>
                 <p className="gate-card__note">
                   <Icon name="mail" size={16} />

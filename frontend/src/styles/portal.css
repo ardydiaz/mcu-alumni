@@ -114,7 +114,11 @@
 .portal-form__alt .link-btn { border: 0; background: none; padding: 0; color: var(--purple-700); font: inherit; font-weight: 700; cursor: pointer; }
 .portal-form__alt .link-btn:hover { text-decoration: underline; }
 .portal-form__forgot { margin: -8px 0 0; text-align: right; font-size: 0.84rem; }
-.portal-form__forgot a { color: var(--purple-700); font-weight: 600; }
+.portal-form__forgot a, .portal-form__forgot .link-btn { border: 0; background: none; padding: 0; color: var(--purple-700); font: inherit; font-weight: 600; cursor: pointer; }
+.portal-form__forgot .link-btn:hover { text-decoration: underline; }
+.portal-form__intro { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.55; }
+.portal-form__alt--small { font-size: 0.8rem; line-height: 1.5; }
+.portal-form__alt--small a { color: var(--purple-700); font-weight: 700; }
 
 /* ---- Login / register modal from the header ("pam") ------------------------- */
 .pam {
@@ -158,7 +162,68 @@
 @keyframes pam-in { from { opacity: 0; transform: translateY(18px) scale(0.98); } }
 @keyframes pam-fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .pam[open], .pam[open]::backdrop { animation: none; } }
-html.evm-lock { overflow: hidden; scrollbar-gutter: stable; } /* keep the scrollbar's space so the page behind doesn't reflow */
+/* ---- "Welcome back" screen after a successful login ("pll") ------------------- */
+html.pll-lock { overflow: hidden; }
+.pll {
+  position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 24px;
+  border: 0; display: grid; place-items: center; overflow: hidden; color: #fff;
+  background: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.06) 1px, transparent 0) 0 0 / 22px 22px,
+    linear-gradient(140deg, #2a0b45 0%, #3d1263 45%, #250a3b 100%);
+  animation: pll-in 0.35s ease both;
+}
+.pll::backdrop { background: transparent; }
+.pll.is-leaving { animation: pll-out 0.35s ease both; }
+@keyframes pll-in { from { opacity: 0; } }
+@keyframes pll-out { to { opacity: 0; visibility: hidden; } }
+
+/* Soft moving colour glows */
+.pll__glow { position: absolute; width: 520px; height: 520px; border-radius: 50%; filter: blur(80px); opacity: 0.55; pointer-events: none; }
+.pll__glow--a { top: -160px; left: -120px; background: #6b2a94; animation: pll-float 6s ease-in-out infinite alternate; }
+.pll__glow--b { bottom: -200px; right: -140px; background: #8a3d55; animation: pll-float 7s ease-in-out infinite alternate-reverse; }
+@keyframes pll-float { to { transform: translate(60px, 40px) scale(1.08); } }
+
+.pll__inner { position: relative; display: grid; justify-items: center; gap: 6px; width: min(420px, 100%); text-align: center; animation: pll-rise 0.5s 0.05s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes pll-rise { from { opacity: 0; transform: translateY(14px) scale(0.98); } }
+.pll__logo { height: 46px; width: auto; margin-bottom: 26px; opacity: 0.95; }
+
+/* Avatar inside a spinning gold ring, with a check badge that pops in */
+.pll__ring { position: relative; display: grid; place-items: center; width: 112px; height: 112px; margin-bottom: 18px; }
+.pll__spin {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 25%, rgba(255, 183, 54, 0.15) 35%, #ffb736 75%, #ffd62e 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  animation: pll-spin 1s linear infinite;
+}
+@keyframes pll-spin { to { transform: rotate(360deg); } }
+.pll__avatar {
+  display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%; overflow: hidden;
+  background: linear-gradient(135deg, #ffb736, #f0a733); color: #2e0046; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08);
+}
+.pll__avatar b { font-size: 1.6rem; font-weight: 900; letter-spacing: 0.02em; }
+.pll__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.pll__avatar.has-photo { background: #fff; }
+.pll__check {
+  position: absolute; right: 6px; bottom: 6px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: #22a35a; color: #fff; border: 3px solid #36104f; animation: pll-pop 0.45s 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes pll-pop { from { transform: scale(0); } }
+
+.pll__eyebrow { color: var(--gold-500); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.pll h2 { margin: 4px 0 0; color: #fff; font-size: clamp(1.6rem, 4vw, 2.1rem); letter-spacing: -0.02em; }
+.pll p { margin: 4px 0 0; color: rgba(255, 255, 255, 0.75); font-size: 0.98rem; }
+
+/* Progress bar that fills over the screen's duration */
+.pll__bar { width: min(240px, 70%); height: 4px; margin-top: 24px; border-radius: 999px; background: rgba(255, 255, 255, 0.14); overflow: hidden; }
+.pll__bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ffb736, #ffd62e); transform-origin: left; animation: pll-fill var(--pll-duration, 3000ms) cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@keyframes pll-fill { from { transform: scaleX(0.04); } to { transform: scaleX(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pll, .pll.is-leaving, .pll__inner, .pll__check, .pll__glow { animation: none; }
+  .pll__spin { animation-duration: 3s; }
+}
+
+html.pam-lock { overflow: hidden; scrollbar-gutter: stable; } /* keep the scrollbar's space so the page behind doesn't reflow */
 .pam__panel { display: flex; flex-direction: column; max-height: inherit; }
 .pam__panel:focus { outline: none; }
 .pam__head {

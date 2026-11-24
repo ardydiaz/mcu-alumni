@@ -42,9 +42,11 @@ export function PortalAuthProvider({ children }) {
     return res;
   }, []);
 
+  // loggedOut: when the alumnus logged out on purpose (vs. never logged in / session expired). Portal pages
+  // then go to the homepage with a "You've been logged out" message instead of asking to log in again.
   const logout = useCallback(() => {
     portalSession.set(null);
-    setState({ account: null, status: 'anonymous' });
+    setState({ account: null, status: 'anonymous', loggedOut: Date.now() });
   }, []);
 
   const value = useMemo(() => ({ ...state, login, activate, logout, refresh }), [state, login, activate, logout, refresh]);

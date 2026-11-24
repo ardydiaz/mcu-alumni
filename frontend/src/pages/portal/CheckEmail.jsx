@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import PortalAuthLink from '../../components/portal/PortalAuthLink.jsx';
 import Icon from '../../components/ui/Icon.jsx';
 import { portalApi } from '../../api/portal.js';
 
@@ -33,7 +33,7 @@ export default function CheckEmail({ email, title = 'Check your email', onLogin 
         {onLogin ? (
           <button type="button" className="btn btn-primary" onClick={onLogin}>Go to login</button>
         ) : (
-          <Link to="/portal/login" className="btn btn-primary">Go to login</Link>
+          <PortalAuthLink mode="login" className="btn btn-primary">Go to login</PortalAuthLink>
         )}
       </div>
       {state.message && <p className="portal-notice__msg" role="status"><Icon name="check" size={15} /> {state.message}</p>}

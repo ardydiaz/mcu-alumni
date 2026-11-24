@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import PortalAuthLink from '../../components/portal/PortalAuthLink.jsx';
 import PageHero from '../../components/ui/PageHero.jsx';
 import Icon from '../../components/ui/Icon.jsx';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
@@ -72,8 +73,8 @@ export default function PortalHome() {
           <Link to="/portal/account" className="btn btn-gold btn-lg"><Icon name="users" size={18} /> My account</Link>
         ) : (
           <>
-            <Link to="/portal/login" className="btn btn-gold btn-lg"><Icon name="users" size={18} /> Alumni Login</Link>
-            <Link to="/portal/register" className="btn btn-outline-light btn-lg">Register / Create Account</Link>
+            <PortalAuthLink mode="login" className="btn btn-gold btn-lg"><Icon name="users" size={18} /> Alumni Login</PortalAuthLink>
+            <PortalAuthLink mode="register" className="btn btn-outline-light btn-lg">Register / Create Account</PortalAuthLink>
           </>
         )}
       </PageHero>
@@ -84,22 +85,22 @@ export default function PortalHome() {
             <SignedInCard account={account} />
           ) : (
             <div className="portal-access">
-              <Link to="/portal/login" className="portal-access__card" data-reveal>
+              <PortalAuthLink mode="login" className="portal-access__card" data-reveal>
                 <span className="portal-access__icon" aria-hidden="true"><Icon name="users" size={26} /></span>
                 <span>
                   <strong>Alumni Login</strong>
                   <small>Already registered? Log in to your account.</small>
                 </span>
                 <Icon name="arrowRight" size={20} />
-              </Link>
-              <Link to="/portal/register" className="portal-access__card portal-access__card--gold" data-reveal style={{ '--delay': '90ms' }}>
+              </PortalAuthLink>
+              <PortalAuthLink mode="register" className="portal-access__card portal-access__card--gold" data-reveal style={{ '--delay': '90ms' }}>
                 <span className="portal-access__icon" aria-hidden="true"><Icon name="plus" size={26} /></span>
                 <span>
                   <strong>Register / Create Account</strong>
                   <small>New to the portal? It takes about 3 minutes.</small>
                 </span>
                 <Icon name="arrowRight" size={20} />
-              </Link>
+              </PortalAuthLink>
             </div>
           )}
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../ui/Icon.jsx';
 import ContactForm from '../forms/ContactForm.jsx';
+import PortalAuthLink from '../portal/PortalAuthLink.jsx';
 import { useContent } from '../../hooks/useContent.js';
 import { navigation, portalFooter } from './navigation.js';
 
@@ -119,7 +120,7 @@ export default function Footer() {
           <h3>Alumni Portal</h3>
           <ul>
             {portalFooter.map((l) => (
-              <li key={l.to}><Link to={l.to}>{l.label}</Link></li>
+              <li key={l.to}>{l.modal ? <PortalAuthLink mode={l.modal}>{l.label}</PortalAuthLink> : <Link to={l.to}>{l.label}</Link>}</li>
             ))}
           </ul>
         </div>

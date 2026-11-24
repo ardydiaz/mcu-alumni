@@ -15,6 +15,7 @@ import TransparencyReports from '../pages/public/TransparencyReports.jsx';
 import ContactUpdate from '../pages/public/ContactUpdate.jsx';
 import GraduateTracer from '../pages/public/GraduateTracer.jsx';
 import NotFound from '../pages/public/NotFound.jsx';
+import PortalAuthRoute from '../components/portal/PortalAuthRoute.jsx';
 
 // Alumni events calendar
 const Events = lazy(() => import('../pages/public/Events.jsx'));
@@ -23,10 +24,7 @@ const EventAlertsUnsubscribe = lazy(() => import('../pages/public/EventAlertsUns
 
 // Alumni Portal
 const PortalHome = lazy(() => import('../pages/portal/PortalHome.jsx'));
-const PortalRegister = lazy(() => import('../pages/portal/Register.jsx'));
-const PortalLogin = lazy(() => import('../pages/portal/PortalLogin.jsx'));
 const PortalVerify = lazy(() => import('../pages/portal/VerifyEmail.jsx'));
-const PortalForgotPassword = lazy(() => import('../pages/portal/ForgotPassword.jsx'));
 const PortalResetPassword = lazy(() => import('../pages/portal/ResetPassword.jsx'));
 const PortalActivate = lazy(() => import('../pages/portal/Activate.jsx'));
 const PortalAccount = lazy(() => import('../pages/portal/Account.jsx'));
@@ -92,10 +90,11 @@ export default function AppRoutes() {
           <Route path="events/:slug" element={<EventDetail />} />
           <Route path="event-alerts/unsubscribe" element={<EventAlertsUnsubscribe />} />
           <Route path="portal" element={<PortalHome />} />
-          <Route path="portal/register" element={<PortalRegister />} />
-          <Route path="portal/login" element={<PortalLogin />} />
+          {/* Login, registration and forgot password are modals: these addresses open them (see PortalAuthRoute) */}
+          <Route path="portal/register" element={<PortalAuthRoute mode="register" />} />
+          <Route path="portal/login" element={<PortalAuthRoute mode="login" />} />
+          <Route path="portal/forgot-password" element={<PortalAuthRoute mode="forgot" />} />
           <Route path="portal/verify" element={<PortalVerify />} />
-          <Route path="portal/forgot-password" element={<PortalForgotPassword />} />
           <Route path="portal/reset-password" element={<PortalResetPassword />} />
           <Route path="portal/activate" element={<PortalActivate />} />
           {/* Signed-in portal pages open inside the portal (sidebar layout) */}

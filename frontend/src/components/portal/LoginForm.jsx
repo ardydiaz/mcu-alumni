@@ -6,10 +6,10 @@ import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
 import CheckEmail from '../../pages/portal/CheckEmail.jsx';
 
 /**
- * Alumni Portal login form, used on /portal/login and in the header login modal.
- * onSuccess(): after a successful login. onRegister / onLogin: switch views inside the modal (else links are used).
+ * Alumni Portal login form (in the login modal).
+ * onSuccess(): after a successful login. onRegister / onForgot / onLogin: switch views inside the modal.
  */
-export default function LoginForm({ initialEmail = '', onSuccess, onRegister, onLogin, submitLabel = 'Log in', placeholders = false }) {
+export default function LoginForm({ initialEmail = '', onSuccess, onRegister, onForgot, onLogin, submitLabel = 'Log in', placeholders = false }) {
   const { login } = usePortalAuth();
   const [values, setValues] = useState({ email: initialEmail, password: '' });
   const [state, setState] = useState({ busy: false, error: '', fields: {}, reason: null });
@@ -20,8 +20,8 @@ export default function LoginForm({ initialEmail = '', onSuccess, onRegister, on
     e.preventDefault();
     setState({ busy: true, error: '', fields: {}, reason: null });
     try {
-      await login(values);
-      onSuccess?.();
+      const account = await login(values);
+      onSuccess?.(account);
     } catch (err) {
       setState({ busy: false, error: err.message, fields: err.fields?.reason ? {} : err.fields || {}, reason: err.fields?.reason || null });
     }
@@ -55,7 +55,9 @@ export default function LoginForm({ initialEmail = '', onSuccess, onRegister, on
         onChange={onChange}
         error={state.fields.password}
       />
-      <p className="portal-form__forgot"><Link to={forgot}>Forgot your password?</Link></p>
+      <p className="portal-form__forgot">
+        {onForgot ? <button type="button" className="link-btn" onClick={() => onForgot(values.email.trim())}>Forgot your password?</button> : <Link to={forgot}>Forgot your password?</Link>}
+      </p>
       <button type="submit" className="btn btn-primary btn-lg btn-block portal-form__submit" disabled={state.busy}>
         {state.busy && <span className="spinner" aria-hidden="true" />} {submitLabel}
       </button>

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Icon from '../../components/ui/Icon.jsx';
 import Field from '../../components/forms/Field.jsx';
 import { portalApi } from '../../api/portal.js';
+import PortalAuthLink from '../../components/portal/PortalAuthLink.jsx';
 import '../../styles/portal.css';
 
 // /portal/reset-password?token=...: the link from the "Reset your password" email. Works once, for 1 hour.
@@ -42,8 +43,8 @@ export default function ResetPassword() {
             <h2>This link can't be used</h2>
             <p>{linkError}</p>
             <div className="portal-notice__actions">
-              <Link to="/portal/forgot-password" className="btn btn-primary">Request a new link</Link>
-              <Link to="/portal/login" className="btn btn-outline">Log in</Link>
+              <PortalAuthLink mode="forgot" className="btn btn-primary">Request a new link</PortalAuthLink>
+              <PortalAuthLink mode="login" className="btn btn-outline">Log in</PortalAuthLink>
             </div>
           </div>
         ) : state.done ? (
@@ -52,7 +53,7 @@ export default function ResetPassword() {
             <h2>Password changed</h2>
             <p>You can now log in with your new password. For your security, any device that was logged in has been signed out.</p>
             <div className="portal-notice__actions">
-              <Link to={`/portal/login${who?.email ? `?email=${encodeURIComponent(who.email)}` : ''}`} className="btn btn-primary">Log in</Link>
+              <PortalAuthLink mode="login" email={who?.email} className="btn btn-primary">Log in</PortalAuthLink>
             </div>
           </div>
         ) : !who ? (

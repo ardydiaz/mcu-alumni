@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import Icon from '../ui/Icon.jsx';
+import PortalAuthLink from '../portal/PortalAuthLink.jsx';
 import { getEvent, eventIcsUrl } from '../../api/client.js';
 import { portalApi } from '../../api/portal.js';
 import { usePortalAuth } from '../../context/PortalAuthContext.jsx';
@@ -80,7 +80,6 @@ export function PortalRegistration({ event, onChange, bare = false }) {
   };
 
   const spots = event.capacity ? `${event.spotsLeft.toLocaleString()} of ${event.capacity.toLocaleString()} slots left` : `${event.registeredCount.toLocaleString()} registered`;
-  const next = encodeURIComponent(`/events/${event.slug}`);
 
   return (
     <div className={bare ? 'ev-register ev-register--bare' : 'ev-register'}>
@@ -98,8 +97,9 @@ export function PortalRegistration({ event, onChange, bare = false }) {
           <p className="ev-register__closed">{event.registrationClosed}</p>
         ) : (
           <>
-            <Link to={`/portal/login?next=${next}`} className="btn btn-gold btn-lg btn-block">Log in to register</Link>
-            <p className="ev-register__hint">Registration is for MCU alumni with an Alumni Portal account. <Link to="/portal/register">Create one</Link></p>
+            {/* Login opens over this event (page or modal); afterwards they stay here and can register */}
+            <PortalAuthLink mode="login" stay className="btn btn-gold btn-lg btn-block">Log in to register</PortalAuthLink>
+            <p className="ev-register__hint">Registration is for MCU alumni with an Alumni Portal account. <PortalAuthLink mode="register">Create one</PortalAuthLink></p>
           </>
         )
       ) : account?.status !== 'verified' ? (
